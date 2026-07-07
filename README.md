@@ -43,3 +43,7 @@ After rebuilding, reload the extension from `chrome://extensions/`.
 ## Current Behavior
 
 Markdown preview tables are wrapped in a horizontal scroll container so long cell content does not force every column to become narrow.
+
+## License
+
+MIT
