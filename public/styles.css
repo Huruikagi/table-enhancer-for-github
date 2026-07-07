@@ -1,0 +1,23 @@
+.github-table-enhancer-scroll {
+  margin-block: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-gutter: stable;
+}
+
+.github-table-enhancer-scroll > table {
+  margin-block: 0 !important;
+  min-width: max-content;
+  width: max-content;
+}
+
+.github-table-enhancer-scroll > table th,
+.github-table-enhancer-scroll > table td {
+  white-space: nowrap;
+}
+
+.github-table-enhancer-scroll > table td code,
+.github-table-enhancer-scroll > table th code {
+  white-space: nowrap;
+}

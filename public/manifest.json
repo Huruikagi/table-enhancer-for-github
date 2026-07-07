@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Table Enhancer",
+  "version": "0.1.0",
+  "description": "Makes wide tables easier to read in GitHub Markdown file previews.",
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/*/blob/*/*.md"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
