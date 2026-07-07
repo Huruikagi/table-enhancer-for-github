@@ -5,5 +5,5 @@ await build({
   outfile: "dist/content.js",
   bundle: true,
   format: "iife",
-  target: "es2020"
+  target: "es2020",
 });

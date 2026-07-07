@@ -8,12 +8,18 @@
   "scripts": {
     "build": "node scripts/clean.mjs && pnpm check && node scripts/build.mjs && node scripts/copy-static.mjs",
     "check": "tsc --noEmit",
-    "test": "vitest run"
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "verify": "pnpm lint && pnpm test && pnpm build"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.2",
     "esbuild": "^0.25.5",
     "jsdom": "^26.1.0",
-    "vitest": "^3.2.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

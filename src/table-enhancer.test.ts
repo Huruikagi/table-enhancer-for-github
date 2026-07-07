@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   enhanceTables,
   findMarkdownContainer,
   isMarkdownBlobPage,
   TABLE_WRAPPER_CLASS,
-  wrapTable
+  wrapTable,
 } from "./table-enhancer";
 
 function setPathname(pathname: string): void {

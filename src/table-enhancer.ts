@@ -6,9 +6,7 @@ export function isMarkdownBlobPage(pathname = window.location.pathname): boolean
 
 export function findMarkdownContainer(root: ParentNode = document): ParentNode {
   return (
-    root.querySelector(".markdown-body") ??
-    root.querySelector("[data-testid='readme']") ??
-    root
+    root.querySelector(".markdown-body") ?? root.querySelector("[data-testid='readme']") ?? root
   );
 }
 
@@ -49,7 +47,7 @@ export function startTableEnhancer(): MutationObserver {
 
   observer.observe(document.documentElement, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
 
   return observer;

@@ -6,8 +6,8 @@
   scrollbar-gutter: stable;
 }
 
-.github-table-enhancer-scroll > table {
-  margin-block: 0 !important;
+.markdown-body .github-table-enhancer-scroll > table {
+  margin-block: 0;
   min-width: max-content;
   width: max-content;
 }
