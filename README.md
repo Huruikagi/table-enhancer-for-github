@@ -29,16 +29,7 @@ pnpm format
 pnpm test
 ```
 
-This project pins Node and pnpm in `.mise.toml`. If `pnpm` is not on your PATH, run commands through mise:
-
-```shell
-mise exec --command "pnpm install"
-mise exec --command "pnpm build"
-mise exec --command "pnpm check"
-mise exec --command "pnpm lint"
-mise exec --command "pnpm format"
-mise exec --command "pnpm test"
-```
+This project pins Node and pnpm in `.mise.toml`.
 
 After rebuilding, reload the extension from `chrome://extensions/`.
 

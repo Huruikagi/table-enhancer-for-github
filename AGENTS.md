@@ -11,9 +11,9 @@
 ## Project commands
 
 - Use `mise install` to install the pinned tool versions.
-- Use `mise exec --command "pnpm install"` to install dependencies when needed.
-- Use `mise exec --command "pnpm check"` for TypeScript checks.
-- Use `mise exec --command "pnpm lint"` for linting and formatting checks.
-- Use `mise exec --command "pnpm format"` to apply formatting.
-- Use `mise exec --command "pnpm test"` for unit tests.
-- Use `mise exec --command "pnpm build"` to build the Chrome extension into `dist`.
+- Use `pnpm install` to install dependencies when needed.
+- Use `pnpm check` for TypeScript checks.
+- Use `pnpm lint` for linting and formatting checks.
+- Use `pnpm format` to apply formatting.
+- Use `pnpm test` for unit tests.
+- Use `pnpm build` to build the Chrome extension into `dist`.
