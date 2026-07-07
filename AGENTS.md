@@ -5,6 +5,8 @@
 - Before starting meaningful work on a branch with an upstream, fetch and fast-forward it when the worktree is clean.
 - Use `git pull --ff-only` for this. Do not merge remote changes into a dirty worktree.
 - If the branch cannot fast-forward or the worktree is dirty, report the situation instead of auto-resolving it.
+- After pulling remote changes, if `.mise.toml` changed, run `mise install` before running checks.
+- After pulling remote changes, if `package.json` or `pnpm-lock.yaml` changed, run `pnpm install` before running checks.
 - After making meaningful changes in this workspace, run the relevant checks before finishing.
 - Commit completed work with a concise message.
 - Push committed work to the configured GitHub remote when the local branch has an upstream.
