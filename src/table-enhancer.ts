@@ -175,14 +175,112 @@ export class TableControlsElement extends HTMLElement {
   }
 }
 
-export function defineTableControlsElement(): void {
-  if (!customElements.get(TABLE_CONTROLS_TAG)) {
-    customElements.define(TABLE_CONTROLS_TAG, TableControlsElement);
-  }
+function getCustomElementRegistry(): CustomElementRegistry | null {
+  return window.customElements ?? null;
 }
 
-function createTableControls(table: HTMLTableElement): TableControlsElement {
-  defineTableControlsElement();
+export function defineTableControlsElement(): boolean {
+  const registry = getCustomElementRegistry();
+
+  if (!registry) {
+    return false;
+  }
+
+  if (!registry.get(TABLE_CONTROLS_TAG)) {
+    registry.define(TABLE_CONTROLS_TAG, TableControlsElement);
+  }
+
+  return true;
+}
+
+function createFallbackTableControls(table: HTMLTableElement): HTMLElement {
+  const controls = document.createElement(TABLE_CONTROLS_TAG);
+  controls.classList.add(TABLE_CONTROLS_CLASS);
+
+  let isOpen = false;
+  let values: FreezeOptions = { rows: 0, columns: 0 };
+  const limits: FreezeOptions = {
+    rows: table.rows.length,
+    columns: table.rows[0]?.cells.length ?? 0,
+  };
+
+  const setValues = (nextValues: FreezeOptions): void => {
+    values = {
+      rows: clampInteger(nextValues.rows, 0, limits.rows),
+      columns: clampInteger(nextValues.columns, 0, limits.columns),
+    };
+  };
+
+  const applyValues = (): void => {
+    applyTableFreeze(table, values);
+  };
+
+  const render = (): void => {
+    controls.replaceChildren();
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = TABLE_CONTROLS_TOGGLE_CLASS;
+    toggle.setAttribute("aria-expanded", String(isOpen));
+    toggle.textContent = "Freeze";
+    toggle.addEventListener("click", () => {
+      isOpen = !isOpen;
+      render();
+    });
+    controls.append(toggle);
+
+    if (!isOpen) {
+      return;
+    }
+
+    const panel = document.createElement("div");
+    panel.className = TABLE_CONTROLS_PANEL_CLASS;
+
+    const createInput = (kind: FreezeInputKind, labelText: string): HTMLInputElement => {
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = "0";
+      input.max = String(limits[kind]);
+      input.value = String(values[kind]);
+      input.inputMode = "numeric";
+      input.setAttribute("aria-label", labelText);
+      input.addEventListener("change", () => {
+        setValues({ ...values, [kind]: Number(input.value) });
+        input.value = String(values[kind]);
+        applyValues();
+      });
+
+      return input;
+    };
+
+    const rowsInput = createInput("rows", "Frozen rows");
+    const columnsInput = createInput("columns", "Frozen columns");
+    const resetButton = document.createElement("button");
+    resetButton.type = "button";
+    resetButton.textContent = "Reset";
+    resetButton.addEventListener("click", () => {
+      setValues({ rows: 0, columns: 0 });
+      render();
+      applyValues();
+    });
+
+    const rowsLabel = document.createElement("label");
+    rowsLabel.append("Rows", rowsInput);
+    const columnsLabel = document.createElement("label");
+    columnsLabel.append("Columns", columnsInput);
+    panel.append(rowsLabel, columnsLabel, resetButton);
+    controls.append(panel);
+  };
+
+  render();
+
+  return controls;
+}
+
+function createTableControls(table: HTMLTableElement): HTMLElement {
+  if (!defineTableControlsElement()) {
+    return createFallbackTableControls(table);
+  }
 
   const controls = document.createElement(TABLE_CONTROLS_TAG) as TableControlsElement;
   controls.setLimits({

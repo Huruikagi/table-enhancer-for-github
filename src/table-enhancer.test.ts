@@ -93,6 +93,36 @@ describe("wrapTable", () => {
     document.body.innerHTML = "";
   });
 
+  it("keeps freeze controls working when the custom element registry is unavailable", () => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(window, "customElements");
+    Object.defineProperty(window, "customElements", { configurable: true, value: null });
+
+    try {
+      renderMarkdownTables(`
+        <table>
+          <tbody>
+            <tr><td>one</td><td>two</td></tr>
+            <tr><td>three</td><td>four</td></tr>
+          </tbody>
+        </table>
+      `);
+      const table = getTable();
+
+      wrapTable(table);
+      openFreezeControls();
+      setFreezeInput("Frozen rows", "1");
+      setFreezeInput("Frozen columns", "1");
+
+      expect(document.querySelector(TABLE_CONTROLS_TAG)).toBeInstanceOf(HTMLElement);
+      expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBe("true");
+      expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_Z_INDEX_PROPERTY)).toBe("4");
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(window, "customElements", originalDescriptor);
+      }
+    }
+  });
+
   it("wraps a table in a horizontal scroll container", () => {
     renderMarkdownTables("<table><tbody><tr><td>wide value</td></tr></tbody></table>");
     const table = getTable();
