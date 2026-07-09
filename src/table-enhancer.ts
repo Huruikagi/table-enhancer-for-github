@@ -1,3 +1,4 @@
+import { readHeadingFreezeRule, saveHeadingFreezeRule } from "./freeze-rule-storage";
 import {
   TABLE_COLUMN_RESIZE_HANDLE_CLASS,
   TABLE_CONTROLS_CLASS,
@@ -32,6 +33,31 @@ export function findMarkdownContainer(root: ParentNode = document): ParentNode {
   );
 }
 
+export function normalizeHeadingText(text: string): string {
+  return text.replace(/\s+/g, " ").trim();
+}
+
+export function findPreviousHeadingText(table: HTMLTableElement): string | null {
+  const markdownContainer =
+    table.closest(".markdown-body") ?? table.closest("[data-testid='readme']") ?? document;
+  const headings = Array.from(
+    markdownContainer.querySelectorAll<HTMLHeadingElement>("h1,h2,h3,h4,h5,h6"),
+  );
+  let previousHeadingText: string | null = null;
+
+  for (const heading of headings) {
+    if (heading.compareDocumentPosition(table) & Node.DOCUMENT_POSITION_FOLLOWING) {
+      const headingText = normalizeHeadingText(heading.textContent ?? "");
+
+      if (headingText) {
+        previousHeadingText = headingText;
+      }
+    }
+  }
+
+  return previousHeadingText;
+}
+
 export function wrapTable(table: HTMLTableElement): void {
   if (table.dataset.githubTableEnhancer === "true") {
     return;
@@ -45,7 +71,12 @@ export function wrapTable(table: HTMLTableElement): void {
 
   const wrapper = document.createElement("div");
   wrapper.className = TABLE_WRAPPER_CLASS;
-  const controls = createTableControls(table, (values) => applyTableFreeze(table, values));
+  const headingText = findPreviousHeadingText(table);
+  const controls = createTableControls(table, (values) => applyTableFreeze(table, values), {
+    defaultValuesPromise: headingText ? readHeadingFreezeRule(headingText) : null,
+    headingText,
+    onSaveDefault: headingText ? (values) => saveHeadingFreezeRule(headingText, values) : undefined,
+  });
   table.dataset.githubTableEnhancer = "true";
   parent.insertBefore(wrapper, table);
   wrapper.appendChild(controls);

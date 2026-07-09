@@ -1,6 +1,6 @@
 import type { VNode } from "preact";
 import { render } from "preact";
-import { useId, useLayoutEffect, useState } from "preact/hooks";
+import { useId, useLayoutEffect, useRef, useState } from "preact/hooks";
 import {
   HIDE_ACTION_DATA_ATTRIBUTE,
   HIDE_INDEX_DATA_ATTRIBUTE,
@@ -23,9 +23,12 @@ type FreezeInputKind = keyof FreezeOptions;
 type HideAction = "hide-row" | "hide-column";
 
 type TableControlsProps = {
+  defaultValuesPromise?: Promise<FreezeOptions | null> | null;
+  headingText?: string | null;
   table: HTMLTableElement;
   limits: FreezeOptions;
   onChange: (values: FreezeOptions) => void;
+  onSaveDefault?: (values: FreezeOptions) => Promise<void>;
 };
 
 function createHideButton(action: HideAction, index: number): HTMLButtonElement {
@@ -71,15 +74,23 @@ function installTableHideControls(table: HTMLTableElement): void {
   }
 }
 
-function TableControls({ limits, onChange, table }: TableControlsProps): VNode {
+function TableControls({
+  defaultValuesPromise,
+  headingText,
+  limits,
+  onChange,
+  onSaveDefault,
+  table,
+}: TableControlsProps): VNode {
   const inputIdPrefix = useId();
+  const hasUserEditedValues = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
   const [hiddenRows, setHiddenRows] = useState<readonly number[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
 
-  const updateValues = (nextValues: FreezeOptions): FreezeOptions => {
+  const applyValues = (nextValues: FreezeOptions): FreezeOptions => {
     const clampedValues = {
       rows: clampInteger(nextValues.rows, 0, limits.rows),
       columns: clampInteger(nextValues.columns, 0, limits.columns),
@@ -91,10 +102,32 @@ function TableControls({ limits, onChange, table }: TableControlsProps): VNode {
     return clampedValues;
   };
 
+  const updateValues = (nextValues: FreezeOptions): FreezeOptions => {
+    hasUserEditedValues.current = true;
+
+    return applyValues(nextValues);
+  };
+
   const showHidden = (): void => {
     setHiddenRows([]);
     setHiddenColumns([]);
   };
+
+  useLayoutEffect(() => {
+    let isCanceled = false;
+
+    defaultValuesPromise?.then((defaultValues) => {
+      if (!defaultValues || isCanceled || hasUserEditedValues.current) {
+        return;
+      }
+
+      applyValues(defaultValues);
+    });
+
+    return () => {
+      isCanceled = true;
+    };
+  }, [defaultValuesPromise]);
 
   useLayoutEffect(() => {
     installTableHideControls(table);
@@ -194,6 +227,11 @@ function TableControls({ limits, onChange, table }: TableControlsProps): VNode {
           <button onClick={() => updateValues({ rows: 0, columns: 0 })} type="button">
             Reset
           </button>
+          {headingText && onSaveDefault && (
+            <button onClick={() => onSaveDefault(values)} type="button">
+              Save default
+            </button>
+          )}
         </div>
       )}
     </>
@@ -203,17 +241,21 @@ function TableControls({ limits, onChange, table }: TableControlsProps): VNode {
 export function createTableControls(
   table: HTMLTableElement,
   onChange: (values: FreezeOptions) => void,
+  options: Pick<TableControlsProps, "defaultValuesPromise" | "headingText" | "onSaveDefault"> = {},
 ): HTMLElement {
   const controls = document.createElement(TABLE_CONTROLS_TAG);
   controls.classList.add(TABLE_CONTROLS_CLASS);
   render(
     <TableControls
+      defaultValuesPromise={options.defaultValuesPromise}
+      headingText={options.headingText}
       table={table}
       limits={{
         rows: table.rows.length,
         columns: table.rows[0]?.cells.length ?? 0,
       }}
       onChange={onChange}
+      onSaveDefault={options.onSaveDefault}
     />,
     controls,
   );

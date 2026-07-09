@@ -7,7 +7,8 @@ This document records the initial design for per-table freeze controls.
 - Target GitHub Markdown blob pages only, matching the current extension scope.
 - Target Markdown preview tables only.
 - Do not target issue, pull request, discussion, file list, or repository README landing page tables.
-- Do not persist values across page reloads or future visits in the initial implementation.
+- Persist explicit per-heading default freeze values with `chrome.storage.local`.
+- Use the nearest preceding Markdown heading text as the persistence key.
 
 ## User Interface
 
@@ -23,13 +24,18 @@ The panel contains:
 - Frozen rows input.
 - Frozen columns input.
 - Reset button.
+- Save default button when a preceding heading is available.
 
 Initial values:
 
-- Frozen rows: `0`.
-- Frozen columns: `0`.
+- Frozen rows: saved heading default, or `0` when no rule exists.
+- Frozen columns: saved heading default, or `0` when no rule exists.
 
 Reset returns both values to `0`.
+
+Save default persists the current frozen rows and frozen columns for the nearest preceding heading
+text. Tables without a preceding heading cannot save a default. Tables under the same heading text use
+the same saved default.
 
 ## Freeze Behavior
 
@@ -69,6 +75,8 @@ Responsibilities:
 - Render the open panel with numeric inputs and reset control.
 - Own only UI-local state for open/closed state and current input values in the Preact component.
 - Call the table freeze application logic directly when freeze values change.
+- Load a saved heading default asynchronously and apply it only if the user has not already changed
+  the current table values.
 
 Keep table behavior separate from table discovery:
 
@@ -95,9 +103,18 @@ Stacking:
 - Frozen row-only cells and frozen column-only cells need separate lower layers.
 - Background color should be applied to sticky cells so scrolled content does not show through.
 
+## Heading Default Rules
+
+Heading default rules are intentionally simple:
+
+- Key rules by normalized heading text only.
+- Apply the same rule to repeated headings and to multiple tables under the same heading.
+- Store rules in `chrome.storage.local`, not synced storage.
+- Save rules only when the user explicitly clicks Save default.
+- Do not offer saving when no heading appears before the table.
+
 ## Initial Limitations
 
 - `rowspan` and `colspan` are best effort and not part of the initial guarantee.
-- Value persistence with `chrome.storage` is out of scope.
-- Per-repository or per-path default settings are out of scope.
+- Per-repository, per-path, and per-table default settings are out of scope.
 - Right frozen columns are out of scope.

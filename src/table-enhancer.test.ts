@@ -1,10 +1,11 @@
 import { act } from "preact/test-utils";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   applyTableFreeze,
   applyTableVisibility,
   enhanceTables,
   findMarkdownContainer,
+  findPreviousHeadingText,
   isMarkdownBlobPage,
   startTableEnhancer,
   TABLE_COLUMN_RESIZE_HANDLE_CLASS,
@@ -22,6 +23,48 @@ const HIDDEN_COLUMN_DATA_ATTRIBUTE = "githubTableEnhancerHiddenColumn";
 const STICKY_TOP_PROPERTY = "--gte-sticky-top";
 const STICKY_LEFT_PROPERTY = "--gte-sticky-left";
 const STICKY_Z_INDEX_PROPERTY = "--gte-sticky-z-index";
+const FREEZE_RULE_SETTINGS_STORAGE_KEY = "githubTableEnhancerFreezeRuleSettings";
+
+type FakeChromeStorage = Record<string, unknown>;
+
+function installFakeChromeStorage(initialStorage: FakeChromeStorage = {}): FakeChromeStorage {
+  const storage = { ...initialStorage };
+
+  (
+    globalThis as typeof globalThis & {
+      chrome?: unknown;
+    }
+  ).chrome = {
+    storage: {
+      local: {
+        async get(key: string): Promise<Record<string, unknown>> {
+          return { [key]: storage[key] };
+        },
+        async set(items: Record<string, unknown>): Promise<void> {
+          Object.assign(storage, items);
+        },
+      },
+    },
+  };
+
+  return storage;
+}
+
+function uninstallFakeChromeStorage(): void {
+  delete (
+    globalThis as typeof globalThis & {
+      chrome?: unknown;
+    }
+  ).chrome;
+}
+
+async function flushPromises(): Promise<void> {
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+}
 
 function setPathname(pathname: string): void {
   window.history.replaceState(null, "", pathname);
@@ -116,9 +159,39 @@ describe("findMarkdownContainer", () => {
   });
 });
 
+describe("findPreviousHeadingText", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("uses the nearest preceding Markdown heading text", () => {
+    renderMarkdownTables(`
+      <h2>First Section</h2>
+      <table id="first"><tbody><tr><td>one</td></tr></tbody></table>
+      <h3>  Release   Matrix  </h3>
+      <p>Details</p>
+      <table id="second"><tbody><tr><td>two</td></tr></tbody></table>
+    `);
+
+    expect(findPreviousHeadingText(getTable("#first"))).toBe("First Section");
+    expect(findPreviousHeadingText(getTable("#second"))).toBe("Release Matrix");
+  });
+
+  it("returns null when no heading precedes the table", () => {
+    renderMarkdownTables("<table><tbody><tr><td>one</td></tr></tbody></table><h2>Later</h2>");
+
+    expect(findPreviousHeadingText(getTable())).toBeNull();
+  });
+});
+
 describe("wrapTable", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
+    uninstallFakeChromeStorage();
+  });
+
+  afterEach(() => {
+    uninstallFakeChromeStorage();
   });
 
   it("wraps a table in a horizontal scroll container", () => {
@@ -169,6 +242,82 @@ describe("wrapTable", () => {
     expect(table.rows[0]?.cells[1]?.style.getPropertyValue(STICKY_Z_INDEX_PROPERTY)).toBe("3");
     expect(table.rows[1]?.cells[0]?.style.getPropertyValue(STICKY_Z_INDEX_PROPERTY)).toBe("2");
     expect(table.rows[1]?.cells[1]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+  });
+
+  it("applies a saved heading freeze rule as the initial value", async () => {
+    installFakeChromeStorage({
+      [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
+        version: 1,
+        headingRules: {
+          "Release Matrix": { rows: 1, columns: 1 },
+        },
+      },
+    });
+    renderMarkdownTables(`
+      <h2>Release Matrix</h2>
+      <table>
+        <tbody>
+          <tr><td>one</td><td>two</td></tr>
+          <tr><td>three</td><td>four</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    await flushPromises();
+
+    expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBe("true");
+    expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_TOP_PROPERTY)).toBe("0px");
+    expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("0px");
+  });
+
+  it("saves explicit freeze values for the preceding heading", async () => {
+    const storage = installFakeChromeStorage();
+    renderMarkdownTables(`
+      <h2>Release Matrix</h2>
+      <table>
+        <tbody>
+          <tr><td>one</td><td>two</td></tr>
+          <tr><td>three</td><td>four</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    openFreezeControls();
+    setFreezeInput("Frozen rows", "1");
+    setFreezeInput("Frozen columns", "1");
+    clickButton("Save default");
+    await flushPromises();
+
+    expect(storage[FREEZE_RULE_SETTINGS_STORAGE_KEY]).toEqual({
+      version: 1,
+      headingRules: {
+        "Release Matrix": { rows: 1, columns: 1 },
+      },
+    });
+  });
+
+  it("does not show the save default control without a preceding heading", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>one</td><td>two</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    openFreezeControls();
+
+    expect(
+      Array.from(document.querySelectorAll<HTMLButtonElement>("button")).some(
+        (button) => button.textContent === "Save default",
+      ),
+    ).toBe(false);
   });
 
   it("adds hover controls that hide rows and columns", () => {

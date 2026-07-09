@@ -9,6 +9,10 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Normal-width tables should still look like regular GitHub Markdown tables.
 - Each enhanced table should show a compact Freeze control above the table.
 - Opening the Freeze control should show inputs for frozen rows and frozen columns.
+- Tables with a preceding heading should show a Save default button in the Freeze control.
+- Tables without a preceding heading should not offer Save default.
+- Clicking Save default should persist the current rows and columns for the nearest preceding heading text.
+- Reloading the page should apply the saved default to tables with the same preceding heading text.
 - Hovering a table header cell should show a column hide button.
 - Hovering the first cell in a row should show a row hide button.
 - Dragging a column edge should resize that displayed column without changing the surrounding GitHub layout.
@@ -58,7 +62,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 03 | Rows | Set Rows to `1`. | The first row stays visible while scrolling down. |
 | 04 | Rows | Set Rows to `2`. | The first two rows stay visible with a clear separator below the second frozen row. |
 | 05 | Columns | Set Columns to `1`. | The first column stays visible while scrolling horizontally. |
-| 06 | Combined | Keep Rows at `2` and Columns at `1`. | The top-left frozen cells stay above the rest of the table. |
+| 06 | Defaults | Click Save default. | The current Rows `2` and Columns `1` values are saved for `Long Table For Frozen Rows`. |
 | 07 | Scroll | Drag the vertical scrollbar near the middle. | Lower rows become visible without moving the frozen rows. |
 | 08 | Scroll | Drag the vertical scrollbar near the bottom. | The last rows can be reached inside the wrapper. |
 | 09 | Scroll | Drag the horizontal scrollbar away from the left edge. | Frozen columns remain visible. |
@@ -82,7 +86,8 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 27 | Restore | Open the Freeze control and click Show hidden. | Hidden rows and columns are restored. |
 | 28 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
 | 29 | Content | Scroll to the final row below. | All body rows should be reachable. |
-| 30 | Final | Confirm the bottom of the table is visible. | No content should be clipped below the wrapper. |
+| 30 | Reload | Reload the page and return to this table. | Rows `2` and Columns `1` are applied automatically from the heading default. |
+| 31 | Final | Confirm the bottom of the table is visible. | No content should be clipped below the wrapper. |
 
 ## Normal-Width Control Table
 
