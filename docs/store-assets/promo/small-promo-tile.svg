@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="280" viewBox="0 0 440 280" role="img" aria-labelledby="title desc">
+  <title id="title">Table Enhancer for GitHub promo tile</title>
+  <desc id="desc">A small promotional tile showing the extension icon and a stylized wide table preview.</desc>
+  <rect width="440" height="280" fill="#f6f8fa"/>
+  <rect x="30" y="34" width="380" height="212" rx="18" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+  <rect x="48" y="54" width="92" height="92" rx="22" fill="#24292f"/>
+  <rect x="66" y="74" width="56" height="50" rx="7" fill="#f6f8fa"/>
+  <path d="M66 81c0-3.9 3.1-7 7-7h42c3.9 0 7 3.1 7 7v9H66v-9Z" fill="#2da44e"/>
+  <rect x="66" y="90" width="15" height="34" fill="#dbeafe"/>
+  <path d="M81 74v50M99 74v50M66 90h56M66 107h56" fill="none" stroke="#57606a" stroke-width="3"/>
+  <rect x="66" y="74" width="56" height="50" rx="7" fill="none" stroke="#f6f8fa" stroke-width="4"/>
+  <path d="M110 110h8v8M118 110l-14 14" fill="none" stroke="#0969da" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="158" y="84" fill="#24292f" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700">Table Enhancer</text>
+  <text x="159" y="112" fill="#57606a" font-family="Arial, Helvetica, sans-serif" font-size="16">for GitHub Markdown previews</text>
+  <g transform="translate(50 168)">
+    <rect width="340" height="54" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="2"/>
+    <rect width="340" height="18" rx="8" fill="#2da44e"/>
+    <path d="M0 18h340M0 36h340M80 0v54M172 0v54M260 0v54" stroke="#d0d7de" stroke-width="2"/>
+    <rect x="0" y="18" width="80" height="36" fill="#dbeafe" opacity="0.85"/>
+    <path d="M0 18h340M0 36h340M80 0v54M172 0v54M260 0v54" stroke="#d0d7de" stroke-width="2"/>
+    <rect x="9" y="25" width="46" height="4" rx="2" fill="#8c959f"/>
+    <rect x="92" y="25" width="58" height="4" rx="2" fill="#8c959f"/>
+    <rect x="184" y="25" width="52" height="4" rx="2" fill="#8c959f"/>
+    <rect x="272" y="25" width="42" height="4" rx="2" fill="#8c959f"/>
+    <rect x="9" y="43" width="34" height="4" rx="2" fill="#8c959f"/>
+    <rect x="92" y="43" width="66" height="4" rx="2" fill="#8c959f"/>
+    <rect x="184" y="43" width="44" height="4" rx="2" fill="#8c959f"/>
+    <rect x="272" y="43" width="50" height="4" rx="2" fill="#8c959f"/>
+  </g>
+  <text x="52" y="239" fill="#57606a" font-family="Arial, Helvetica, sans-serif" font-size="13">Freeze rows and columns. Hide and resize wide tables.</text>
+</svg>
