@@ -451,6 +451,50 @@ describe("wrapTable", () => {
     expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[1]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
   });
+
+  it("resets all per-table view changes from the table controls", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>one long value</td><td>two</td></tr>
+          <tr><td>three</td><td>four</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    openFreezeControls();
+    setFreezeInput("Frozen rows", "1");
+    setFreezeInput("Frozen columns", "1");
+    clickButton("Hide row 2");
+    clickButton("Hide column 2");
+    clickButton("Wrap");
+
+    const handle = table.querySelector<HTMLElement>(`.${TABLE_COLUMN_RESIZE_HANDLE_CLASS}`);
+    act(() => {
+      handle?.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientX: 100 }));
+      window.dispatchEvent(new MouseEvent("pointermove", { clientX: 132 }));
+      window.dispatchEvent(new MouseEvent("pointerup", { clientX: 132 }));
+    });
+
+    expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBe("true");
+    expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBe("true");
+    expect(table.dataset.githubTableEnhancerWrappedColumns).toBe("true");
+    expect(table.dataset.githubTableEnhancerResizedColumns).toBe("true");
+
+    clickButton("Reset table view");
+
+    expect(getFreezeInput("Frozen rows").value).toBe("0");
+    expect(getFreezeInput("Frozen columns").value).toBe("0");
+    expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.dataset.githubTableEnhancerWrappedColumns).toBeUndefined();
+    expect(table.dataset.githubTableEnhancerResizedColumns).toBeUndefined();
+    expect(table.style.width).toBe("");
+    expect(table.querySelector<HTMLTableColElement>("col")?.style.width).toBe("");
+  });
 });
 
 describe("applyTableFreeze", () => {
