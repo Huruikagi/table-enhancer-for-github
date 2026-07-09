@@ -9,6 +9,7 @@ export const TABLE_CONTROLS_PANEL_CLASS = "github-table-enhancer-controls-panel"
 export const TABLE_CONTROLS_TOGGLE_CLASS = "github-table-enhancer-controls-toggle";
 const STICKY_CELL_DATA_ATTRIBUTE = "githubTableEnhancerSticky";
 const STICKY_CELL_SELECTOR = "[data-github-table-enhancer-sticky='true']";
+const FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE = "githubTableEnhancerFrozenRowBoundary";
 const FROZEN_ROWS_DATA_ATTRIBUTE = "githubTableEnhancerFrozenRows";
 const STICKY_TOP_PROPERTY = "--gte-sticky-top";
 const STICKY_LEFT_PROPERTY = "--gte-sticky-left";
@@ -22,6 +23,7 @@ type FreezeOptions = {
 type FreezeInputKind = keyof FreezeOptions;
 type StickyCellLayout = {
   cell: HTMLTableCellElement;
+  isFrozenRowBoundary: boolean;
   top: number | null;
   left: number | null;
   zIndex: number;
@@ -155,6 +157,7 @@ function resetTableFreeze(table: HTMLTableElement): void {
 
   for (const cell of stickyCells) {
     delete cell.dataset[STICKY_CELL_DATA_ATTRIBUTE];
+    delete cell.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE];
     cell.style.removeProperty(STICKY_TOP_PROPERTY);
     cell.style.removeProperty(STICKY_LEFT_PROPERTY);
     cell.style.removeProperty(STICKY_Z_INDEX_PROPERTY);
@@ -206,6 +209,7 @@ function getStickyCellLayouts(table: HTMLTableElement, options: FreezeOptions): 
 
   rows.forEach((row, rowIndex) => {
     const isFrozenRow = rowIndex < options.rows;
+    const isFrozenRowBoundary = rowIndex === options.rows - 1;
     let left = 0;
 
     Array.from(row.cells).forEach((cell, columnIndex) => {
@@ -217,6 +221,7 @@ function getStickyCellLayouts(table: HTMLTableElement, options: FreezeOptions): 
 
       layouts.push({
         cell,
+        isFrozenRowBoundary,
         top: isFrozenRow ? top : null,
         left: isFrozenColumn ? left : null,
         zIndex: getStickyZIndex(isFrozenRow, isFrozenColumn),
@@ -235,9 +240,19 @@ function getStickyCellLayouts(table: HTMLTableElement, options: FreezeOptions): 
   return layouts;
 }
 
-function applyStickyCellLayout({ cell, top, left, zIndex }: StickyCellLayout): void {
+function applyStickyCellLayout({
+  cell,
+  isFrozenRowBoundary,
+  top,
+  left,
+  zIndex,
+}: StickyCellLayout): void {
   cell.dataset[STICKY_CELL_DATA_ATTRIBUTE] = "true";
   cell.style.setProperty(STICKY_Z_INDEX_PROPERTY, String(zIndex));
+
+  if (isFrozenRowBoundary) {
+    cell.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE] = "true";
+  }
 
   if (top !== null) {
     cell.style.setProperty(STICKY_TOP_PROPERTY, `${top}px`);

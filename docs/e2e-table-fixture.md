@@ -10,6 +10,7 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Each enhanced table should show a compact Freeze control above the table.
 - Opening the Freeze control should show inputs for frozen rows and frozen columns.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.
+- The last frozen row should show a clear bottom separator while the table scrolls vertically.
 - When frozen rows are enabled, long tables may scroll vertically inside the table wrapper.
 - Setting frozen columns should keep the first N left columns fully visible while scrolling horizontally, including after dragging the table scrollbar away from the left edge.
 - Reset should return both freeze values to `0` and remove sticky row and column behavior.
@@ -47,7 +48,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 01 | Setup | Open this fixture from a GitHub Markdown blob page. | The Freeze control appears above this table. |
 | 02 | Setup | Open the Freeze control. | Rows and Columns inputs are visible. |
 | 03 | Rows | Set Rows to `1`. | The first row stays visible while scrolling down. |
-| 04 | Rows | Set Rows to `2`. | The first two rows stay visible while scrolling down. |
+| 04 | Rows | Set Rows to `2`. | The first two rows stay visible with a clear separator below the second frozen row. |
 | 05 | Columns | Set Columns to `1`. | The first column stays visible while scrolling horizontally. |
 | 06 | Combined | Keep Rows at `2` and Columns at `1`. | The top-left frozen cells stay above the rest of the table. |
 | 07 | Scroll | Drag the vertical scrollbar near the middle. | Lower rows become visible without moving the frozen rows. |

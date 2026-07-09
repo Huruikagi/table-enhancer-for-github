@@ -12,6 +12,7 @@ import {
 } from "./table-enhancer";
 
 const STICKY_CELL_DATA_ATTRIBUTE = "githubTableEnhancerSticky";
+const FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE = "githubTableEnhancerFrozenRowBoundary";
 const STICKY_TOP_PROPERTY = "--gte-sticky-top";
 const STICKY_LEFT_PROPERTY = "--gte-sticky-left";
 const STICKY_Z_INDEX_PROPERTY = "--gte-sticky-z-index";
@@ -171,9 +172,31 @@ describe("applyTableFreeze", () => {
     applyTableFreeze(table, { rows: 0, columns: 0 });
 
     expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[0]?.cells[0]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_TOP_PROPERTY)).toBe("");
     expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("");
     expect(table.rows[0]?.cells[0]?.style.getPropertyValue(STICKY_Z_INDEX_PROPERTY)).toBe("");
+  });
+
+  it("marks only the final frozen row as the row boundary", () => {
+    document.body.innerHTML = `
+      <table>
+        <tbody>
+          <tr><td>one</td><td>two</td></tr>
+          <tr><td>three</td><td>four</td></tr>
+          <tr><td>five</td><td>six</td></tr>
+        </tbody>
+      </table>
+    `;
+    const table = getTable();
+
+    applyTableFreeze(table, { rows: 2, columns: 1 });
+
+    expect(table.rows[0]?.cells[0]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[0]?.cells[1]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[1]?.cells[0]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBe("true");
+    expect(table.rows[1]?.cells[1]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBe("true");
+    expect(table.rows[2]?.cells[0]?.dataset[FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE]).toBeUndefined();
   });
 });
 
