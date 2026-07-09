@@ -96,6 +96,7 @@ function TableControls({
 }: TableControlsProps): VNode {
   const inputIdPrefix = useId();
   const hasUserEditedValues = useRef(false);
+  const freezeToggleRef = useRef<HTMLButtonElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
@@ -251,6 +252,11 @@ function TableControls({
     [onChange, table, values],
   );
 
+  const closeFreezePanel = (): void => {
+    setIsOpen(false);
+    freezeToggleRef.current?.focus();
+  };
+
   const createNumberInput = (kind: FreezeInputKind, label: string) => (
     <input
       aria-label={label}
@@ -263,6 +269,15 @@ function TableControls({
         const clampedValues = updateValues({ ...values, [kind]: Number(input.value) });
         input.value = String(clampedValues[kind]);
       }}
+      onKeyDown={(event) => {
+        if (event.key !== "Escape") {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        closeFreezePanel();
+      }}
       type="number"
       value={String(values[kind])}
     />
@@ -274,6 +289,7 @@ function TableControls({
         aria-expanded={isOpen}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
         onClick={() => setIsOpen((currentValue) => !currentValue)}
+        ref={freezeToggleRef}
         type="button"
       >
         Freeze

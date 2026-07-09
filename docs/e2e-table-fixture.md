@@ -64,6 +64,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | --- | --- | --- | --- |
 | 01 | Setup | Open this fixture from a GitHub Markdown blob page. | The Freeze control appears above this table. |
 | 02 | Setup | Open the Freeze control. | Rows and Columns inputs are visible. |
+| 02a | Keyboard | Focus the Rows or Columns input, then press Escape. | The Freeze control panel closes and focus returns to the Freeze button. |
 | 03 | Rows | Set Rows to `1`. | The first row stays visible while scrolling down. |
 | 04 | Rows | Set Rows to `2`. | The first two rows stay visible with a clear separator below the second frozen row. |
 | 05 | Columns | Set Columns to `1`. | The first column stays visible while scrolling horizontally. |
