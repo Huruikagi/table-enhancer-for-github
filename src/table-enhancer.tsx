@@ -1,6 +1,6 @@
-import type { ComponentChild, VNode } from "preact";
-import { Fragment, h, render } from "preact";
-import { useState } from "preact/hooks";
+import type { VNode } from "preact";
+import { render } from "preact";
+import { useId, useState } from "preact/hooks";
 
 export const TABLE_WRAPPER_CLASS = "github-table-enhancer-scroll";
 export const TABLE_CONTROLS_TAG = "gte-table-controls";
@@ -50,11 +50,8 @@ type TableControlsProps = {
   onChange: (values: FreezeOptions) => void;
 };
 
-function createInputLabel(text: string, input: ComponentChild): VNode {
-  return h("label", null, text, input);
-}
-
 function TableControls({ limits, onChange }: TableControlsProps): VNode {
+  const inputIdPrefix = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
 
@@ -70,49 +67,49 @@ function TableControls({ limits, onChange }: TableControlsProps): VNode {
     return clampedValues;
   };
 
-  const createNumberInput = (kind: FreezeInputKind, label: string) =>
-    h("input", {
-      "aria-label": label,
-      inputMode: "numeric",
-      max: String(limits[kind]),
-      min: "0",
-      onChange: (event: Event) => {
-        const input = event.currentTarget as HTMLInputElement;
+  const createNumberInput = (kind: FreezeInputKind, label: string) => (
+    <input
+      aria-label={label}
+      id={`${inputIdPrefix}-${kind}`}
+      inputMode="numeric"
+      max={String(limits[kind])}
+      min="0"
+      onChange={(event) => {
+        const input = event.currentTarget;
         const clampedValues = updateValues({ ...values, [kind]: Number(input.value) });
         input.value = String(clampedValues[kind]);
-      },
-      type: "number",
-      value: String(values[kind]),
-    });
+      }}
+      type="number"
+      value={String(values[kind])}
+    />
+  );
 
-  return h(
-    Fragment,
-    null,
-    h(
-      "button",
-      {
-        "aria-expanded": String(isOpen),
-        className: TABLE_CONTROLS_TOGGLE_CLASS,
-        onClick: () => setIsOpen((currentValue) => !currentValue),
-        type: "button",
-      },
-      "Freeze",
-    ),
-    isOpen &&
-      h(
-        "div",
-        { className: TABLE_CONTROLS_PANEL_CLASS },
-        createInputLabel("Rows", createNumberInput("rows", "Frozen rows")),
-        createInputLabel("Columns", createNumberInput("columns", "Frozen columns")),
-        h(
-          "button",
-          {
-            onClick: () => updateValues({ rows: 0, columns: 0 }),
-            type: "button",
-          },
-          "Reset",
-        ),
-      ),
+  return (
+    <>
+      <button
+        aria-expanded={isOpen}
+        className={TABLE_CONTROLS_TOGGLE_CLASS}
+        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        type="button"
+      >
+        Freeze
+      </button>
+      {isOpen && (
+        <div className={TABLE_CONTROLS_PANEL_CLASS}>
+          <label htmlFor={`${inputIdPrefix}-rows`}>
+            Rows
+            {createNumberInput("rows", "Frozen rows")}
+          </label>
+          <label htmlFor={`${inputIdPrefix}-columns`}>
+            Columns
+            {createNumberInput("columns", "Frozen columns")}
+          </label>
+          <button onClick={() => updateValues({ rows: 0, columns: 0 })} type="button">
+            Reset
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -120,13 +117,13 @@ function createTableControls(table: HTMLTableElement): HTMLElement {
   const controls = document.createElement(TABLE_CONTROLS_TAG);
   controls.classList.add(TABLE_CONTROLS_CLASS);
   render(
-    h(TableControls, {
-      limits: {
+    <TableControls
+      limits={{
         rows: table.rows.length,
         columns: table.rows[0]?.cells.length ?? 0,
-      },
-      onChange: (values) => applyTableFreeze(table, values),
-    }),
+      }}
+      onChange={(values) => applyTableFreeze(table, values)}
+    />,
     controls,
   );
 
