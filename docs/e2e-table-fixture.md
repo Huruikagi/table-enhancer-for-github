@@ -60,7 +60,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 11 | Reapply | Set Rows to `1` again. | Sticky row styles are applied again cleanly. |
 | 12 | Reapply | Set Columns to `2`. | The first two columns stay visible with a clear separator to the right of the second frozen column. |
 | 13 | Content | Confirm this row remains readable. | Body rows should not overlap the frozen row. |
-| 14 | Content | Confirm alternating nearby rows remain readable. | Sticky backgrounds should cover scrolled content. |
+| 14 | Content | Confirm alternating nearby rows remain readable. | Sticky backgrounds should cover scrolled content without text showing through cell seams. |
 | 15 | Content | Scroll slowly through this section. | There should be no jumpy table resizing. |
 | 16 | Content | Scroll quickly through this section. | The frozen row should stay anchored to the wrapper. |
 | 17 | Content | Stop with this row near the top. | Text should not render on top of frozen cells. |

@@ -73,6 +73,8 @@
 }
 
 .markdown-body .github-table-enhancer-scroll > table {
+  border-collapse: separate;
+  border-spacing: 0;
   display: table;
   margin-block: 0;
   max-width: none;
