@@ -4,23 +4,32 @@
   <img src="public/icons/icon128.png" width="128" height="128" alt="Table Enhancer for GitHub icon">
 </p>
 
-A small, unofficial Chrome extension that makes wide tables easier to read in GitHub Markdown file previews.
+A small, unofficial Chrome extension that makes wide tables easier to read and review in GitHub Markdown file previews.
 
 ## Scope
 
 - Runs only on GitHub Markdown blob file preview pages, such as `https://github.com/owner/repo/blob/main/docs/file.md`.
 - Does not run on issues, pull requests, discussions, repository README landing pages, or rendered Markdown outside GitHub blob views.
-- Uses a content script only; no extra permissions are required.
+- Uses a content script on GitHub Markdown blob pages and the `storage` permission for heading-based freeze defaults.
 - This project is not affiliated with, sponsored by, or endorsed by GitHub.
+
+## Features
+
+- Wraps Markdown preview tables in a horizontal scroll container so wide rows remain readable.
+- Adds a compact Freeze control for keeping the first N displayed rows or columns visible while scrolling.
+- Saves Freeze defaults per nearest preceding heading, then reapplies them when the same heading is viewed again.
+- Lets you temporarily hide displayed rows or columns and restore them with Show hidden.
+- Lets you drag column edges to resize displayed columns during review.
 
 ## Local Install
 
-1. Install dependencies with `pnpm install`.
-2. Build the extension with `pnpm build` for production output, or `pnpm build:dev` for a development build with source maps.
-3. Open `chrome://extensions/`.
-4. Enable Developer mode.
-5. Click **Load unpacked**.
-6. Select the generated `dist` folder.
+1. Install the pinned tool versions with `mise install`.
+2. Install dependencies with `pnpm install`.
+3. Build the extension with `pnpm build` for production output, or `pnpm build:dev` for a development build with source maps.
+4. Open `chrome://extensions/`.
+5. Enable Developer mode.
+6. Click **Load unpacked**.
+7. Select the generated `dist` folder.
 
 ## Development
 
@@ -31,11 +40,12 @@ pnpm build:dev
 pnpm build
 pnpm check
 pnpm lint
+pnpm lint:fix
 pnpm format
 pnpm test
 ```
 
-This project pins Node and pnpm in `.mise.toml`.
+This project pins Node and pnpm in `.mise.toml`, and `package.json` pins the expected pnpm release through `packageManager`.
 
 After rebuilding, reload the extension from `chrome://extensions/`.
 
@@ -46,10 +56,16 @@ After rebuilding, reload the extension from `chrome://extensions/`.
 3. Click **Load unpacked**.
 4. Select the `dist` folder after running `pnpm build`.
 
-## Current Behavior
+## Behavior
 
 Markdown preview tables are wrapped in a horizontal scroll container so long cell content does not force every column to become narrow.
-Each table also gets a compact Freeze control for temporarily freezing the first N displayed rows and the first N left columns.
+Each table gets compact controls above it. The Freeze panel can temporarily freeze the first N displayed rows and the first N left columns, reset those values, and save defaults for tables that have a preceding heading.
+
+Hide buttons appear while hovering table cells. Row hide buttons appear on the first cell in each row, and column hide buttons appear on header cells. Hidden rows and columns are temporary and can be restored with Show hidden.
+
+Column resize handles appear on the table's header row. Dragging a handle changes that displayed column's width without changing the surrounding GitHub layout.
+
+For manual Chrome checks, use [docs/e2e-table-fixture.md](docs/e2e-table-fixture.md) from a GitHub Markdown blob page.
 
 ## License
 
