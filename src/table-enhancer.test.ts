@@ -413,6 +413,29 @@ describe("wrapTable", () => {
     expect(document.activeElement).toBe(getInput("Filter rows"));
   });
 
+  it("keeps the freeze and filter panels mutually exclusive", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>Runtime</td><td>Status</td></tr>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    openFreezeControls();
+    expect(getFreezeInput("Frozen rows")).toBeInstanceOf(HTMLInputElement);
+
+    clickButton("Filter");
+    expect(document.querySelector("input[aria-label='Frozen rows']")).toBeNull();
+    expect(getInput("Filter rows")).toBeInstanceOf(HTMLInputElement);
+
+    clickButton("Freeze");
+    expect(document.querySelector("input[aria-label='Filter rows']")).toBeNull();
+    expect(getFreezeInput("Frozen rows")).toBeInstanceOf(HTMLInputElement);
+  });
+
   it("filters body rows by matching row text", () => {
     renderMarkdownTables(`
       <table>
@@ -747,12 +770,14 @@ describe("wrapTable", () => {
 
     clickButton("Reset table view");
 
+    expect(getInput("Filter rows").value).toBe("");
+    clickButton("Freeze");
+
     expect(getFreezeInput("Frozen rows").value).toBe("0");
     expect(getFreezeInput("Frozen columns").value).toBe("0");
     expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[2]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBeUndefined();
-    expect(getInput("Filter rows").value).toBe("");
     expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.dataset.githubTableEnhancerWrappedColumns).toBeUndefined();
     expect(table.dataset.githubTableEnhancerResizedColumns).toBeUndefined();

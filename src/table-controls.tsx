@@ -271,6 +271,26 @@ function TableControls({
     freezeToggleRef.current?.focus();
   };
 
+  const toggleFreezePanel = (): void => {
+    setIsOpen((currentValue) => {
+      if (!currentValue) {
+        setIsFilterOpen(false);
+      }
+
+      return !currentValue;
+    });
+  };
+
+  const toggleFilterPanel = (): void => {
+    setIsFilterOpen((currentValue) => {
+      if (!currentValue) {
+        setIsOpen(false);
+      }
+
+      return !currentValue;
+    });
+  };
+
   const createNumberInput = (kind: FreezeInputKind, label: string) => (
     <input
       aria-label={label}
@@ -303,7 +323,7 @@ function TableControls({
       <button
         aria-expanded={isOpen}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
-        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        onClick={toggleFreezePanel}
         ref={freezeToggleRef}
         type="button"
       >
@@ -323,7 +343,7 @@ function TableControls({
       <button
         aria-expanded={isFilterOpen}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
-        onClick={() => setIsFilterOpen((currentValue) => !currentValue)}
+        onClick={toggleFilterPanel}
         type="button"
       >
         Filter
