@@ -625,6 +625,7 @@ describe("wrapTable", () => {
         <tbody>
           <tr><td>one long value</td><td>two</td></tr>
           <tr><td>three</td><td>four</td></tr>
+          <tr><td>five</td><td>six</td></tr>
         </tbody>
       </table>
     `);
@@ -637,6 +638,8 @@ describe("wrapTable", () => {
     clickButton("Hide row 2");
     clickButton("Hide column 2");
     clickButton("Wrap");
+    clickButton("Filter");
+    setFilterInput("three");
 
     const handle = table.querySelector<HTMLElement>(`.${TABLE_COLUMN_RESIZE_HANDLE_CLASS}`);
     act(() => {
@@ -649,6 +652,8 @@ describe("wrapTable", () => {
     expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBe("true");
     expect(table.dataset.githubTableEnhancerWrappedColumns).toBe("true");
     expect(table.dataset.githubTableEnhancerResizedColumns).toBe("true");
+    expect(table.rows[2]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBe("true");
+    expect(getInput("Filter rows").value).toBe("three");
 
     clickButton("Reset table view");
 
@@ -656,6 +661,8 @@ describe("wrapTable", () => {
     expect(getFreezeInput("Frozen columns").value).toBe("0");
     expect(table.rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.rows[2]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(getInput("Filter rows").value).toBe("");
     expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.dataset.githubTableEnhancerWrappedColumns).toBeUndefined();
     expect(table.dataset.githubTableEnhancerResizedColumns).toBeUndefined();
