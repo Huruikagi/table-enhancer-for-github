@@ -38,6 +38,39 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 | Needs rebuild | [Chrome extensions page](chrome://extensions/) | `dist/content.js` | _manual step_ | Chrome blocks direct links to internal pages, but the text is useful during manual testing. |
 | Regression check | [README](../README.md) | `.markdown-body table` | **wide table** | Use this to compare against a smaller table below. |
 
+## Long Table For Frozen Rows
+
+Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while the frozen row stays visible.
+
+| Step | Area | Command Or Check | Expected Result |
+| --- | --- | --- | --- |
+| 01 | Setup | Open this fixture from a GitHub Markdown blob page. | The Freeze control appears above this table. |
+| 02 | Setup | Open the Freeze control. | Rows and Columns inputs are visible. |
+| 03 | Rows | Set Rows to `1`. | The first row stays visible while scrolling down. |
+| 04 | Rows | Set Rows to `2`. | The first two rows stay visible while scrolling down. |
+| 05 | Columns | Set Columns to `1`. | The first column stays visible while scrolling horizontally. |
+| 06 | Combined | Keep Rows at `2` and Columns at `1`. | The top-left frozen cells stay above the rest of the table. |
+| 07 | Scroll | Drag the vertical scrollbar near the middle. | Lower rows become visible without moving the frozen rows. |
+| 08 | Scroll | Drag the vertical scrollbar near the bottom. | The last rows can be reached inside the wrapper. |
+| 09 | Scroll | Drag the horizontal scrollbar away from the left edge. | Frozen columns remain visible. |
+| 10 | Reset | Click Reset. | The wrapper no longer needs to keep frozen rows visible. |
+| 11 | Reapply | Set Rows to `1` again. | Sticky row styles are applied again cleanly. |
+| 12 | Reapply | Set Columns to `2`. | The first two columns stay visible. |
+| 13 | Content | Confirm this row remains readable. | Body rows should not overlap the frozen row. |
+| 14 | Content | Confirm alternating nearby rows remain readable. | Sticky backgrounds should cover scrolled content. |
+| 15 | Content | Scroll slowly through this section. | There should be no jumpy table resizing. |
+| 16 | Content | Scroll quickly through this section. | The frozen row should stay anchored to the wrapper. |
+| 17 | Content | Stop with this row near the top. | Text should not render on top of frozen cells. |
+| 18 | Content | Stop with this row near the bottom. | The table should still be horizontally scrollable. |
+| 19 | Content | Verify this row after changing Columns. | Column offsets should stay aligned. |
+| 20 | Content | Verify this row after changing Rows. | Row offsets should stay aligned. |
+| 21 | Content | Use the browser page scrollbar. | The table wrapper should keep its own scroll behavior. |
+| 22 | Content | Use the table wrapper scrollbar. | The page layout should remain stable. |
+| 23 | Content | Scroll to this row with Rows set to `1`. | The header row should still be visible. |
+| 24 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
+| 25 | Content | Scroll to the final row below. | All body rows should be reachable. |
+| 26 | Final | Confirm the bottom of the table is visible. | No content should be clipped below the wrapper. |
+
 ## Normal-Width Control Table
 
 | Item | Result |
