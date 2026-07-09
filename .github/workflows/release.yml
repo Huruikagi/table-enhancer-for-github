@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.3
+          cache: pnpm
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run checks
+        run: pnpm verify
+
+      - name: Package extension
+        run: pnpm package
+
+      - name: Read manifest version
+        id: manifest
+        run: |
+          version="$(node -p "require('./public/manifest.json').version")"
+          if [ -z "$version" ]; then
+            echo "public/manifest.json does not define a version." >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Build release notes
+        run: |
+          tag="${{ steps.manifest.outputs.tag }}"
+          previous_tag="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+
+          {
+            echo "## Table Enhancer for GitHub $tag"
+            echo
+            if [ -n "$previous_tag" ]; then
+              echo "Changes since $previous_tag:"
+              echo
+              git log --no-merges --pretty='- %s (%h)' "$previous_tag..HEAD"
+            else
+              echo "Initial release changes:"
+              echo
+              git log --no-merges --pretty='- %s (%h)'
+            fi
+          } > release-notes.md
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: table-enhancer-for-github-v${{ steps.manifest.outputs.version }}
+          path: release/table-enhancer-for-github-v${{ steps.manifest.outputs.version }}.zip
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.manifest.outputs.tag }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists." >&2
+            exit 1
+          fi
+
+          gh release create "$tag" \
+            "release/table-enhancer-for-github-v${{ steps.manifest.outputs.version }}.zip" \
+            --title "$tag" \
+            --notes-file release-notes.md
