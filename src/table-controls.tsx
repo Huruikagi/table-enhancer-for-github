@@ -15,6 +15,7 @@ import type { FreezeOptions } from "./table-freeze";
 import {
   installColumnResizeBehavior,
   installTableColumnResizeControls,
+  resetTableColumnResize,
   resetTableColumnResizeControls,
 } from "./table-resize";
 import { addUniqueSortedIndex, clampInteger } from "./table-utils";
@@ -124,6 +125,18 @@ function TableControls({
   const showHidden = (): void => {
     setHiddenRows([]);
     setHiddenColumns([]);
+  };
+
+  const resetTableView = (): void => {
+    hasUserEditedValues.current = true;
+    setSaveDefaultStatus("idle");
+    setHiddenRows([]);
+    setHiddenColumns([]);
+    setIsWrapped(false);
+    applyTableWrap(table, false);
+    applyTableVisibility(table, { rows: [], columns: [] });
+    resetTableColumnResize(table);
+    applyValues({ rows: 0, columns: 0 });
   };
 
   const toggleWrap = (): void => {
@@ -263,6 +276,9 @@ function TableControls({
           Show hidden
         </button>
       )}
+      <button className={TABLE_CONTROLS_TOGGLE_CLASS} onClick={resetTableView} type="button">
+        Reset table view
+      </button>
       {isOpen && (
         <div className={TABLE_CONTROLS_PANEL_CLASS}>
           <label htmlFor={`${inputIdPrefix}-rows`}>

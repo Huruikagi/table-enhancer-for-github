@@ -19,6 +19,17 @@ export function resetTableColumnResizeControls(table: HTMLTableElement): void {
   }
 }
 
+export function resetTableColumnResize(table: HTMLTableElement): void {
+  delete table.dataset[RESIZED_COLUMNS_DATA_ATTRIBUTE];
+  table.style.width = "";
+  table.style.minWidth = "";
+
+  for (const column of table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col")) {
+    column.style.width = "";
+    column.style.display = "";
+  }
+}
+
 function createColumnResizeHandle(index: number): HTMLSpanElement {
   const handle = document.createElement("span");
 
