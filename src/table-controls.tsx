@@ -98,6 +98,7 @@ function TableControls({
   const hasUserEditedValues = useRef(false);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
+  const filterInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
@@ -259,6 +260,12 @@ function TableControls({
     }
   }, [isOpen]);
 
+  useLayoutEffect(() => {
+    if (isFilterOpen) {
+      filterInputRef.current?.focus();
+    }
+  }, [isFilterOpen]);
+
   const closeFreezePanel = (): void => {
     setIsOpen(false);
     freezeToggleRef.current?.focus();
@@ -339,6 +346,7 @@ function TableControls({
               id={`${inputIdPrefix}-filter`}
               onInput={(event) => setFilterQuery(event.currentTarget.value)}
               placeholder="Filter rows..."
+              ref={filterInputRef}
               type="search"
               value={filterQuery}
             />

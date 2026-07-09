@@ -397,6 +397,22 @@ describe("wrapTable", () => {
     expect(input.placeholder).toBe("Filter rows...");
   });
 
+  it("focuses the filter input when the filter panel opens", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>Runtime</td><td>Status</td></tr>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    clickButton("Filter");
+
+    expect(document.activeElement).toBe(getInput("Filter rows"));
+  });
+
   it("filters body rows by matching row text", () => {
     renderMarkdownTables(`
       <table>

@@ -20,7 +20,7 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Clicking Wrap should switch resized cells from ellipsis clipping to wrapped content.
 - Clicking a hide button should remove that displayed row or column without changing the surrounding GitHub layout.
 - Show hidden should restore hidden rows and columns.
-- Clicking Filter should show a Filter rows input. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible.
+- Clicking Filter should show and focus a Filter rows input. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible.
 - Clear filter should restore rows hidden only by the filter, while manually hidden rows remain hidden until Show hidden is clicked.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.
 - Frozen rows should stay visually contained to the table area and should not cover GitHub file action controls while the page itself scrolls.
