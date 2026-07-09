@@ -10,6 +10,7 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Each enhanced table should show a compact Freeze control above the table.
 - Opening the Freeze control should show inputs for frozen rows and frozen columns.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.
+- Frozen rows should stay visually contained to the table area and should not cover GitHub file action controls while the page itself scrolls.
 - Frozen cells should keep normal-weight table grid lines visible while covering scrolled content behind them.
 - The last frozen row should show a clear bottom separator while the table scrolls vertically.
 - When frozen rows are enabled, long tables may scroll vertically inside the table wrapper.
@@ -69,10 +70,11 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 20 | Content | Verify this row after changing Rows. | Row offsets should stay aligned. |
 | 21 | Content | Use the browser page scrollbar. | The table wrapper should keep its own scroll behavior. |
 | 22 | Content | Use the table wrapper scrollbar. | The page layout should remain stable. |
-| 23 | Content | Scroll to this row with Rows set to `1`. | The header row should still be visible. |
-| 24 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
-| 25 | Content | Scroll to the final row below. | All body rows should be reachable. |
-| 26 | Final | Confirm the bottom of the table is visible. | No content should be clipped below the wrapper. |
+| 23 | Page scroll | Scroll the GitHub file view so the top of this table passes under the repository controls. | Frozen rows should not appear above the table wrapper or cover GitHub file actions. |
+| 24 | Content | Scroll to this row with Rows set to `1`. | The header row should still be visible. |
+| 25 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
+| 26 | Content | Scroll to the final row below. | All body rows should be reachable. |
+| 27 | Final | Confirm the bottom of the table is visible. | No content should be clipped below the wrapper. |
 
 ## Normal-Width Control Table
 

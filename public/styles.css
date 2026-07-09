@@ -1,9 +1,12 @@
 .github-table-enhancer-scroll {
+  isolation: isolate;
   margin-block: 16px;
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
+  position: relative;
   scrollbar-gutter: stable;
+  z-index: 0;
 }
 
 .github-table-enhancer-scroll[data-github-table-enhancer-frozen-rows="true"] {
