@@ -2,6 +2,10 @@
 
 Use this text when filling out the Chrome Web Store Privacy tab.
 
+Public privacy policy URL for Chrome Web Store:
+
+<https://huruikagi.github.io/table-enhancer-for-github/privacy-policy/>
+
 ## Single Purpose
 
 Table Enhancer for GitHub improves readability and navigation for wide tables on GitHub Markdown blob file preview pages.

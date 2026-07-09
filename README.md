@@ -67,6 +67,14 @@ Column resize handles appear on the table's header row. Dragging a handle change
 
 For manual Chrome checks, use [docs/e2e-table-fixture.md](docs/e2e-table-fixture.md) from a GitHub Markdown blob page.
 
+## Chrome Web Store
+
+Chrome Web Store submission notes live in [docs/chrome-web-store-listing.md](docs/chrome-web-store-listing.md) and [docs/chrome-web-store-privacy.md](docs/chrome-web-store-privacy.md).
+
+The public privacy policy page is [docs/privacy-policy.md](docs/privacy-policy.md). When GitHub Pages is enabled for the `docs` folder on `main`, the Chrome Web Store privacy policy URL is:
+
+<https://huruikagi.github.io/table-enhancer-for-github/privacy-policy/>
+
 ## License
 
 MIT
