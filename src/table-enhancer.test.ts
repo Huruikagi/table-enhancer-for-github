@@ -276,6 +276,22 @@ describe("wrapTable", () => {
     expect(table.rows[1]?.cells[1]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
   });
 
+  it("focuses the rows input when the freeze panel opens", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>one</td><td>two</td></tr>
+          <tr><td>three</td><td>four</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    openFreezeControls();
+
+    expect(document.activeElement).toBe(getFreezeInput("Frozen rows"));
+  });
+
   it("closes the freeze panel with Escape from a freeze input", () => {
     renderMarkdownTables(`
       <table>

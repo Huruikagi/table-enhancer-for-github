@@ -97,6 +97,7 @@ function TableControls({
   const inputIdPrefix = useId();
   const hasUserEditedValues = useRef(false);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
+  const rowsInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
@@ -252,6 +253,12 @@ function TableControls({
     [onChange, table, values],
   );
 
+  useLayoutEffect(() => {
+    if (isOpen) {
+      rowsInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   const closeFreezePanel = (): void => {
     setIsOpen(false);
     freezeToggleRef.current?.focus();
@@ -278,6 +285,7 @@ function TableControls({
         event.stopPropagation();
         closeFreezePanel();
       }}
+      ref={kind === "rows" ? rowsInputRef : undefined}
       type="number"
       value={String(values[kind])}
     />
