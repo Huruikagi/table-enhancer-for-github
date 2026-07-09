@@ -27,7 +27,10 @@ const FREEZE_RULE_SETTINGS_STORAGE_KEY = "githubTableEnhancerFreezeRuleSettings"
 
 type FakeChromeStorage = Record<string, unknown>;
 
-function installFakeChromeStorage(initialStorage: FakeChromeStorage = {}): FakeChromeStorage {
+function installFakeChromeStorage(
+  initialStorage: FakeChromeStorage = {},
+  options: { setDelayMs?: number } = {},
+): FakeChromeStorage {
   const storage = { ...initialStorage };
 
   (
@@ -41,6 +44,10 @@ function installFakeChromeStorage(initialStorage: FakeChromeStorage = {}): FakeC
           return { [key]: storage[key] };
         },
         async set(items: Record<string, unknown>): Promise<void> {
+          if (options.setDelayMs !== undefined) {
+            await new Promise((resolve) => setTimeout(resolve, options.setDelayMs));
+          }
+
           Object.assign(storage, items);
         },
       },
@@ -122,6 +129,18 @@ function clickButton(label: string): void {
   act(() => {
     button.click();
   });
+}
+
+function getButton(label: string): HTMLButtonElement {
+  const button = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
+    (candidate) => candidate.textContent === label,
+  );
+
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error(`Expected ${label} button to be rendered`);
+  }
+
+  return button;
 }
 
 describe("isMarkdownBlobPage", () => {
@@ -273,7 +292,7 @@ describe("wrapTable", () => {
   });
 
   it("saves explicit freeze values for the preceding heading", async () => {
-    const storage = installFakeChromeStorage();
+    const storage = installFakeChromeStorage({}, { setDelayMs: 1 });
     renderMarkdownTables(`
       <h2>Release Matrix</h2>
       <table>
@@ -290,14 +309,20 @@ describe("wrapTable", () => {
     setFreezeInput("Frozen rows", "1");
     setFreezeInput("Frozen columns", "1");
     clickButton("Save default");
+    expect(getButton("Saving...").disabled).toBe(true);
     await flushPromises();
 
+    expect(getButton("Saved").disabled).toBe(false);
     expect(storage[FREEZE_RULE_SETTINGS_STORAGE_KEY]).toEqual({
       version: 1,
       headingRules: {
         "Release Matrix": { rows: 1, columns: 1 },
       },
     });
+
+    setFreezeInput("Frozen columns", "2");
+
+    expect(getButton("Save default").disabled).toBe(false);
   });
 
   it("does not show the save default control without a preceding heading", () => {

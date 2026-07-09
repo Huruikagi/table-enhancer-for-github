@@ -21,6 +21,7 @@ import { applyTableVisibility } from "./table-visibility";
 
 type FreezeInputKind = keyof FreezeOptions;
 type HideAction = "hide-row" | "hide-column";
+type SaveDefaultStatus = "idle" | "saving" | "saved" | "failed";
 
 type TableControlsProps = {
   defaultValuesPromise?: Promise<FreezeOptions | null> | null;
@@ -88,6 +89,7 @@ function TableControls({
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
   const [hiddenRows, setHiddenRows] = useState<readonly number[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
+  const [saveDefaultStatus, setSaveDefaultStatus] = useState<SaveDefaultStatus>("idle");
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
 
   const applyValues = (nextValues: FreezeOptions): FreezeOptions => {
@@ -104,6 +106,7 @@ function TableControls({
 
   const updateValues = (nextValues: FreezeOptions): FreezeOptions => {
     hasUserEditedValues.current = true;
+    setSaveDefaultStatus("idle");
 
     return applyValues(nextValues);
   };
@@ -111,6 +114,26 @@ function TableControls({
   const showHidden = (): void => {
     setHiddenRows([]);
     setHiddenColumns([]);
+  };
+
+  const saveDefault = async (): Promise<void> => {
+    if (!onSaveDefault) {
+      return;
+    }
+
+    setSaveDefaultStatus("saving");
+
+    try {
+      await onSaveDefault(values);
+      setSaveDefaultStatus("saved");
+      window.setTimeout(() => {
+        setSaveDefaultStatus((currentStatus) =>
+          currentStatus === "saved" ? "idle" : currentStatus,
+        );
+      }, 1500);
+    } catch {
+      setSaveDefaultStatus("failed");
+    }
   };
 
   useLayoutEffect(() => {
@@ -228,8 +251,16 @@ function TableControls({
             Reset
           </button>
           {headingText && onSaveDefault && (
-            <button onClick={() => onSaveDefault(values)} type="button">
-              Save default
+            <button
+              aria-live="polite"
+              disabled={saveDefaultStatus === "saving"}
+              onClick={saveDefault}
+              type="button"
+            >
+              {saveDefaultStatus === "saving" && "Saving..."}
+              {saveDefaultStatus === "saved" && "Saved"}
+              {saveDefaultStatus === "failed" && "Failed"}
+              {saveDefaultStatus === "idle" && "Save default"}
             </button>
           )}
         </div>
