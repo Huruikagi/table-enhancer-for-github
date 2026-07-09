@@ -4,6 +4,8 @@
 
 - Before starting meaningful work on a branch with an upstream, fetch and fast-forward it when the worktree is clean.
 - Use `git pull --ff-only` for this. Do not merge remote changes into a dirty worktree.
+- In this Codex desktop Windows sandbox, run `git pull --ff-only` with escalated permission from the start when the worktree is clean and has an upstream, because sandboxed execution is expected to be blocked when writing `.git/FETCH_HEAD`.
+- Treat that `.git/FETCH_HEAD` permission failure as an environment sandbox limitation, not a repository problem.
 - If the branch cannot fast-forward or the worktree is dirty, report the situation instead of auto-resolving it.
 - After pulling remote changes, if `.mise.toml` changed, run `mise install` before running checks.
 - After pulling remote changes, if `package.json` or `pnpm-lock.yaml` changed, run `pnpm install` before running checks.
