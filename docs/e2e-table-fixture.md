@@ -10,6 +10,7 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Each enhanced table should show a compact Freeze control above the table.
 - Opening the Freeze control should show inputs for frozen rows and frozen columns.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.
+- Frozen cells should keep normal table grid lines visible while covering scrolled content behind them.
 - The last frozen row should show a clear bottom separator while the table scrolls vertically.
 - When frozen rows are enabled, long tables may scroll vertically inside the table wrapper.
 - Setting frozen columns should keep the first N left columns fully visible while scrolling horizontally, including after dragging the table scrollbar away from the left edge.
