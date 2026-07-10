@@ -15,6 +15,7 @@
 - Do not commit or push unfinished experiments unless the user explicitly asks for that.
 - If checks cannot be run or push fails, report the reason clearly.
 - When adding or changing user-visible table behavior, update `docs/e2e-table-fixture.md` as needed so manual Chrome E2E coverage stays current.
+- When changing browser-visible table behavior, run `pnpm test:e2e` when the change affects extension loading, Chrome storage, table controls, scrolling, sticky freeze behavior, filtering, hiding, resizing, fit, wrap, or reset behavior.
 
 ## Project commands
 
@@ -24,4 +25,7 @@
 - Use `pnpm lint` for linting and formatting checks.
 - Use `pnpm format` to apply formatting.
 - Use `pnpm test` for unit tests.
+- Use `pnpm test:e2e` for automated Chrome extension E2E tests.
+- Use `pnpm test:e2e:headed` when visual browser debugging is useful.
+- If Playwright Chromium is missing, run `pnpm exec playwright install chromium`.
 - Use `pnpm build` to build the Chrome extension into `dist`.
