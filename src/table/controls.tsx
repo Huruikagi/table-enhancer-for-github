@@ -52,6 +52,7 @@ function TableControls({
   const inputIdPrefix = useId();
   const hasUserEditedValues = useRef(false);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
+  const filterToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
   const filterInputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -217,6 +218,11 @@ function TableControls({
     freezeToggleRef.current?.focus();
   };
 
+  const closeFilterPanel = (): void => {
+    setIsFilterOpen(false);
+    filterToggleRef.current?.focus();
+  };
+
   const toggleFreezePanel = (): void => {
     setIsOpen((currentValue) => {
       if (!currentValue) {
@@ -263,6 +269,7 @@ function TableControls({
         aria-expanded={isFilterOpen}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
         onClick={toggleFilterPanel}
+        ref={filterToggleRef}
         type="button"
       >
         Filter
@@ -281,6 +288,7 @@ function TableControls({
           filterInputRef={filterInputRef}
           filterQuery={filterQuery}
           inputIdPrefix={inputIdPrefix}
+          onEscape={closeFilterPanel}
           onFilterQueryChange={setFilterQuery}
         />
       )}

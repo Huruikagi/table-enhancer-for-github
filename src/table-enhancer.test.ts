@@ -413,6 +413,32 @@ describe("wrapTable", () => {
     expect(document.activeElement).toBe(getInput("Filter rows"));
   });
 
+  it("closes the filter panel with Escape from the filter input", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>Runtime</td><td>Status</td></tr>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    clickButton("Filter");
+
+    const filterButton = getButton("Filter");
+    const filterInput = getInput("Filter rows");
+
+    act(() => {
+      filterInput.focus();
+      filterInput.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
+    });
+
+    expect(document.querySelector("input[aria-label='Filter rows']")).toBeNull();
+    expect(filterButton.ariaExpanded).toBe("false");
+    expect(document.activeElement).toBe(filterButton);
+  });
+
   it("keeps the freeze and filter panels mutually exclusive", () => {
     renderMarkdownTables(`
       <table>

@@ -22,6 +22,7 @@ type FilterPanelProps = {
   filterQuery: string;
   inputIdPrefix: string;
   onFilterQueryChange: (filterQuery: string) => void;
+  onEscape: () => void;
 };
 
 type FreezePanelProps = {
@@ -79,6 +80,7 @@ export function FilterPanel({
   filterQuery,
   inputIdPrefix,
   onFilterQueryChange,
+  onEscape,
 }: FilterPanelProps): VNode {
   return (
     <div className={TABLE_CONTROLS_PANEL_CLASS}>
@@ -88,6 +90,15 @@ export function FilterPanel({
           aria-label="Filter rows"
           id={`${inputIdPrefix}-filter`}
           onInput={(event) => onFilterQueryChange(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key !== "Escape") {
+              return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            onEscape();
+          }}
           placeholder="Filter rows..."
           ref={filterInputRef}
           type="search"
