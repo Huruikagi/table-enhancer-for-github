@@ -2,16 +2,18 @@ import type { VNode } from "preact";
 import { render } from "preact";
 import { useId, useLayoutEffect, useRef, useState } from "preact/hooks";
 import {
-  HIDE_ACTION_DATA_ATTRIBUTE,
-  HIDE_INDEX_DATA_ATTRIBUTE,
   TABLE_CONTROLS_CLASS,
-  TABLE_CONTROLS_PANEL_CLASS,
   TABLE_CONTROLS_TAG,
   TABLE_CONTROLS_TOGGLE_CLASS,
-  TABLE_HIDE_BUTTON_CLASS,
   WRAPPED_COLUMNS_DATA_ATTRIBUTE,
 } from "./table-constants";
+import { FilterPanel, FreezePanel, type SaveDefaultStatus } from "./table-control-panels";
 import type { FreezeOptions } from "./table-freeze";
+import {
+  getHideControlClick,
+  installTableHideControls,
+  resetTableHideControls,
+} from "./table-hide-controls";
 import {
   fitTableColumnWidths,
   installColumnResizeBehavior,
@@ -22,10 +24,6 @@ import {
 import { addUniqueSortedIndex, clampInteger } from "./table-utils";
 import { applyTableVisibility } from "./table-visibility";
 
-type FreezeInputKind = keyof FreezeOptions;
-type HideAction = "hide-row" | "hide-column";
-type SaveDefaultStatus = "idle" | "saving" | "saved" | "failed";
-
 type TableControlsProps = {
   defaultValuesPromise?: Promise<FreezeOptions | null> | null;
   headingText?: string | null;
@@ -34,49 +32,6 @@ type TableControlsProps = {
   onChange: (values: FreezeOptions) => void;
   onSaveDefault?: (values: FreezeOptions) => Promise<void>;
 };
-
-function createHideButton(action: HideAction, index: number): HTMLButtonElement {
-  const button = document.createElement("button");
-  const labelKind = action === "hide-row" ? "row" : "column";
-
-  button.ariaLabel = `Hide ${labelKind} ${index + 1}`;
-  button.className = `${TABLE_HIDE_BUTTON_CLASS} ${TABLE_HIDE_BUTTON_CLASS}--${labelKind}`;
-  button.dataset[HIDE_ACTION_DATA_ATTRIBUTE] = action;
-  button.dataset[HIDE_INDEX_DATA_ATTRIBUTE] = String(index);
-  button.title = button.ariaLabel;
-  button.type = "button";
-  button.textContent = "×";
-
-  return button;
-}
-
-function resetTableHideControls(table: HTMLTableElement): void {
-  for (const button of table.querySelectorAll(`.${TABLE_HIDE_BUTTON_CLASS}`)) {
-    button.remove();
-  }
-}
-
-function installTableHideControls(table: HTMLTableElement): void {
-  resetTableHideControls(table);
-
-  for (const [rowIndex, row] of Array.from(table.rows).entries()) {
-    const firstCell = row.cells[0];
-
-    if (firstCell) {
-      firstCell.appendChild(createHideButton("hide-row", rowIndex));
-    }
-  }
-
-  const columnControlRow = table.tHead?.rows[0] ?? table.rows[0];
-
-  if (!columnControlRow) {
-    return;
-  }
-
-  for (const [columnIndex, cell] of Array.from(columnControlRow.cells).entries()) {
-    cell.appendChild(createHideButton("hide-column", columnIndex));
-  }
-}
 
 function applyTableWrap(table: HTMLTableElement, isWrapped: boolean): void {
   if (isWrapped) {
@@ -202,32 +157,23 @@ function TableControls({
     installTableColumnResizeControls(table);
 
     const handleClick = (event: MouseEvent): void => {
-      if (!(event.target instanceof Element)) {
-        return;
-      }
+      const hideControlClick = getHideControlClick(table, event.target);
 
-      const button = event.target.closest<HTMLButtonElement>(`.${TABLE_HIDE_BUTTON_CLASS}`);
-
-      if (!button || !table.contains(button)) {
-        return;
-      }
-
-      const action = button.dataset[HIDE_ACTION_DATA_ATTRIBUTE];
-      const index = Number(button.dataset[HIDE_INDEX_DATA_ATTRIBUTE]);
-
-      if (!Number.isInteger(index)) {
+      if (!hideControlClick) {
         return;
       }
 
       event.preventDefault();
       event.stopPropagation();
 
-      if (action === "hide-row") {
-        setHiddenRows((currentValue) => addUniqueSortedIndex(currentValue, index));
+      if (hideControlClick.action === "hide-row") {
+        setHiddenRows((currentValue) => addUniqueSortedIndex(currentValue, hideControlClick.index));
       }
 
-      if (action === "hide-column") {
-        setHiddenColumns((currentValue) => addUniqueSortedIndex(currentValue, index));
+      if (hideControlClick.action === "hide-column") {
+        setHiddenColumns((currentValue) =>
+          addUniqueSortedIndex(currentValue, hideControlClick.index),
+        );
       }
     };
 
@@ -291,33 +237,6 @@ function TableControls({
     });
   };
 
-  const createNumberInput = (kind: FreezeInputKind, label: string) => (
-    <input
-      aria-label={label}
-      id={`${inputIdPrefix}-${kind}`}
-      inputMode="numeric"
-      max={String(limits[kind])}
-      min="0"
-      onChange={(event) => {
-        const input = event.currentTarget;
-        const clampedValues = updateValues({ ...values, [kind]: Number(input.value) });
-        input.value = String(clampedValues[kind]);
-      }}
-      onKeyDown={(event) => {
-        if (event.key !== "Escape") {
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        closeFreezePanel();
-      }}
-      ref={kind === "rows" ? rowsInputRef : undefined}
-      type="number"
-      value={String(values[kind])}
-    />
-  );
-
   return (
     <>
       <button
@@ -358,53 +277,25 @@ function TableControls({
       </button>
 
       {isFilterOpen && (
-        <div className={TABLE_CONTROLS_PANEL_CLASS}>
-          <label htmlFor={`${inputIdPrefix}-filter`}>
-            Filter rows
-            <input
-              aria-label="Filter rows"
-              id={`${inputIdPrefix}-filter`}
-              onInput={(event) => setFilterQuery(event.currentTarget.value)}
-              placeholder="Filter rows..."
-              ref={filterInputRef}
-              type="search"
-              value={filterQuery}
-            />
-          </label>
-          {filterQuery.trim() && (
-            <button onClick={() => setFilterQuery("")} type="button">
-              Clear filter
-            </button>
-          )}
-        </div>
+        <FilterPanel
+          filterInputRef={filterInputRef}
+          filterQuery={filterQuery}
+          inputIdPrefix={inputIdPrefix}
+          onFilterQueryChange={setFilterQuery}
+        />
       )}
       {isOpen && (
-        <div className={TABLE_CONTROLS_PANEL_CLASS}>
-          <label htmlFor={`${inputIdPrefix}-rows`}>
-            Rows
-            {createNumberInput("rows", "Frozen rows")}
-          </label>
-          <label htmlFor={`${inputIdPrefix}-columns`}>
-            Columns
-            {createNumberInput("columns", "Frozen columns")}
-          </label>
-          <button onClick={() => updateValues({ rows: 0, columns: 0 })} type="button">
-            Reset
-          </button>
-          {headingText && onSaveDefault && (
-            <button
-              aria-live="polite"
-              disabled={saveDefaultStatus === "saving"}
-              onClick={saveDefault}
-              type="button"
-            >
-              {saveDefaultStatus === "saving" && "Saving..."}
-              {saveDefaultStatus === "saved" && "Saved"}
-              {saveDefaultStatus === "failed" && "Failed"}
-              {saveDefaultStatus === "idle" && "Save default"}
-            </button>
-          )}
-        </div>
+        <FreezePanel
+          headingText={headingText}
+          inputIdPrefix={inputIdPrefix}
+          limits={limits}
+          onClose={closeFreezePanel}
+          onSaveDefault={onSaveDefault ? saveDefault : undefined}
+          onUpdateValues={updateValues}
+          rowsInputRef={rowsInputRef}
+          saveDefaultStatus={saveDefaultStatus}
+          values={values}
+        />
       )}
     </>
   );
