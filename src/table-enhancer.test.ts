@@ -174,6 +174,20 @@ function getButton(label: string): HTMLButtonElement {
   return button;
 }
 
+function createRect(width: number): DOMRect {
+  return {
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: width,
+    top: 0,
+    width,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  };
+}
+
 describe("isMarkdownBlobPage", () => {
   it("matches GitHub Markdown blob paths", () => {
     expect(isMarkdownBlobPage("/owner/repo/blob/main/docs/index.md")).toBe(true);
@@ -395,6 +409,59 @@ describe("wrapTable", () => {
     expect(table.style.width).toBe("");
     expect(columns[0]?.style.width).toBe("");
     expect(columns[1]?.style.width).toBe("");
+  });
+
+  it("keeps fit column widths stable when Fit is clicked repeatedly", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>Runtime</td><td>Release notes</td></tr>
+          <tr><td>Node.js</td><td>Long text that still fits below the cap</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+    const intrinsicWidths = [124, 188];
+
+    wrapTable(table);
+
+    for (const row of Array.from(table.rows)) {
+      for (const [columnIndex, cell] of Array.from(row.cells).entries()) {
+        const getMeasuredWidth = (): number => {
+          const column = table.querySelectorAll<HTMLTableColElement>("col")[columnIndex];
+          const appliedWidth = Number.parseFloat(column?.style.width ?? "");
+
+          if (
+            table.dataset.githubTableEnhancerResizedColumns === "true" &&
+            Number.isFinite(appliedWidth)
+          ) {
+            return appliedWidth + 8;
+          }
+
+          return intrinsicWidths[columnIndex] ?? 96;
+        };
+
+        Object.defineProperty(cell, "scrollWidth", {
+          configurable: true,
+          get: getMeasuredWidth,
+        });
+        vi.spyOn(cell, "getBoundingClientRect").mockImplementation(() =>
+          createRect(getMeasuredWidth()),
+        );
+      }
+    }
+
+    clickButton("Fit");
+
+    const columns = table.querySelectorAll("col");
+    expect(columns[0]?.style.width).toBe("124px");
+    expect(columns[1]?.style.width).toBe("188px");
+
+    clickButton("Fit");
+
+    expect(columns[0]?.style.width).toBe("124px");
+    expect(columns[1]?.style.width).toBe("188px");
+    expect(table.style.width).toBe("312px");
   });
 
   it("shows a row filter input from the Filter control", () => {

@@ -83,6 +83,41 @@ function getCellPreferredWidth(cell: HTMLTableCellElement): number {
   );
 }
 
+function measureWithIntrinsicColumnWidths<T>(table: HTMLTableElement, measure: () => T): T {
+  const hadResizedColumns = table.dataset[RESIZED_COLUMNS_DATA_ATTRIBUTE] === "true";
+  const tableWidth = table.style.width;
+  const tableMinWidth = table.style.minWidth;
+  const columnWidths = Array.from(
+    table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col"),
+    (column) => column.style.width,
+  );
+
+  delete table.dataset[RESIZED_COLUMNS_DATA_ATTRIBUTE];
+  table.style.width = "";
+  table.style.minWidth = "";
+
+  for (const column of table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col")) {
+    column.style.width = "";
+  }
+
+  try {
+    return measure();
+  } finally {
+    if (hadResizedColumns) {
+      table.dataset[RESIZED_COLUMNS_DATA_ATTRIBUTE] = "true";
+    }
+
+    table.style.width = tableWidth;
+    table.style.minWidth = tableMinWidth;
+
+    Array.from(table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col")).forEach(
+      (column, index) => {
+        column.style.width = columnWidths[index] ?? "";
+      },
+    );
+  }
+}
+
 function isVisibleRow(row: HTMLTableRowElement): boolean {
   return (
     row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE] !== "true" &&
@@ -162,23 +197,25 @@ export function fitTableColumnWidths(
     return;
   }
 
-  const widths = Array.from({ length: columnCount }, (_, columnIndex) => {
-    const preferredWidth = Array.from(table.rows).reduce((currentWidth, row) => {
-      if (!isVisibleRow(row)) {
-        return currentWidth;
-      }
+  const widths = measureWithIntrinsicColumnWidths(table, () =>
+    Array.from({ length: columnCount }, (_, columnIndex) => {
+      const preferredWidth = Array.from(table.rows).reduce((currentWidth, row) => {
+        if (!isVisibleRow(row)) {
+          return currentWidth;
+        }
 
-      const cell = row.cells[columnIndex];
+        const cell = row.cells[columnIndex];
 
-      if (!cell) {
-        return currentWidth;
-      }
+        if (!cell) {
+          return currentWidth;
+        }
 
-      return Math.max(currentWidth, getCellPreferredWidth(cell));
-    }, MIN_COLUMN_WIDTH);
+        return Math.max(currentWidth, getCellPreferredWidth(cell));
+      }, MIN_COLUMN_WIDTH);
 
-    return clampColumnWidth(preferredWidth);
-  });
+      return clampColumnWidth(preferredWidth);
+    }),
+  );
 
   applyColumnWidths(table, widths);
   updateResizedTableWidth(table, hiddenColumns);
