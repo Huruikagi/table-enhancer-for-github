@@ -14,6 +14,8 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "test": "vitest run",
+    "test:e2e": "pnpm build:dev && playwright test",
+    "test:e2e:headed": "pnpm build:dev && playwright test --headed",
     "verify": "pnpm lint && pnpm test && pnpm build",
     "package": "pnpm build && node scripts/package.mjs",
     "build:dev": "node scripts/clean.mjs && pnpm check && node scripts/build.mjs --mode development && node scripts/copy-static.mjs",
@@ -21,6 +23,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.2",
+    "@playwright/test": "^1.61.1",
     "esbuild": "^0.28.1",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",

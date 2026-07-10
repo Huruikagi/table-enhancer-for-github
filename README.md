@@ -46,11 +46,17 @@ pnpm lint
 pnpm lint:fix
 pnpm format
 pnpm test
+pnpm test:e2e
 ```
 
 This project pins Node and pnpm in `.mise.toml`, and `package.json` pins the expected pnpm release through `packageManager`.
 
 After rebuilding, reload the extension from `chrome://extensions/`.
+
+`pnpm test:e2e` builds the extension in development mode and runs Playwright against a
+Chromium profile with the generated `dist` extension loaded. The tests visit a GitHub Markdown
+blob URL and serve a local GitHub-like fixture for that request, so the content script's
+production URL match is exercised without depending on live GitHub pages.
 
 ## Manual Install Without Building
 
