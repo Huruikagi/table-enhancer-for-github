@@ -23,7 +23,9 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - Clicking Filter should show and focus a Filter rows input. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible.
 - Pressing Escape while Filter rows is focused should close the Filter panel and return focus to the Filter button.
 - Clear filter should restore rows hidden only by the filter, while manually hidden rows remain hidden until Show hidden is clicked.
-- Opening Freeze while Filter is open, or opening Filter while Freeze is open, should close the previously open panel.
+- Clicking Copy as should offer Markdown, CSV, and TSV copy actions.
+- Copy as should copy only the current visible table view, excluding hidden rows, filtered rows, and hidden columns.
+- Opening Freeze, Filter, or Copy as while another panel is open should close the previously open panel.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.
 - Frozen rows should stay visually contained to the table area and should not cover GitHub file action controls while the page itself scrolls.
 - Frozen cells should keep normal-weight table grid lines visible while covering scrolled content behind them.
@@ -97,7 +99,8 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 29a | Restore | Open the Freeze control and click Show hidden. | Hidden rows and columns are restored. |
 | 29b | Filter | Click Filter and type `rebuild`. | Only matching body rows remain visible, while the header row and any manually hidden rows keep their expected visibility. |
 | 29c | Clear filter | Click Clear filter. | Rows hidden only by filtering are restored. |
-| 29d | Reset table view | Reapply Rows `2`, Columns `2`, hide one row and one column, click Fit, resize a column, type a filter, then click Reset table view. | Freeze, filter, hidden rows and columns, wrapping, fitted widths, and resized widths are all cleared for this table. |
+| 29d | Copy as | With a filter or hidden column applied, click Copy as and choose Markdown, CSV, or TSV. | Clipboard output includes the visible header and visible rows only, in the selected format. |
+| 29e | Reset table view | Reapply Rows `2`, Columns `2`, hide one row and one column, click Fit, resize a column, type a filter, then click Reset table view. | Freeze, filter, hidden rows and columns, wrapping, fitted widths, and resized widths are all cleared for this table. |
 | 30 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
 | 31 | Content | Scroll to the final row below. | All body rows should be reachable. |
 | 32 | Reload | Reload the page and return to this table. | Rows `2` and Columns `1` are applied automatically from the heading default. |

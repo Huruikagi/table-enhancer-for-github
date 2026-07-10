@@ -20,6 +20,7 @@ A small, unofficial Chrome extension that makes wide tables easier to read and r
 - Saves Freeze defaults per nearest preceding heading, then reapplies them when the same heading is viewed again.
 - Lets you temporarily hide displayed rows or columns and restore them with Show hidden.
 - Lets you temporarily filter table rows by case-insensitive text matching without saving the filter.
+- Lets you copy the currently visible table view as Markdown, CSV, or TSV.
 - Lets you auto-fit displayed columns into readable widths with Fit.
 - Lets you drag column edges to resize displayed columns during review.
 - Lets you reset a table view back to its initial display state.
@@ -73,6 +74,8 @@ Each table gets compact controls above it. The Freeze panel can temporarily free
 Hide buttons appear while hovering table cells. Row hide buttons appear on the first cell in each row, and column hide buttons appear on header cells. Hidden rows and columns are temporary and can be restored with Show hidden.
 
 The Filter control can temporarily show only body rows whose row text contains a case-insensitive search term. Header rows stay visible, Clear filter restores filtered rows, and manually hidden rows remain hidden until Show hidden is used.
+
+The Copy as control writes the current visible table view to the clipboard as Markdown, CSV, or TSV. Rows hidden manually, rows hidden by the current filter, and hidden columns are omitted from the copied output.
 
 Column resize handles appear on the table's header row. Dragging a handle changes that displayed column's width without changing the surrounding GitHub layout.
 The Fit control applies readable column widths and wrapping in one step, while Reset table view clears temporary table changes and returns the table to its initial display.

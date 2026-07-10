@@ -1,5 +1,6 @@
 import { act } from "preact/test-utils";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { getVisibleTableData, serializeTableData } from "./table/copy";
 import {
   applyTableFreeze,
   applyTableVisibility,
@@ -27,6 +28,23 @@ const STICKY_Z_INDEX_PROPERTY = "--gte-sticky-z-index";
 const FREEZE_RULE_SETTINGS_STORAGE_KEY = "githubTableEnhancerFreezeRuleSettings";
 
 type FakeChromeStorage = Record<string, unknown>;
+
+function installFakeClipboard(): { writeText: ReturnType<typeof vi.fn> } {
+  const clipboard = {
+    writeText: vi.fn(async () => {}),
+  };
+
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: clipboard,
+  });
+
+  return clipboard;
+}
+
+function uninstallFakeClipboard(): void {
+  Reflect.deleteProperty(navigator, "clipboard");
+}
 
 function installFakeChromeStorage(
   initialStorage: FakeChromeStorage = {},
@@ -220,10 +238,12 @@ describe("wrapTable", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
     uninstallFakeChromeStorage();
+    uninstallFakeClipboard();
   });
 
   afterEach(() => {
     uninstallFakeChromeStorage();
+    uninstallFakeClipboard();
   });
 
   it("wraps a table in a horizontal scroll container", () => {
@@ -460,6 +480,57 @@ describe("wrapTable", () => {
     clickButton("Freeze");
     expect(document.querySelector("input[aria-label='Filter rows']")).toBeNull();
     expect(getFreezeInput("Frozen rows")).toBeInstanceOf(HTMLInputElement);
+  });
+
+  it("keeps the freeze, filter, and copy panels mutually exclusive", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody>
+          <tr><td>Runtime</td><td>Status</td></tr>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    openFreezeControls();
+    expect(getFreezeInput("Frozen rows")).toBeInstanceOf(HTMLInputElement);
+
+    clickButton("Copy as");
+    expect(document.querySelector("input[aria-label='Frozen rows']")).toBeNull();
+    expect(getButton("Markdown")).toBeInstanceOf(HTMLButtonElement);
+
+    clickButton("Filter");
+    expect(
+      Array.from(document.querySelectorAll<HTMLButtonElement>("button")).some(
+        (button) => button.textContent === "Markdown",
+      ),
+    ).toBe(false);
+    expect(getInput("Filter rows")).toBeInstanceOf(HTMLInputElement);
+  });
+
+  it("copies the current visible table view to the clipboard", async () => {
+    const clipboard = installFakeClipboard();
+    renderMarkdownTables(`
+      <table>
+        <thead><tr><th>Runtime</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+          <tr><td>Ruby</td><td>Blocked</td></tr>
+        </tbody>
+      </table>
+    `);
+
+    wrapTable(getTable());
+    clickButton("Hide column 2");
+    clickButton("Filter");
+    setFilterInput("node");
+    clickButton("Copy as");
+    clickButton("CSV");
+    await flushPromises();
+
+    expect(clipboard.writeText).toHaveBeenCalledWith("Runtime\nNode.js");
+    expect(getButton("Copied CSV")).toBeInstanceOf(HTMLButtonElement);
   });
 
   it("filters body rows by matching row text", () => {
@@ -907,6 +978,38 @@ describe("applyTableVisibility", () => {
     applyTableVisibility(table, { rows: [], columns: [] });
     expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBeUndefined();
     expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBeUndefined();
+  });
+});
+
+describe("copy table data", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("serializes only visible table rows and columns", () => {
+    document.body.innerHTML = `
+      <table>
+        <thead><tr><th>Runtime</th><th>Status</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>Node.js</td><td>Ready</td><td>Uses | pipes</td></tr>
+          <tr><td>Ruby</td><td>Blocked</td><td>Needs review</td></tr>
+        </tbody>
+      </table>
+    `;
+    const table = getTable();
+
+    applyTableVisibility(table, { rows: [], columns: [1], filterQuery: "node" });
+
+    const visibleData = getVisibleTableData(table);
+    expect(visibleData).toEqual([
+      ["Runtime", "Notes"],
+      ["Node.js", "Uses | pipes"],
+    ]);
+    expect(serializeTableData(visibleData, "markdown")).toBe(
+      "| Runtime | Notes |\n| --- | --- |\n| Node.js | Uses \\| pipes |",
+    );
+    expect(serializeTableData(visibleData, "csv")).toBe("Runtime,Notes\nNode.js,Uses | pipes");
+    expect(serializeTableData(visibleData, "tsv")).toBe("Runtime\tNotes\nNode.js\tUses | pipes");
   });
 });
 

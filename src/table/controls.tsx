@@ -7,7 +7,8 @@ import {
   TABLE_CONTROLS_TOGGLE_CLASS,
   WRAPPED_COLUMNS_DATA_ATTRIBUTE,
 } from "./constants";
-import { FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
+import { CopyPanel, FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
+import { type CopyFormat, copyVisibleTable } from "./copy";
 import type { FreezeOptions } from "./freeze";
 import {
   getHideControlClick,
@@ -51,10 +52,12 @@ function TableControls({
 }: TableControlsProps): VNode {
   const inputIdPrefix = useId();
   const hasUserEditedValues = useRef(false);
+  const copyToggleRef = useRef<HTMLButtonElement>(null);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
   const filterToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
   const filterInputRef = useRef<HTMLInputElement>(null);
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
@@ -62,6 +65,7 @@ function TableControls({
   const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
   const [isWrapped, setIsWrapped] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+  const [copyStatus, setCopyStatus] = useState<CopyFormat | "failed" | "idle">("idle");
   const [saveDefaultStatus, setSaveDefaultStatus] = useState<SaveDefaultStatus>("idle");
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
 
@@ -115,6 +119,18 @@ function TableControls({
     setIsWrapped(nextIsWrapped);
     applyTableWrap(table, nextIsWrapped);
     onChange(values);
+  };
+
+  const copyTable = async (format: CopyFormat): Promise<void> => {
+    try {
+      await copyVisibleTable(table, format);
+      setCopyStatus(format);
+      window.setTimeout(() => {
+        setCopyStatus((currentStatus) => (currentStatus === format ? "idle" : currentStatus));
+      }, 1500);
+    } catch {
+      setCopyStatus("failed");
+    }
   };
 
   const saveDefault = async (): Promise<void> => {
@@ -223,9 +239,21 @@ function TableControls({
     filterToggleRef.current?.focus();
   };
 
+  const toggleCopyPanel = (): void => {
+    setIsCopyOpen((currentValue) => {
+      if (!currentValue) {
+        setIsOpen(false);
+        setIsFilterOpen(false);
+      }
+
+      return !currentValue;
+    });
+  };
+
   const toggleFreezePanel = (): void => {
     setIsOpen((currentValue) => {
       if (!currentValue) {
+        setIsCopyOpen(false);
         setIsFilterOpen(false);
       }
 
@@ -236,6 +264,7 @@ function TableControls({
   const toggleFilterPanel = (): void => {
     setIsFilterOpen((currentValue) => {
       if (!currentValue) {
+        setIsCopyOpen(false);
         setIsOpen(false);
       }
 
@@ -253,6 +282,15 @@ function TableControls({
         type="button"
       >
         Freeze
+      </button>
+      <button
+        aria-expanded={isCopyOpen}
+        className={TABLE_CONTROLS_TOGGLE_CLASS}
+        onClick={toggleCopyPanel}
+        ref={copyToggleRef}
+        type="button"
+      >
+        Copy as
       </button>
       <button className={TABLE_CONTROLS_TOGGLE_CLASS} onClick={fitTableView} type="button">
         Fit
@@ -283,6 +321,7 @@ function TableControls({
         Reset table view
       </button>
 
+      {isCopyOpen && <CopyPanel onCopy={copyTable} status={copyStatus} />}
       {isFilterOpen && (
         <FilterPanel
           filterInputRef={filterInputRef}

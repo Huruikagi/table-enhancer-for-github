@@ -1,5 +1,6 @@
 import type { Ref, VNode } from "preact";
 import { TABLE_CONTROLS_PANEL_CLASS } from "./constants";
+import type { CopyFormat } from "./copy";
 import type { FreezeOptions } from "./freeze";
 
 type FreezeInputKind = keyof FreezeOptions;
@@ -25,6 +26,11 @@ type FilterPanelProps = {
   onEscape: () => void;
 };
 
+type CopyPanelProps = {
+  onCopy: (format: CopyFormat) => void;
+  status: CopyFormat | "failed" | "idle";
+};
+
 type FreezePanelProps = {
   headingText?: string | null;
   inputIdPrefix: string;
@@ -36,6 +42,12 @@ type FreezePanelProps = {
   saveDefaultStatus: SaveDefaultStatus;
   values: FreezeOptions;
 };
+
+const COPY_FORMAT_LABELS = {
+  markdown: "Markdown",
+  csv: "CSV",
+  tsv: "TSV",
+} satisfies Record<CopyFormat, string>;
 
 function FreezeNumberInput({
   inputIdPrefix,
@@ -110,6 +122,19 @@ export function FilterPanel({
           Clear filter
         </button>
       )}
+    </div>
+  );
+}
+
+export function CopyPanel({ onCopy, status }: CopyPanelProps): VNode {
+  return (
+    <div aria-live="polite" className={TABLE_CONTROLS_PANEL_CLASS}>
+      {(["markdown", "csv", "tsv"] as const).map((format) => (
+        <button key={format} onClick={() => onCopy(format)} type="button">
+          {status === format ? `Copied ${COPY_FORMAT_LABELS[format]}` : COPY_FORMAT_LABELS[format]}
+        </button>
+      ))}
+      {status === "failed" && <span>Copy failed</span>}
     </div>
   );
 }
