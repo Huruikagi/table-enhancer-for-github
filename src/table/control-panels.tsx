@@ -21,8 +21,11 @@ type FreezeNumberInputProps = {
 type FilterPanelProps = {
   filterInputRef: Ref<HTMLInputElement>;
   filterQuery: string;
+  filterRegularExpressionError: string | null;
+  filterUsesRegularExpression: boolean;
   inputIdPrefix: string;
   onFilterQueryChange: (filterQuery: string) => void;
+  onFilterUsesRegularExpressionChange: (value: boolean) => void;
   onEscape: () => void;
   positionAnchor: string;
 };
@@ -95,8 +98,11 @@ function FreezeNumberInput({
 export function FilterPanel({
   filterInputRef,
   filterQuery,
+  filterRegularExpressionError,
+  filterUsesRegularExpression,
   inputIdPrefix,
   onFilterQueryChange,
+  onFilterUsesRegularExpressionChange,
   onEscape,
   positionAnchor,
 }: FilterPanelProps): VNode {
@@ -105,6 +111,10 @@ export function FilterPanel({
       <label htmlFor={`${inputIdPrefix}-filter`}>
         Filter rows
         <input
+          aria-describedby={
+            filterRegularExpressionError ? `${inputIdPrefix}-filter-error` : undefined
+          }
+          aria-invalid={filterRegularExpressionError ? "true" : undefined}
           aria-label="Filter rows"
           id={`${inputIdPrefix}-filter`}
           onInput={(event) => onFilterQueryChange(event.currentTarget.value)}
@@ -123,6 +133,20 @@ export function FilterPanel({
           value={filterQuery}
         />
       </label>
+      <button
+        aria-label="Use regular expression"
+        aria-pressed={filterUsesRegularExpression}
+        onClick={() => onFilterUsesRegularExpressionChange(!filterUsesRegularExpression)}
+        title="Use regular expression"
+        type="button"
+      >
+        .*
+      </button>
+      {filterRegularExpressionError && (
+        <span id={`${inputIdPrefix}-filter-error`} role="alert">
+          {filterRegularExpressionError}
+        </span>
+      )}
       {filterQuery.trim() && (
         <button onClick={() => onFilterQueryChange("")} type="button">
           Clear filter

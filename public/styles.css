@@ -113,6 +113,17 @@ body.github-table-enhancer-focus-mode-open {
   cursor: default;
 }
 
+.github-table-enhancer-controls-panel button[aria-pressed="true"] {
+  background: var(--button-primary-bgColor-rest, var(--color-btn-primary-bg, #1f883d));
+  color: var(--button-primary-fgColor-rest, var(--color-btn-primary-text, #ffffff));
+}
+
+.github-table-enhancer-controls-panel [role="alert"] {
+  color: var(--fgColor-danger, var(--color-danger-fg, #cf222e));
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .github-table-enhancer-controls-panel {
   align-items: center;
   background: var(--bgColor-default, var(--color-canvas-default, #ffffff));

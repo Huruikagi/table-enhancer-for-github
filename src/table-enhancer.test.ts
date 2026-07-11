@@ -746,6 +746,56 @@ describe("wrapTable", () => {
     ).toBe(true);
   });
 
+  it("toggles case-insensitive regular expression filtering", () => {
+    renderMarkdownTables(`
+      <table>
+        <thead><tr><th>Runtime</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Node.js</td><td>Ready</td></tr>
+          <tr><td>Ruby</td><td>Blocked</td></tr>
+        </tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    clickButton("Filter");
+    const regularExpressionButton = getButton("Use regular expression");
+    expect(regularExpressionButton.ariaPressed).toBe("false");
+
+    clickButton("Use regular expression");
+    setFilterInput("node\\.js.*ready$");
+
+    expect(regularExpressionButton.ariaPressed).toBe("true");
+    expect(table.tBodies[0]?.rows[0]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(table.tBodies[0]?.rows[1]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBe("true");
+  });
+
+  it("shows invalid regular expressions without filtering rows", () => {
+    renderMarkdownTables(`
+      <table>
+        <thead><tr><th>Runtime</th></tr></thead>
+        <tbody><tr><td>Node.js</td></tr><tr><td>Ruby</td></tr></tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    clickButton("Filter");
+    clickButton("Use regular expression");
+    setFilterInput("[");
+
+    expect(getInput("Filter rows").ariaInvalid).toBe("true");
+    expect(document.querySelector("[role='alert']")?.textContent).toBe(
+      "Invalid regular expression",
+    );
+    expect(
+      Array.from(table.tBodies[0]?.rows ?? []).every(
+        (row) => row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] === undefined,
+      ),
+    ).toBe(true);
+  });
+
   it("clears row filtering for empty input and Clear filter", () => {
     renderMarkdownTables(`
       <table>

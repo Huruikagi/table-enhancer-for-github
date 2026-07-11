@@ -10,7 +10,21 @@ export type TableVisibility = {
   rows: readonly number[];
   columns: readonly number[];
   filterQuery?: string;
+  filterUsesRegularExpression?: boolean;
 };
+
+export function getFilterRegularExpressionError(filterQuery: string): string | null {
+  if (!filterQuery.trim()) {
+    return null;
+  }
+
+  try {
+    new RegExp(filterQuery, "i");
+    return null;
+  } catch {
+    return "Invalid regular expression";
+  }
+}
 
 function isHeaderRow(table: HTMLTableElement, row: HTMLTableRowElement, rowIndex: number): boolean {
   if (table.tHead) {
@@ -24,20 +38,34 @@ function isFilteredRow(
   table: HTMLTableElement,
   row: HTMLTableRowElement,
   rowIndex: number,
-  normalizedFilterQuery: string,
+  matchesFilter: ((text: string) => boolean) | null,
 ): boolean {
-  if (!normalizedFilterQuery || isHeaderRow(table, row, rowIndex)) {
+  if (!matchesFilter || isHeaderRow(table, row, rowIndex)) {
     return false;
   }
 
-  return !(row.textContent ?? "").toLowerCase().includes(normalizedFilterQuery);
+  return !matchesFilter(row.textContent ?? "");
 }
 
 export function applyTableVisibility(table: HTMLTableElement, visibility: TableVisibility): void {
   initializeOriginalRowIndexes(table);
   const hiddenRows = new Set(visibility.rows);
   const hiddenColumns = new Set(visibility.columns);
-  const normalizedFilterQuery = visibility.filterQuery?.trim().toLowerCase() ?? "";
+  const filterQuery = visibility.filterQuery ?? "";
+  let matchesFilter: ((text: string) => boolean) | null = null;
+  if (filterQuery.trim()) {
+    if (visibility.filterUsesRegularExpression) {
+      try {
+        const regularExpression = new RegExp(filterQuery, "i");
+        matchesFilter = (text) => regularExpression.test(text);
+      } catch {
+        matchesFilter = null;
+      }
+    } else {
+      const normalizedFilterQuery = filterQuery.trim().toLowerCase();
+      matchesFilter = (text) => text.toLowerCase().includes(normalizedFilterQuery);
+    }
+  }
   const columns = table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col");
 
   for (const [rowIndex, row] of Array.from(table.rows).entries()) {
@@ -47,7 +75,7 @@ export function applyTableVisibility(table: HTMLTableElement, visibility: TableV
       delete row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE];
     }
 
-    if (isFilteredRow(table, row, rowIndex, normalizedFilterQuery)) {
+    if (isFilteredRow(table, row, rowIndex, matchesFilter)) {
       row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] = "true";
     } else {
       delete row.dataset[FILTERED_ROW_DATA_ATTRIBUTE];

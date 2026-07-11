@@ -34,7 +34,7 @@ import {
   type TableSort,
 } from "./sort";
 import { addUniqueSortedIndex, clampInteger } from "./utils";
-import { applyTableVisibility } from "./visibility";
+import { applyTableVisibility, getFilterRegularExpressionError } from "./visibility";
 
 type TableControlsProps = {
   defaultValuesPromise?: Promise<FreezeOptions | null> | null;
@@ -98,6 +98,7 @@ function TableControls({
   const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
   const [isWrapped, setIsWrapped] = useState(false);
   const [filterQuery, setFilterQuery] = useState("");
+  const [filterUsesRegularExpression, setFilterUsesRegularExpression] = useState(false);
   const [sort, setSort] = useState<TableSort>(null);
   const [copyStatus, setCopyStatus] = useState<CopyFormat | "failed" | "idle">("idle");
   const [saveDefaultStatus, setSaveDefaultStatus] = useState<SaveDefaultStatus>("idle");
@@ -142,6 +143,7 @@ function TableControls({
     setHiddenColumns([]);
     setIsWrapped(false);
     setFilterQuery("");
+    setFilterUsesRegularExpression(false);
     setSort(null);
     applyTableWrap(table, false);
     applyTableVisibility(table, { rows: [], columns: [], filterQuery: "" });
@@ -255,9 +257,18 @@ function TableControls({
       rows: hiddenRows,
       columns: hiddenColumns,
       filterQuery,
+      filterUsesRegularExpression,
     });
     onChange(values);
-  }, [filterQuery, hiddenRows, hiddenColumns, onChange, table, values]);
+  }, [
+    filterQuery,
+    filterUsesRegularExpression,
+    hiddenRows,
+    hiddenColumns,
+    onChange,
+    table,
+    values,
+  ]);
 
   useLayoutEffect(() => {
     applyTableSort(table, sort);
@@ -493,9 +504,14 @@ function TableControls({
         <FilterPanel
           filterInputRef={filterInputRef}
           filterQuery={filterQuery}
+          filterRegularExpressionError={
+            filterUsesRegularExpression ? getFilterRegularExpressionError(filterQuery) : null
+          }
+          filterUsesRegularExpression={filterUsesRegularExpression}
           inputIdPrefix={inputIdPrefix}
           onEscape={closeFilterPanel}
           onFilterQueryChange={setFilterQuery}
+          onFilterUsesRegularExpressionChange={setFilterUsesRegularExpression}
           positionAnchor={`${anchorPrefix}-filter`}
         />
       )}

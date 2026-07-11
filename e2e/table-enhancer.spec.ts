@@ -159,6 +159,29 @@ test("filters rows and resets the current table view", async ({ page }) => {
   await expect(table).not.toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
 });
 
+test("toggles regular expression filtering and reports invalid expressions", async ({ page }) => {
+  await page.goto(fixtureUrl);
+
+  const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+  const rows = wrapper.locator("tbody tr");
+  await wrapper.getByRole("button", { name: "Filter" }).click();
+  const regularExpressionButton = wrapper.getByRole("button", {
+    name: "Use regular expression",
+  });
+  await regularExpressionButton.click();
+  await wrapper.getByLabel("Filter rows").fill("03[\\s\\S]*active");
+
+  await expect(regularExpressionButton).toHaveAttribute("aria-pressed", "true");
+  await expect(rows.nth(2)).not.toHaveAttribute("data-github-table-enhancer-filtered-row", "true");
+  await expect(rows.nth(0)).toHaveAttribute("data-github-table-enhancer-filtered-row", "true");
+
+  await wrapper.getByLabel("Filter rows").fill("[");
+  await expect(wrapper.getByRole("alert")).toHaveText("Invalid regular expression");
+  await expect(
+    wrapper.locator('tbody tr[data-github-table-enhancer-filtered-row="true"]'),
+  ).toHaveCount(0);
+});
+
 test("sorts rows through all three states and resets to the source order", async ({ page }) => {
   await page.goto(fixtureUrl);
 
