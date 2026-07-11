@@ -179,8 +179,20 @@ test("expands one table into Focus mode and restores the page with Escape", asyn
   });
   const controlsBox = await firstWrapper.locator("gte-table-controls").boundingBox();
   const frozenRowBox = await table.locator("thead tr").boundingBox();
+  const focusMask = await firstWrapper.evaluate((wrapper) => {
+    const styles = getComputedStyle(wrapper, "::before");
+
+    return {
+      backgroundColor: styles.backgroundColor,
+      height: styles.height,
+      position: styles.position,
+    };
+  });
   expect(controlsBox).not.toBeNull();
   expect(frozenRowBox).not.toBeNull();
+  expect(focusMask.backgroundColor).toBe("rgb(255, 255, 255)");
+  expect(Number.parseFloat(focusMask.height)).toBeGreaterThan(0);
+  expect(focusMask.position).toBe("sticky");
   expect(frozenRowBox?.y).toBeGreaterThanOrEqual(
     (controlsBox?.y ?? 0) + (controlsBox?.height ?? 0),
   );
