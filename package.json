@@ -17,6 +17,7 @@
     "test:e2e": "pnpm build:dev && playwright test",
     "test:e2e:headed": "pnpm build:dev && playwright test --headed",
     "demo:video": "pnpm build:dev && playwright test --config playwright.demo.config.ts",
+    "guide:screenshots": "pnpm build:dev && playwright test --config playwright.guide.config.ts",
     "verify": "pnpm lint && pnpm test && pnpm build",
     "package": "pnpm build && node scripts/package.mjs",
     "build:dev": "node scripts/clean.mjs && pnpm check && node scripts/build.mjs --mode development && node scripts/copy-static.mjs",

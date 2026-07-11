@@ -8,6 +8,8 @@ A small, unofficial Chrome extension that makes wide tables easier to read and r
 
 [Install from the Chrome Web Store](https://chromewebstore.google.com/detail/gnnboemmkojioleagajnphgfdpdemjlg)
 
+[Read the user guide](https://huruikagi.github.io/table-enhancer-for-github/user-guide/)
+
 ## Scope
 
 - Runs only on GitHub Markdown blob file preview pages, such as `https://github.com/owner/repo/blob/main/docs/file.md`.
