@@ -159,6 +159,27 @@ test("filters rows and resets the current table view", async ({ page }) => {
   await expect(table).not.toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
 });
 
+test("expands one table into Focus mode and restores the page with Escape", async ({ page }) => {
+  await page.goto(fixtureUrl);
+
+  const firstWrapper = page.locator(".github-table-enhancer-scroll").first();
+  const table = firstWrapper.locator("table");
+  await firstWrapper.getByRole("button", { name: "Wrap" }).click();
+  await firstWrapper.getByRole("button", { name: "Expand" }).click();
+
+  await expect(firstWrapper).toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
+  await expect(page.locator("body")).toHaveClass(/github-table-enhancer-focus-mode-open/);
+  await expect(firstWrapper.getByRole("button", { name: "Close" })).toBeVisible();
+  await expect(table).toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
+
+  await page.keyboard.press("Escape");
+
+  await expect(firstWrapper).not.toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
+  await expect(page.locator("body")).not.toHaveClass(/github-table-enhancer-focus-mode-open/);
+  await expect(firstWrapper.getByRole("button", { name: "Expand" })).toBeFocused();
+  await expect(table).toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
+});
+
 test("saves freeze defaults and reapplies them after reload", async ({ page }) => {
   await page.goto(fixtureUrl);
 

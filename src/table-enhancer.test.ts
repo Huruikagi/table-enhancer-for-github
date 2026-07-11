@@ -326,6 +326,53 @@ describe("wrapTable", () => {
     expect(document.activeElement).toBe(getFreezeInput("Frozen rows"));
   });
 
+  it("expands a table into Focus mode and closes it without replacing the table", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody><tr><td>wide value</td></tr></tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    const wrapper = table.closest<HTMLElement>(`.${TABLE_WRAPPER_CLASS}`);
+
+    clickButton("Expand");
+
+    expect(wrapper?.dataset.githubTableEnhancerFocusMode).toBe("true");
+    expect(document.body.classList.contains("github-table-enhancer-focus-mode-open")).toBe(true);
+    expect(getButton("Close").ariaPressed).toBe("true");
+    expect(wrapper?.querySelector("table")).toBe(table);
+
+    clickButton("Close");
+
+    expect(wrapper?.dataset.githubTableEnhancerFocusMode).toBeUndefined();
+    expect(document.body.classList.contains("github-table-enhancer-focus-mode-open")).toBe(false);
+    expect(getButton("Expand").ariaPressed).toBe("false");
+    expect(wrapper?.querySelector("table")).toBe(table);
+  });
+
+  it("closes Focus mode with Escape and returns focus to Expand", () => {
+    renderMarkdownTables(`
+      <table>
+        <tbody><tr><td>wide value</td></tr></tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    clickButton("Expand");
+
+    act(() => {
+      document.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
+    });
+
+    expect(
+      table.closest<HTMLElement>(`.${TABLE_WRAPPER_CLASS}`)?.dataset.githubTableEnhancerFocusMode,
+    ).toBeUndefined();
+    expect(document.activeElement).toBe(getButton("Expand"));
+  });
+
   it("closes the freeze panel with Escape from a freeze input", () => {
     renderMarkdownTables(`
       <table>

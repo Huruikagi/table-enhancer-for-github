@@ -2,6 +2,8 @@ import type { VNode } from "preact";
 import { render } from "preact";
 import { useId, useLayoutEffect, useRef, useState } from "preact/hooks";
 import {
+  FOCUS_MODE_BODY_CLASS,
+  FOCUS_MODE_DATA_ATTRIBUTE,
   TABLE_CONTROLS_CLASS,
   TABLE_CONTROLS_TAG,
   TABLE_CONTROLS_TOGGLE_CLASS,
@@ -55,11 +57,13 @@ function TableControls({
   const copyToggleRef = useRef<HTMLButtonElement>(null);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
   const filterToggleRef = useRef<HTMLButtonElement>(null);
+  const focusToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
   const filterInputRef = useRef<HTMLInputElement>(null);
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
   const [hiddenRows, setHiddenRows] = useState<readonly number[]>([]);
   const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
@@ -229,6 +233,39 @@ function TableControls({
     }
   }, [isFilterOpen]);
 
+  useLayoutEffect(() => {
+    const wrapper = table.closest<HTMLElement>(`.github-table-enhancer-scroll`);
+
+    if (!wrapper) {
+      return;
+    }
+
+    const closeFocusMode = (): void => {
+      setIsFocusMode(false);
+      focusToggleRef.current?.focus();
+    };
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") {
+        closeFocusMode();
+      }
+    };
+
+    if (isFocusMode) {
+      wrapper.dataset[FOCUS_MODE_DATA_ATTRIBUTE] = "true";
+      document.body.classList.add(FOCUS_MODE_BODY_CLASS);
+      document.addEventListener("keydown", handleKeyDown);
+    } else {
+      delete wrapper.dataset[FOCUS_MODE_DATA_ATTRIBUTE];
+      document.body.classList.remove(FOCUS_MODE_BODY_CLASS);
+    }
+
+    return () => {
+      delete wrapper.dataset[FOCUS_MODE_DATA_ATTRIBUTE];
+      document.body.classList.remove(FOCUS_MODE_BODY_CLASS);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFocusMode, table]);
+
   const closeFreezePanel = (): void => {
     setIsOpen(false);
     freezeToggleRef.current?.focus();
@@ -270,6 +307,10 @@ function TableControls({
 
       return !currentValue;
     });
+  };
+
+  const toggleFocusMode = (): void => {
+    setIsFocusMode((currentValue) => !currentValue);
   };
 
   return (
@@ -319,6 +360,15 @@ function TableControls({
       )}
       <button className={TABLE_CONTROLS_TOGGLE_CLASS} onClick={resetTableView} type="button">
         Reset table view
+      </button>
+      <button
+        aria-pressed={isFocusMode}
+        className={TABLE_CONTROLS_TOGGLE_CLASS}
+        onClick={toggleFocusMode}
+        ref={focusToggleRef}
+        type="button"
+      >
+        {isFocusMode ? "Close" : "Expand"}
       </button>
 
       {isCopyOpen && <CopyPanel onCopy={copyTable} status={copyStatus} />}

@@ -24,6 +24,7 @@ A small, unofficial Chrome extension that makes wide tables easier to read and r
 - Lets you temporarily filter table rows by case-insensitive text matching without saving the filter.
 - Lets you copy the currently visible table view as Markdown, CSV, or TSV.
 - Lets you auto-fit displayed columns into readable widths with Fit.
+- Expands an individual table into a full-window Focus mode without losing its current view state.
 - Lets you drag column edges to resize displayed columns during review.
 - Lets you reset a table view back to its initial display state.
 
@@ -81,6 +82,8 @@ The Copy as control writes the current visible table view to the clipboard as Ma
 
 Column resize handles appear on the table's header row. Dragging a handle changes that displayed column's width without changing the surrounding GitHub layout.
 The Fit control applies readable column widths and wrapping in one step, while Reset table view clears temporary table changes and returns the table to its initial display.
+
+The Expand control opens the current table in a full-window Focus mode while preserving filters, hidden rows and columns, wrapping, fitted widths, resized columns, and freeze settings. Click Close or press Escape to return to the GitHub file view.
 
 For manual Chrome checks, use [docs/e2e-table-fixture.md](docs/e2e-table-fixture.md) from a GitHub Markdown blob page.
 

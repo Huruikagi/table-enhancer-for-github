@@ -19,6 +19,8 @@ export const HIDE_INDEX_DATA_ATTRIBUTE = "githubTableEnhancerHideIndex";
 export const COLUMN_RESIZE_INDEX_DATA_ATTRIBUTE = "githubTableEnhancerColumnResizeIndex";
 export const RESIZED_COLUMNS_DATA_ATTRIBUTE = "githubTableEnhancerResizedColumns";
 export const WRAPPED_COLUMNS_DATA_ATTRIBUTE = "githubTableEnhancerWrappedColumns";
+export const FOCUS_MODE_DATA_ATTRIBUTE = "githubTableEnhancerFocusMode";
+export const FOCUS_MODE_BODY_CLASS = "github-table-enhancer-focus-mode-open";
 
 export const STICKY_TOP_PROPERTY = "--gte-sticky-top";
 export const STICKY_LEFT_PROPERTY = "--gte-sticky-left";

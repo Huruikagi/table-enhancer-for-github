@@ -35,6 +35,8 @@ Use this page to manually verify the extension on an actual GitHub Markdown blob
 - The last frozen column should show a clear right separator while the table scrolls horizontally.
 - Reset should return both freeze values to `0` and remove sticky row and column behavior.
 - Reset table view should restore the current table to its initial display by clearing freeze, hidden rows and columns, filters, wrap, fitted widths, and resized column widths.
+- Clicking Expand should show only that table in a full-window Focus mode while preserving its current filter, visibility, sizing, wrapping, and freeze state.
+- Clicking Close or pressing Escape should leave Focus mode and restore the GitHub file view without resetting the table state.
 
 ## Wide Release Matrix
 
@@ -101,6 +103,8 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 29c | Clear filter | Click Clear filter. | Rows hidden only by filtering are restored. |
 | 29d | Copy as | With a filter or hidden column applied, click Copy as and choose Markdown, CSV, or TSV. | Clipboard output includes the visible header and visible rows only, in the selected format. |
 | 29e | Reset table view | Reapply Rows `2`, Columns `2`, hide one row and one column, click Fit, resize a column, type a filter, then click Reset table view. | Freeze, filter, hidden rows and columns, wrapping, fitted widths, and resized widths are all cleared for this table. |
+| 29f | Focus mode | Apply a filter, hide a column, resize a column, and set Rows `2` / Columns `2`, then click Expand. | The selected table fills the browser window and retains all current table view settings. |
+| 29g | Close Focus mode | Press Escape, reopen Focus mode, then click Close. | Each action restores the GitHub file view and the table keeps the state applied before expansion. |
 | 30 | Content | Scroll to this row with Rows set to `2`. | Two rows should still be visible. |
 | 31 | Content | Scroll to the final row below. | All body rows should be reachable. |
 | 32 | Reload | Reload the page and return to this table. | Rows `2` and Columns `1` are applied automatically from the heading default. |

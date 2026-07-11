@@ -14,6 +14,22 @@
   overflow: auto;
 }
 
+body.github-table-enhancer-focus-mode-open {
+  overflow: hidden;
+}
+
+.github-table-enhancer-scroll[data-github-table-enhancer-focus-mode="true"] {
+  background: var(--bgColor-default, var(--color-canvas-default, #ffffff));
+  inset: 0;
+  margin: 0;
+  max-height: none;
+  max-width: none;
+  overflow: auto;
+  padding: 16px;
+  position: fixed;
+  z-index: 2147483646;
+}
+
 .github-table-enhancer-controls {
   display: flex;
   gap: 6px;
@@ -23,6 +39,13 @@
   position: sticky;
   left: 0;
   z-index: 5;
+}
+
+.github-table-enhancer-scroll[data-github-table-enhancer-focus-mode="true"]
+  .github-table-enhancer-controls {
+  background: var(--bgColor-default, var(--color-canvas-default, #ffffff));
+  padding-block: 4px 8px;
+  top: 0;
 }
 
 .github-table-enhancer-controls-toggle,
