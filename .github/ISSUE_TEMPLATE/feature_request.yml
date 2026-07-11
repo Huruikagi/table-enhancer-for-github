@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest an improvement to the extension.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for sharing an idea. English and Japanese are both welcome.
+
+        アイデアの共有ありがとうございます。英語・日本語のどちらでも歓迎します。
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the table-review task that is difficult today.
+      placeholder: When reviewing Markdown tables, it is difficult to ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Tell us about workarounds or other approaches, if any.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add mockups, examples, or links that help explain the idea. Please remove sensitive information.

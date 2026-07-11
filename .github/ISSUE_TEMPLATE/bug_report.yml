@@ -1,0 +1,53 @@
+name: Bug report
+description: Report a reproducible problem with the extension.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. English and Japanese are both welcome.
+
+        不具合の報告ありがとうございます。英語・日本語のどちらでも歓迎します。
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Tell us what you expected and what actually happened.
+      placeholder: Expected ... but ... happened.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Give the smallest set of steps that reliably reproduces the problem.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: input
+    id: page-url
+    attributes:
+      label: GitHub Markdown page URL
+      description: Paste the Markdown blob page URL, if it is safe to share.
+      placeholder: https://github.com/owner/repo/blob/main/file.md
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the extension version, Chrome version, and operating system.
+      placeholder: |
+        Extension version:
+        Chrome version:
+        Operating system:
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or additional context
+      description: Add screenshots, console errors, or any other useful details. Please remove sensitive information.

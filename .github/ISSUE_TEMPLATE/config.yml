@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: User guide
+    url: https://huruikagi.github.io/table-enhancer-for-github/user-guide/
+    about: Check the user guide before reporting a usage question.
