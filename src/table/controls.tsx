@@ -1,69 +1,23 @@
 import type { VNode } from "preact";
 import { render } from "preact";
 import { useId, useLayoutEffect, useRef, useState } from "preact/hooks";
-import {
-  TABLE_CONTROLS_CLASS,
-  TABLE_CONTROLS_TAG,
-  TABLE_CONTROLS_TOGGLE_CLASS,
-  WRAPPED_COLUMNS_DATA_ATTRIBUTE,
-} from "./constants";
+import { TABLE_CONTROLS_CLASS, TABLE_CONTROLS_TAG, TABLE_CONTROLS_TOGGLE_CLASS } from "./constants";
 import { ControlIcon } from "./control-icons";
 import { CopyPanel, FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
-import { type CopyFormat, copyVisibleTable } from "./copy";
+import type { CopyFormat } from "./copy";
 import { useTableFocusMode } from "./focus-mode";
 import type { FreezeOptions } from "./freeze";
-import {
-  getHideControlClick,
-  installTableHideControls,
-  resetTableHideControls,
-} from "./hide-controls";
-import {
-  fitTableColumnWidths,
-  installColumnResizeBehavior,
-  installTableColumnResizeControls,
-  resetTableColumnResize,
-  resetTableColumnResizeControls,
-} from "./resize";
-import {
-  applyTableSort,
-  getNextTableSort,
-  getSortColumnClick,
-  installTableSortControls,
-  resetTableSortControls,
-  type TableSort,
-} from "./sort";
-import { addUniqueSortedIndex, clampInteger } from "./utils";
-import { applyTableVisibility, getFilterRegularExpressionError } from "./visibility";
+import type { TableSession } from "./session";
+import { getFilterRegularExpressionError } from "./visibility";
 
 type TableControlsProps = {
-  defaultValuesPromise?: Promise<FreezeOptions | null> | null;
-  headingText?: string | null;
-  table: HTMLTableElement;
-  limits: FreezeOptions;
-  onChange: (values: FreezeOptions) => void;
-  onSaveDefault?: (values: FreezeOptions) => Promise<void>;
+  session: TableSession;
 };
 
 type OpenPanel = "copy" | "filter" | "freeze" | null;
 
-function applyTableWrap(table: HTMLTableElement, isWrapped: boolean): void {
-  if (isWrapped) {
-    table.dataset[WRAPPED_COLUMNS_DATA_ATTRIBUTE] = "true";
-  } else {
-    delete table.dataset[WRAPPED_COLUMNS_DATA_ATTRIBUTE];
-  }
-}
-
-function TableControls({
-  defaultValuesPromise,
-  headingText,
-  limits,
-  onChange,
-  onSaveDefault,
-  table,
-}: TableControlsProps): VNode {
+function TableControls({ session }: TableControlsProps): VNode {
   const inputIdPrefix = useId();
-  const hasUserEditedValues = useRef(false);
   const copyToggleRef = useRef<HTMLButtonElement>(null);
   const copyFirstButtonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -75,76 +29,45 @@ function TableControls({
   const filterInputRef = useRef<HTMLInputElement>(null);
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
-  const [values, setValues] = useState<FreezeOptions>({ rows: 0, columns: 0 });
-  const [hiddenRows, setHiddenRows] = useState<readonly number[]>([]);
-  const [hiddenColumns, setHiddenColumns] = useState<readonly number[]>([]);
-  const [isWrapped, setIsWrapped] = useState(false);
-  const [filterQuery, setFilterQuery] = useState("");
-  const [filterUsesRegularExpression, setFilterUsesRegularExpression] = useState(false);
-  const [sort, setSort] = useState<TableSort>(null);
+  const [viewState, setViewState] = useState(session.getState());
   const [copyStatus, setCopyStatus] = useState<CopyFormat | "failed" | "idle">("idle");
   const [saveDefaultStatus, setSaveDefaultStatus] = useState<SaveDefaultStatus>("idle");
+  const { filterQuery, filterUsesRegularExpression, freeze, hiddenColumns, hiddenRows, isWrapped } =
+    viewState;
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
   const anchorPrefix = `--gte-${inputIdPrefix.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const applyValues = (nextValues: FreezeOptions): FreezeOptions => {
-    const clampedValues = {
-      rows: clampInteger(nextValues.rows, 0, limits.rows),
-      columns: clampInteger(nextValues.columns, 0, limits.columns),
-    };
-
-    setValues(clampedValues);
-    onChange(clampedValues);
-
-    return clampedValues;
+    session.dispatch({ type: "freezeChanged", value: nextValues });
+    return session.getState().freeze;
   };
 
   const updateValues = (nextValues: FreezeOptions): FreezeOptions => {
-    hasUserEditedValues.current = true;
     setSaveDefaultStatus("idle");
 
     return applyValues(nextValues);
   };
 
   const showHidden = (): void => {
-    setHiddenRows([]);
-    setHiddenColumns([]);
+    session.dispatch({ type: "hiddenShown" });
   };
 
   const fitTableView = (): void => {
-    setIsWrapped(true);
-    applyTableWrap(table, true);
-    fitTableColumnWidths(table, new Set(hiddenColumns));
-    onChange(values);
+    session.fitColumns();
   };
 
   const resetTableView = (): void => {
-    hasUserEditedValues.current = true;
     setSaveDefaultStatus("idle");
-    setHiddenRows([]);
-    setHiddenColumns([]);
-    setIsWrapped(false);
-    setFilterQuery("");
-    setFilterUsesRegularExpression(false);
-    setSort(null);
-    applyTableWrap(table, false);
-    applyTableVisibility(table, { rows: [], columns: [], filterQuery: "" });
-    applyTableSort(table, null);
-    resetTableColumnResize(table);
-    applyValues({ rows: 0, columns: 0 });
+    session.dispatch({ type: "reset" });
   };
 
   const toggleWrap = (): void => {
-    const nextIsWrapped = !isWrapped;
-
-    setIsWrapped(nextIsWrapped);
-    applyTableWrap(table, nextIsWrapped);
-    onChange(values);
+    session.dispatch({ type: "wrapChanged", value: !isWrapped });
   };
 
   const copyTable = async (format: CopyFormat): Promise<void> => {
     try {
-      await copyVisibleTable(table, format);
+      await session.copy(format);
       setCopyStatus(format);
       window.setTimeout(() => {
         setCopyStatus((currentStatus) => (currentStatus === format ? "idle" : currentStatus));
@@ -155,14 +78,14 @@ function TableControls({
   };
 
   const saveDefault = async (): Promise<void> => {
-    if (!onSaveDefault) {
+    if (!session.saveDefault) {
       return;
     }
 
     setSaveDefaultStatus("saving");
 
     try {
-      await onSaveDefault(values);
+      await session.saveDefault();
       setSaveDefaultStatus("saved");
       window.setTimeout(() => {
         setSaveDefaultStatus((currentStatus) =>
@@ -174,93 +97,7 @@ function TableControls({
     }
   };
 
-  useLayoutEffect(() => {
-    let isCanceled = false;
-
-    defaultValuesPromise?.then((defaultValues) => {
-      if (!defaultValues || isCanceled || hasUserEditedValues.current) {
-        return;
-      }
-
-      applyValues(defaultValues);
-    });
-
-    return () => {
-      isCanceled = true;
-    };
-  }, [defaultValuesPromise]);
-
-  useLayoutEffect(() => {
-    installTableHideControls(table);
-    installTableColumnResizeControls(table);
-    installTableSortControls(table);
-
-    const handleClick = (event: MouseEvent): void => {
-      const hideControlClick = getHideControlClick(table, event.target);
-      const sortColumn = getSortColumnClick(table, event.target);
-
-      if (sortColumn !== null) {
-        event.preventDefault();
-        event.stopPropagation();
-        setSort((currentSort) => getNextTableSort(currentSort, sortColumn));
-        return;
-      }
-
-      if (!hideControlClick) {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (hideControlClick.action === "hide-row") {
-        setHiddenRows((currentValue) => addUniqueSortedIndex(currentValue, hideControlClick.index));
-      }
-
-      if (hideControlClick.action === "hide-column") {
-        setHiddenColumns((currentValue) =>
-          addUniqueSortedIndex(currentValue, hideControlClick.index),
-        );
-      }
-    };
-
-    table.addEventListener("click", handleClick);
-
-    return () => {
-      table.removeEventListener("click", handleClick);
-      resetTableHideControls(table);
-      resetTableColumnResizeControls(table);
-      resetTableSortControls(table);
-    };
-  }, [table]);
-
-  useLayoutEffect(() => {
-    applyTableVisibility(table, {
-      rows: hiddenRows,
-      columns: hiddenColumns,
-      filterQuery,
-      filterUsesRegularExpression,
-    });
-    onChange(values);
-  }, [
-    filterQuery,
-    filterUsesRegularExpression,
-    hiddenRows,
-    hiddenColumns,
-    onChange,
-    table,
-    values,
-  ]);
-
-  useLayoutEffect(() => {
-    applyTableSort(table, sort);
-    onChange(values);
-  }, [onChange, sort, table, values]);
-
-  useLayoutEffect(
-    () => installColumnResizeBehavior(table, () => onChange(values)),
-    [onChange, table, values],
-  );
+  useLayoutEffect(() => session.subscribe(setViewState), [session]);
 
   useLayoutEffect(() => {
     if (openPanel === "copy") {
@@ -312,7 +149,7 @@ function TableControls({
     };
   }, [openPanel]);
 
-  useTableFocusMode(table, isFocusMode, setIsFocusMode, focusToggleRef);
+  useTableFocusMode(session.table, isFocusMode, setIsFocusMode, focusToggleRef);
 
   const closeFreezePanel = (): void => {
     setOpenPanel(null);
@@ -458,8 +295,10 @@ function TableControls({
           filterUsesRegularExpression={filterUsesRegularExpression}
           inputIdPrefix={inputIdPrefix}
           onEscape={closeFilterPanel}
-          onFilterQueryChange={setFilterQuery}
-          onFilterUsesRegularExpressionChange={setFilterUsesRegularExpression}
+          onFilterQueryChange={(value) => session.dispatch({ type: "filterQueryChanged", value })}
+          onFilterUsesRegularExpressionChange={(value) =>
+            session.dispatch({ type: "filterRegularExpressionChanged", value })
+          }
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-filter`}
         />
@@ -467,44 +306,31 @@ function TableControls({
       {openPanel === "freeze" && (
         <FreezePanel
           columnsInputRef={columnsInputRef}
-          headingText={headingText}
+          headingText={session.headingText}
           inputIdPrefix={inputIdPrefix}
-          limits={limits}
+          limits={session.limits}
           onClose={closeFreezePanel}
-          onSaveDefault={onSaveDefault ? saveDefault : undefined}
+          onSaveDefault={session.saveDefault ? saveDefault : undefined}
           onUpdateValues={updateValues}
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-freeze`}
           rowsInputRef={rowsInputRef}
           saveDefaultStatus={saveDefaultStatus}
-          values={values}
+          values={freeze}
         />
       )}
     </>
   );
 }
 
-export function createTableControls(
-  table: HTMLTableElement,
-  onChange: (values: FreezeOptions) => void,
-  options: Pick<TableControlsProps, "defaultValuesPromise" | "headingText" | "onSaveDefault"> = {},
-): HTMLElement {
+export function createTableControls(session: TableSession): HTMLElement {
   const controls = document.createElement(TABLE_CONTROLS_TAG);
   controls.classList.add(TABLE_CONTROLS_CLASS);
-  render(
-    <TableControls
-      defaultValuesPromise={options.defaultValuesPromise}
-      headingText={options.headingText}
-      table={table}
-      limits={{
-        rows: Math.min(table.rows.length, 5),
-        columns: Math.min(table.rows[0]?.cells.length ?? 0, 5),
-      }}
-      onChange={onChange}
-      onSaveDefault={options.onSaveDefault}
-    />,
-    controls,
-  );
+  render(<TableControls session={session} />, controls);
 
   return controls;
+}
+
+export function destroyTableControls(controls: HTMLElement): void {
+  render(null, controls);
 }

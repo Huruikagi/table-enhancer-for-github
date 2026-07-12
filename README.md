@@ -60,6 +60,8 @@ pnpm test:e2e
 
 This project pins Node and pnpm in `.mise.toml`, and `package.json` pins the expected pnpm release through `packageManager`.
 
+The content-script runtime and per-table state boundaries are documented in [docs/architecture.md](docs/architecture.md).
+
 After rebuilding, reload the extension from `chrome://extensions/`.
 
 `pnpm test:e2e` builds the extension in development mode and runs Playwright against a

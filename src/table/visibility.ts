@@ -3,7 +3,6 @@ import {
   HIDDEN_COLUMN_DATA_ATTRIBUTE,
   HIDDEN_ROW_DATA_ATTRIBUTE,
 } from "./constants";
-import { updateResizedTableWidth } from "./resize";
 import { getOriginalRowIndex, initializeOriginalRowIndexes } from "./sort";
 
 export type TableVisibility = {
@@ -93,5 +92,4 @@ export function applyTableVisibility(table: HTMLTableElement, visibility: TableV
   columns.forEach((column, columnIndex) => {
     column.style.display = hiddenColumns.has(columnIndex) ? "none" : "";
   });
-  updateResizedTableWidth(table, hiddenColumns);
 }

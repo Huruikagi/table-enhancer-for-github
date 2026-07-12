@@ -1,7 +1,6 @@
 import { TABLE_WRAPPER_CLASS } from "./constants";
-import { createTableControls } from "./controls";
-import { applyTableFreeze } from "./freeze";
 import { readHeadingFreezeRule, saveHeadingFreezeRule } from "./freeze-rule-storage";
+import { destroyDetachedTableSessions, mountTableSession } from "./lifecycle";
 
 export {
   TABLE_COLUMN_RESIZE_HANDLE_CLASS,
@@ -62,16 +61,25 @@ export function wrapTable(table: HTMLTableElement): void {
   }
 
   const parent = table.parentElement;
-  if (!parent || parent.classList.contains(TABLE_WRAPPER_CLASS)) {
+  if (!parent) {
     table.dataset.githubTableEnhancer = "true";
     return;
   }
 
-  const wrapper = document.createElement("div");
-  wrapper.className = TABLE_WRAPPER_CLASS;
+  const wrapper = parent.classList.contains(TABLE_WRAPPER_CLASS)
+    ? parent
+    : document.createElement("div");
   const headingText = findPreviousHeadingText(table);
   const repository = getRepositoryKey();
-  const controls = createTableControls(table, (values) => applyTableFreeze(table, values), {
+  table.dataset.githubTableEnhancer = "true";
+
+  if (!parent.classList.contains(TABLE_WRAPPER_CLASS)) {
+    wrapper.className = TABLE_WRAPPER_CLASS;
+    parent.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  }
+
+  const session = mountTableSession(table, {
     defaultValuesPromise:
       headingText && repository ? readHeadingFreezeRule(repository, headingText) : null,
     headingText,
@@ -80,10 +88,7 @@ export function wrapTable(table: HTMLTableElement): void {
         ? (values) => saveHeadingFreezeRule(repository, headingText, values)
         : undefined,
   });
-  table.dataset.githubTableEnhancer = "true";
-  parent.insertBefore(wrapper, table);
-  wrapper.appendChild(controls);
-  wrapper.appendChild(table);
+  wrapper.insertBefore(session.controls, table);
 }
 
 export function enhanceTables(root: ParentNode = document): void {
@@ -109,6 +114,12 @@ export function startTableEnhancer(): MutationObserver {
       for (const node of mutation.addedNodes) {
         if (node instanceof Element) {
           enhanceTables(node);
+        }
+      }
+
+      for (const node of mutation.removedNodes) {
+        if (node instanceof Element) {
+          destroyDetachedTableSessions(node);
         }
       }
     }

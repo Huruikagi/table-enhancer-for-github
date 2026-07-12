@@ -187,17 +187,14 @@ function applyColumnWidths(table: HTMLTableElement, widths: readonly number[]): 
   });
 }
 
-export function fitTableColumnWidths(
-  table: HTMLTableElement,
-  hiddenColumns: ReadonlySet<number> = new Set(),
-): void {
+export function measureFitTableColumnWidths(table: HTMLTableElement): readonly number[] {
   const columnCount = getTableColumnCount(table);
 
   if (columnCount === 0) {
-    return;
+    return [];
   }
 
-  const widths = measureWithIntrinsicColumnWidths(table, () =>
+  return measureWithIntrinsicColumnWidths(table, () =>
     Array.from({ length: columnCount }, (_, columnIndex) => {
       const preferredWidth = Array.from(table.rows).reduce((currentWidth, row) => {
         if (!isVisibleRow(row)) {
@@ -216,9 +213,27 @@ export function fitTableColumnWidths(
       return clampColumnWidth(preferredWidth);
     }),
   );
+}
+
+export function applyTableColumnWidths(
+  table: HTMLTableElement,
+  widths: readonly number[] | null,
+  hiddenColumns: ReadonlySet<number> = new Set(),
+): void {
+  if (!widths) {
+    resetTableColumnResize(table);
+    return;
+  }
 
   applyColumnWidths(table, widths);
   updateResizedTableWidth(table, hiddenColumns);
+}
+
+export function fitTableColumnWidths(
+  table: HTMLTableElement,
+  hiddenColumns: ReadonlySet<number> = new Set(),
+): void {
+  applyTableColumnWidths(table, measureFitTableColumnWidths(table), hiddenColumns);
 }
 
 export function updateResizedTableWidth(
@@ -252,7 +267,7 @@ function getColumnResizeHandle(target: EventTarget | null): HTMLElement | null {
 
 export function installColumnResizeBehavior(
   table: HTMLTableElement,
-  onResize: () => void,
+  onResize: (widths: readonly number[]) => void,
 ): () => void {
   let resizeState: ColumnResizeState | null = null;
 
@@ -264,7 +279,6 @@ export function installColumnResizeBehavior(
     resizeState = null;
     document.documentElement.style.cursor = "";
     document.documentElement.style.userSelect = "";
-    onResize();
   };
 
   const handlePointerMove = (event: PointerEvent): void => {
@@ -278,8 +292,7 @@ export function installColumnResizeBehavior(
       MIN_COLUMN_WIDTH,
     );
 
-    applyColumnWidths(table, widths);
-    onResize();
+    onResize(widths);
   };
 
   const handlePointerUp = (event: PointerEvent): void => {
