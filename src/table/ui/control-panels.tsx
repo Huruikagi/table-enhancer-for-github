@@ -24,6 +24,7 @@ type FilterPanelProps = {
   filterQuery: string;
   filterRegularExpressionError: string | null;
   filterUsesRegularExpression: boolean;
+  resultSummary: string | null;
   inputIdPrefix: string;
   onFilterQueryChange: (filterQuery: string) => void;
   onFilterUsesRegularExpressionChange: (value: boolean) => void;
@@ -125,6 +126,7 @@ export function FilterPanel({
   filterQuery,
   filterRegularExpressionError,
   filterUsesRegularExpression,
+  resultSummary,
   inputIdPrefix,
   onFilterQueryChange,
   onFilterUsesRegularExpressionChange,
@@ -138,7 +140,11 @@ export function FilterPanel({
         Filter rows
         <input
           aria-describedby={
-            filterRegularExpressionError ? `${inputIdPrefix}-filter-error` : undefined
+            filterRegularExpressionError
+              ? `${inputIdPrefix}-filter-error`
+              : resultSummary
+                ? `${inputIdPrefix}-filter-summary`
+                : undefined
           }
           aria-invalid={filterRegularExpressionError ? "true" : undefined}
           aria-label="Filter rows"
@@ -171,6 +177,14 @@ export function FilterPanel({
       {filterRegularExpressionError && (
         <span id={`${inputIdPrefix}-filter-error`} role="alert">
           {filterRegularExpressionError}
+        </span>
+      )}
+      {resultSummary && (
+        <span
+          className="github-table-enhancer-filter-summary"
+          id={`${inputIdPrefix}-filter-summary`}
+        >
+          {resultSummary}
         </span>
       )}
       {filterQuery.trim() && (

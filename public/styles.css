@@ -56,6 +56,7 @@ body.github-table-enhancer-focus-mode-open {
 
 .github-table-enhancer-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   justify-content: flex-end;
   margin-block-end: 6px;
@@ -63,6 +64,35 @@ body.github-table-enhancer-focus-mode-open {
   position: sticky;
   left: 0;
   z-index: 5;
+}
+
+.github-table-enhancer-filter-empty-state {
+  align-items: center;
+  background: var(--bgColor-muted, var(--color-canvas-subtle, #f6f8fa));
+  border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+  border-radius: 6px;
+  color: var(--fgColor-muted, var(--color-fg-muted, #57606a));
+  display: flex;
+  flex-basis: 100%;
+  font-size: 12px;
+  gap: 8px;
+  justify-content: center;
+  order: 1;
+  padding: 8px 12px;
+}
+
+.github-table-enhancer-filter-empty-state button {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+.github-table-enhancer-filter-empty-state button:hover {
+  text-decoration: underline;
 }
 
 .github-table-enhancer-scroll[data-github-table-enhancer-focus-mode="true"]
@@ -145,6 +175,12 @@ body.github-table-enhancer-focus-mode-open {
 
 .github-table-enhancer-controls-panel [role="alert"] {
   color: var(--fgColor-danger, var(--color-danger-fg, #cf222e));
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.github-table-enhancer-filter-summary {
+  color: var(--fgColor-muted, var(--color-fg-muted, #57606a));
   font-size: 12px;
   white-space: nowrap;
 }

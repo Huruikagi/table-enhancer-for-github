@@ -159,6 +159,29 @@ test("filters rows and resets the current table view", async ({ page }) => {
   await expect(table).not.toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
 });
 
+test("explains why a filter leaves no visible rows", async ({ page }) => {
+  await page.goto(fixtureUrl);
+
+  const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+  const filterInput = wrapper.getByLabel("Filter rows");
+
+  await wrapper.getByRole("button", { name: "Filter" }).click();
+  await filterInput.fill("does-not-exist");
+  await expect(wrapper.getByRole("status")).toContainText("No rows match this filter.");
+  await expect(wrapper.locator(".github-table-enhancer-filter-summary")).toContainText(
+    "0 of 4 rows",
+  );
+
+  await filterInput.fill("rebuilt content script is active");
+  const matchingRow = wrapper.locator("tbody tr").nth(2);
+  await matchingRow.hover();
+  await matchingRow.getByRole("button", { name: /Hide row/ }).click();
+
+  await expect(wrapper.getByRole("status")).toContainText("1 matching row is hidden.");
+  await wrapper.getByRole("status").getByRole("button", { name: "Show hidden" }).click();
+  await expect(wrapper.getByRole("status")).toHaveCount(0);
+});
+
 test("toggles regular expression filtering and reports invalid expressions", async ({ page }) => {
   await page.goto(fixtureUrl);
 

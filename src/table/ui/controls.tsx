@@ -9,7 +9,7 @@ import {
 import type { TableController } from "../controller";
 import type { CopyFormat } from "../features/copy";
 import { useTableFocusMode } from "../features/focus-mode";
-import { getFilterRegularExpressionError } from "../features/visibility";
+import { getFilterRegularExpressionError, getTableFilterResult } from "../features/visibility";
 import type { FreezeOptions } from "../state";
 import { ControlIcon } from "./control-icons";
 import { CopyPanel, FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
@@ -51,6 +51,17 @@ function TableControls({
   const { filterQuery, filterUsesRegularExpression, freeze, hiddenColumns, hiddenRows, isWrapped } =
     viewState;
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
+  const filterResult = getTableFilterResult(table, {
+    rows: hiddenRows,
+    columns: hiddenColumns,
+    filterQuery,
+    filterUsesRegularExpression,
+  });
+  const filterResultSummary = filterResult
+    ? filterResult.visibleRows === filterResult.matchingRows
+      ? `${filterResult.matchingRows} of ${filterResult.totalRows} rows`
+      : `${filterResult.visibleRows} shown · ${filterResult.matchingRows} matches · ${filterResult.totalRows} total`
+    : null;
   const anchorPrefix = `--gte-${inputIdPrefix.replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   const applyValues = (nextValues: FreezeOptions): FreezeOptions => {
@@ -291,6 +302,27 @@ function TableControls({
         <ControlIcon kind="expand" />
       </button>
 
+      {filterResult?.visibleRows === 0 && (
+        <div aria-live="polite" className="github-table-enhancer-filter-empty-state" role="status">
+          <span>
+            {filterResult.matchingRows === 0
+              ? "No rows match this filter."
+              : `${filterResult.matchingRows} matching ${filterResult.matchingRows === 1 ? "row is" : "rows are"} hidden.`}
+          </span>
+          {filterResult.matchingRows > 0 && (
+            <button onClick={showHidden} type="button">
+              Show hidden
+            </button>
+          )}
+          <button
+            onClick={() => controller.dispatch({ type: "filterQueryChanged", value: "" })}
+            type="button"
+          >
+            Clear filter
+          </button>
+        </div>
+      )}
+
       {openPanel === "copy" && (
         <CopyPanel
           firstButtonRef={copyFirstButtonRef}
@@ -309,6 +341,7 @@ function TableControls({
             filterUsesRegularExpression ? getFilterRegularExpressionError(filterQuery) : null
           }
           filterUsesRegularExpression={filterUsesRegularExpression}
+          resultSummary={filterResultSummary}
           inputIdPrefix={inputIdPrefix}
           onEscape={closeFilterPanel}
           onFilterQueryChange={(value) =>

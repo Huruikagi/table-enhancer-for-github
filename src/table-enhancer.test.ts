@@ -790,6 +790,65 @@ describe("wrapTable", () => {
     expect(table.rows[2]?.dataset[FILTERED_ROW_DATA_ATTRIBUTE]).toBeUndefined();
   });
 
+  it("explains empty filter results and distinguishes manually hidden matches", () => {
+    renderMarkdownTables(`
+      <table>
+        <thead><tr><th>Runtime</th></tr></thead>
+        <tbody><tr><td>Node.js</td></tr><tr><td>Ruby</td></tr></tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    clickButton("Filter");
+    setFilterInput("missing");
+
+    expect(document.querySelector(".github-table-enhancer-filter-summary")?.textContent).toBe(
+      "0 of 2 rows",
+    );
+    expect(document.querySelector("[role='status']")?.textContent).toContain(
+      "No rows match this filter.",
+    );
+
+    setFilterInput("node");
+    clickButton("Hide row 2");
+
+    expect(document.querySelector(".github-table-enhancer-filter-summary")?.textContent).toBe(
+      "0 shown · 1 matches · 2 total",
+    );
+    expect(document.querySelector("[role='status']")?.textContent).toContain(
+      "1 matching row is hidden.",
+    );
+    expect(document.querySelector("[role='status']")?.textContent).toContain("Show hidden");
+  });
+
+  it("restores hidden filter matches from the empty state", () => {
+    renderMarkdownTables(`
+      <table>
+        <thead><tr><th>Runtime</th></tr></thead>
+        <tbody><tr><td>Node.js</td></tr><tr><td>Ruby</td></tr></tbody>
+      </table>
+    `);
+    const table = getTable();
+
+    wrapTable(table);
+    clickButton("Filter");
+    setFilterInput("node");
+    clickButton("Hide row 2");
+    const emptyState = document.querySelector<HTMLElement>(
+      ".github-table-enhancer-filter-empty-state",
+    );
+
+    act(() => {
+      emptyState
+        ?.querySelector<HTMLButtonElement>("button")
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+
+    expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(document.querySelector(".github-table-enhancer-filter-empty-state")).toBeNull();
+  });
+
   it("keeps the first row visible as a header when the table has no thead", () => {
     renderMarkdownTables(`
       <table>

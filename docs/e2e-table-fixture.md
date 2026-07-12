@@ -24,6 +24,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Clicking a column header sort button should cycle body rows through ascending, descending, and original Markdown order while leaving header rows in place.
 - Show hidden should restore hidden rows and columns.
 - Clicking Filter should show and focus a Filter rows input. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible.
+- The Filter panel should show the matching and visible row counts. When no rows remain, the table should show whether no rows match or all matching rows were manually hidden, with actions to clear the filter or restore hidden rows.
 - The `.*` button should toggle regular-expression matching. A valid expression should match rows case-insensitively, while an invalid expression should show an error and leave all rows visible.
 - Pressing Escape inside Freeze, Filter, or Copy as should close the popup and return focus to its button.
 - Clicking outside an open Freeze, Filter, or Copy as popup should close it without moving focus away from the clicked element.
@@ -109,6 +110,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 29 | Page scroll | Scroll the GitHub file view so the top of this table passes under the repository controls. | Frozen rows should not appear above the table wrapper or cover GitHub file actions. |
 | 29a | Restore | Open the Freeze control and click Show hidden. | Hidden rows and columns are restored. |
 | 29b | Filter | Click Filter and type `rebuild`. | Only matching body rows remain visible, while the header row and any manually hidden rows keep their expected visibility. |
+| 29b-0 | Empty filter result | Enter a query with no matches, then hide the only row matching another query. | The first case says no rows match and offers Clear filter; the second says the matching row is hidden and offers Show hidden and Clear filter. |
 | 29b-1 | Regular expression filter | Enable `.*` and type `03[\\s\\S]*active`. Then enter an invalid `[` expression. | The valid expression shows matching rows case-insensitively; the invalid expression shows an error and leaves all rows visible. |
 | 29c | Clear filter | Click Clear filter. | Rows hidden only by filtering are restored. |
 | 29d | Copy as | With a filter or hidden column applied, click Copy as and choose Markdown, CSV, or TSV. | Clipboard output includes the visible header and visible rows only, in the selected format. |

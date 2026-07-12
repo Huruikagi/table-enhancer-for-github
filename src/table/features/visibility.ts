@@ -12,6 +12,12 @@ export type TableVisibility = {
   filterUsesRegularExpression?: boolean;
 };
 
+export type TableFilterResult = {
+  matchingRows: number;
+  totalRows: number;
+  visibleRows: number;
+};
+
 export function getFilterRegularExpressionError(filterQuery: string): string | null {
   if (!filterQuery.trim()) {
     return null;
@@ -46,25 +52,69 @@ function isFilteredRow(
   return !matchesFilter(row.textContent ?? "");
 }
 
+function createFilterMatcher(
+  filterQuery: string,
+  filterUsesRegularExpression = false,
+): ((text: string) => boolean) | null {
+  if (!filterQuery.trim()) {
+    return null;
+  }
+
+  if (filterUsesRegularExpression) {
+    try {
+      const regularExpression = new RegExp(filterQuery, "i");
+      return (text) => regularExpression.test(text);
+    } catch {
+      return null;
+    }
+  }
+
+  const normalizedFilterQuery = filterQuery.trim().toLowerCase();
+  return (text) => text.toLowerCase().includes(normalizedFilterQuery);
+}
+
+export function getTableFilterResult(
+  table: HTMLTableElement,
+  visibility: TableVisibility,
+): TableFilterResult | null {
+  initializeOriginalRowIndexes(table);
+  const filterQuery = visibility.filterQuery ?? "";
+  const matchesFilter = createFilterMatcher(filterQuery, visibility.filterUsesRegularExpression);
+
+  if (!matchesFilter) {
+    return null;
+  }
+
+  const hiddenRows = new Set(visibility.rows);
+  let matchingRows = 0;
+  let totalRows = 0;
+  let visibleRows = 0;
+
+  for (const [rowIndex, row] of Array.from(table.rows).entries()) {
+    if (isHeaderRow(table, row, rowIndex)) {
+      continue;
+    }
+
+    totalRows += 1;
+    if (!matchesFilter(row.textContent ?? "")) {
+      continue;
+    }
+
+    matchingRows += 1;
+    if (!hiddenRows.has(getOriginalRowIndex(row))) {
+      visibleRows += 1;
+    }
+  }
+
+  return { matchingRows, totalRows, visibleRows };
+}
+
 export function applyTableVisibility(table: HTMLTableElement, visibility: TableVisibility): void {
   initializeOriginalRowIndexes(table);
   const hiddenRows = new Set(visibility.rows);
   const hiddenColumns = new Set(visibility.columns);
   const filterQuery = visibility.filterQuery ?? "";
-  let matchesFilter: ((text: string) => boolean) | null = null;
-  if (filterQuery.trim()) {
-    if (visibility.filterUsesRegularExpression) {
-      try {
-        const regularExpression = new RegExp(filterQuery, "i");
-        matchesFilter = (text) => regularExpression.test(text);
-      } catch {
-        matchesFilter = null;
-      }
-    } else {
-      const normalizedFilterQuery = filterQuery.trim().toLowerCase();
-      matchesFilter = (text) => text.toLowerCase().includes(normalizedFilterQuery);
-    }
-  }
+  const matchesFilter = createFilterMatcher(filterQuery, visibility.filterUsesRegularExpression);
   const columns = table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col");
 
   for (const [rowIndex, row] of Array.from(table.rows).entries()) {
