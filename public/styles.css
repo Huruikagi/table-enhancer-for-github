@@ -298,6 +298,18 @@ body.github-table-enhancer-focus-mode-open {
   color: var(--fgColor-default, var(--color-fg-default));
 }
 
+.github-table-enhancer-scroll > table [aria-sort="none"] > .github-table-enhancer-sort-button {
+  opacity: 0.65;
+}
+
+.github-table-enhancer-scroll > table [aria-sort="none"] > .github-table-enhancer-sort-button:hover,
+.github-table-enhancer-scroll
+  > table
+  [aria-sort="none"]
+  > .github-table-enhancer-sort-button:focus-visible {
+  opacity: 1;
+}
+
 .github-table-enhancer-scroll
   > table
   [aria-sort="ascending"]
