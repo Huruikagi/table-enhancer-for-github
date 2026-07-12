@@ -83,7 +83,7 @@ Hide buttons appear while hovering table cells. Row hide buttons appear on the f
 
 The Filter control can temporarily show only body rows whose row text contains a case-insensitive search term. Regular expression mode supports more precise matching and reports invalid expressions without hiding rows. Header rows stay visible, Clear filter restores filtered rows, and manually hidden rows remain hidden until Show hidden is used.
 
-Each column header includes a sort button. Repeated clicks cycle through ascending, descending, and original Markdown order. Numeric and date-like values are compared by value, while other text uses case-insensitive natural ordering. Sorting is temporary and keeps filters and manually hidden rows attached to the same rows.
+Hover a column header to reveal its unsorted sort button. Once selected, the ascending or descending direction remains visible. Repeated clicks cycle through ascending, descending, and original Markdown order. Numeric and date-like values are compared by value, while other text uses case-insensitive natural ordering. Sorting is temporary and keeps filters and manually hidden rows attached to the same rows.
 
 The Copy as control writes the current visible table view to the clipboard as Markdown, CSV, or TSV. Rows hidden manually, rows hidden by the current filter, and hidden columns are omitted from the copied output.
 

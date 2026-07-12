@@ -299,6 +299,14 @@ body.github-table-enhancer-focus-mode-open {
 }
 
 .github-table-enhancer-scroll > table [aria-sort="none"] > .github-table-enhancer-sort-button {
+  opacity: 0;
+  transition: opacity 80ms ease-in-out;
+}
+
+.github-table-enhancer-scroll
+  > table
+  th[aria-sort="none"]:hover
+  > .github-table-enhancer-sort-button {
   opacity: 0.65;
 }
 

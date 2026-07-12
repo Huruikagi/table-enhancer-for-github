@@ -52,7 +52,7 @@ Filtering is temporary and is not saved as a default.
 
 ## Sort table rows
 
-Select the sort button in a column header to sort the table body by that column. Repeated selections cycle through ascending, descending, and original Markdown order. Numeric and date-like values are compared by value; other text uses case-insensitive natural ordering.
+Hover a column header to reveal its unsorted sort button, then select it to sort the table body by that column. Once selected, the ascending or descending direction remains visible. Repeated selections cycle through ascending, descending, and original Markdown order. Numeric and date-like values are compared by value; other text uses case-insensitive natural ordering.
 
 Sorting is temporary. It preserves the identity of manually hidden and filtered rows as their positions change.
 

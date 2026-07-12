@@ -15,7 +15,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Tables without a preceding heading should not offer Save default.
 - Clicking Save default should persist the current rows and columns for the nearest preceding heading text.
 - Reloading the page should apply the saved default to tables with the same preceding heading text.
-- Hovering a table header cell should show a column hide button.
+- Hovering a table header cell should show its column hide button and unsorted sort button.
 - Hovering the first cell in a row should show a row hide button.
 - Dragging a column edge should resize that displayed column without changing the surrounding GitHub layout.
 - Clicking Fit should set readable column widths and enable wrapped cell rendering in one step.

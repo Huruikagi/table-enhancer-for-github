@@ -189,9 +189,13 @@ test("sorts rows through all three states and resets to the source order", async
   const rows = wrapper.locator("tbody tr");
   const sortButton = wrapper.getByRole("button", { name: "Sort by column 2" });
 
+  await expect(sortButton).toHaveCSS("opacity", "0");
+  await wrapper.locator("thead th").nth(1).hover();
+  await expect(sortButton).toHaveCSS("opacity", "0.65");
   await sortButton.click();
   await expect(rows.nth(0).locator("td").nth(1)).toHaveText("Filter");
   await expect(wrapper.locator("thead th").nth(1)).toHaveAttribute("aria-sort", "ascending");
+  await expect(sortButton).toHaveCSS("opacity", "1");
 
   await sortButton.click();
   await expect(rows.nth(0).locator("td").nth(1)).toHaveText("Setup");
