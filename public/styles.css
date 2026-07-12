@@ -303,6 +303,7 @@ body.github-table-enhancer-focus-mode-open {
   [aria-sort="ascending"]
   > .github-table-enhancer-sort-button::after {
   content: "↑";
+  font-size: 16px;
 }
 
 .github-table-enhancer-scroll
@@ -310,6 +311,7 @@ body.github-table-enhancer-focus-mode-open {
   [aria-sort="descending"]
   > .github-table-enhancer-sort-button::after {
   content: "↓";
+  font-size: 16px;
 }
 
 .github-table-enhancer-scroll
