@@ -4,25 +4,25 @@
  */
 import { createTableController, type TableController } from "./controller";
 import { createTableControls, destroyTableControls } from "./controls";
-import { type CopyFormat, copyVisibleTable } from "./copy";
+import { type CopyFormat, copyVisibleTable } from "./features/copy";
 import {
   getHideControlClick,
   installTableHideControls,
   resetTableHideControls,
-} from "./hide-controls";
-import { reconcileTable } from "./reconcile";
+} from "./features/hide-controls";
 import {
   installColumnResizeBehavior,
   installTableColumnResizeControls,
   measureFitTableColumnWidths,
   resetTableColumnResizeControls,
-} from "./resize";
+} from "./features/resize";
 import {
   getNextTableSort,
   getSortColumnClick,
   installTableSortControls,
   resetTableSortControls,
-} from "./sort";
+} from "./features/sort";
+import { reconcileTable } from "./reconcile";
 import type { FreezeOptions } from "./state";
 
 export type TableRuntimeOptions = {

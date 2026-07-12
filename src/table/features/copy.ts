@@ -2,7 +2,7 @@ import {
   FILTERED_ROW_DATA_ATTRIBUTE,
   HIDDEN_COLUMN_DATA_ATTRIBUTE,
   HIDDEN_ROW_DATA_ATTRIBUTE,
-} from "./constants";
+} from "../constants";
 
 export type CopyFormat = "markdown" | "csv" | "tsv";
 

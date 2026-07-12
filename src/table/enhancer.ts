@@ -11,8 +11,8 @@ export {
   TABLE_HIDE_BUTTON_CLASS,
   TABLE_WRAPPER_CLASS,
 } from "./constants";
-export { applyTableFreeze } from "./freeze";
-export { applyTableVisibility } from "./visibility";
+export { applyTableFreeze } from "./features/freeze";
+export { applyTableVisibility } from "./features/visibility";
 
 export function isMarkdownBlobPage(pathname = window.location.pathname): boolean {
   return /^\/[^/]+\/[^/]+\/blob\/.+\.md$/i.test(pathname);

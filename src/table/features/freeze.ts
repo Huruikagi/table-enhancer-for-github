@@ -8,10 +8,10 @@ import {
   STICKY_TOP_PROPERTY,
   STICKY_Z_INDEX_PROPERTY,
   TABLE_WRAPPER_CLASS,
-} from "./constants";
+} from "../constants";
+import type { FreezeOptions } from "../state";
+import { clampInteger } from "../utils";
 import { getStickyColumnWidth } from "./resize";
-import type { FreezeOptions } from "./state";
-import { clampInteger } from "./utils";
 
 type StickyCellLayout = {
   cell: HTMLTableCellElement;

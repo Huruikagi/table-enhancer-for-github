@@ -2,7 +2,7 @@ import {
   HIDE_ACTION_DATA_ATTRIBUTE,
   HIDE_INDEX_DATA_ATTRIBUTE,
   TABLE_HIDE_BUTTON_CLASS,
-} from "./constants";
+} from "../constants";
 import { getOriginalRowIndex, initializeOriginalRowIndexes } from "./sort";
 
 export type HideAction = "hide-row" | "hide-column";

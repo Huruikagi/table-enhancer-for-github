@@ -5,10 +5,10 @@ import { TABLE_CONTROLS_CLASS, TABLE_CONTROLS_TAG, TABLE_CONTROLS_TOGGLE_CLASS }
 import { ControlIcon } from "./control-icons";
 import { CopyPanel, FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
 import type { TableController } from "./controller";
-import type { CopyFormat } from "./copy";
-import { useTableFocusMode } from "./focus-mode";
+import type { CopyFormat } from "./features/copy";
+import { useTableFocusMode } from "./features/focus-mode";
+import { getFilterRegularExpressionError } from "./features/visibility";
 import type { FreezeOptions } from "./state";
-import { getFilterRegularExpressionError } from "./visibility";
 
 type TableControlsProps = {
   controller: TableController;

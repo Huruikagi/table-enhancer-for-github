@@ -6,7 +6,7 @@ import {
   FOCUS_MODE_DATA_ATTRIBUTE,
   TABLE_CONTROLS_CLASS,
   TABLE_WRAPPER_CLASS,
-} from "./constants";
+} from "../constants";
 
 export function useTableFocusMode(
   table: HTMLTableElement,

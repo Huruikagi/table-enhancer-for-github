@@ -2,7 +2,7 @@ import {
   FILTERED_ROW_DATA_ATTRIBUTE,
   HIDDEN_COLUMN_DATA_ATTRIBUTE,
   HIDDEN_ROW_DATA_ATTRIBUTE,
-} from "./constants";
+} from "../constants";
 import { getOriginalRowIndex, initializeOriginalRowIndexes } from "./sort";
 
 export type TableVisibility = {

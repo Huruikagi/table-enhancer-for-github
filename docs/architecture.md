@@ -21,6 +21,23 @@ composition boundary: it installs table interactions, subscribes DOM reconciliat
 changes, passes external operation callbacks to the controls, and releases those resources when
 GitHub removes the table from the page.
 
+## Module layout
+
+The files directly under `src/table/` define application boundaries such as state, controller,
+mounting, reconciliation, lifecycle, discovery, storage, and controls. Individual table behaviors
+live under `src/table/features/`:
+
+- `copy.ts`
+- `focus-mode.ts`
+- `freeze.ts`
+- `hide-controls.ts`
+- `resize.ts`
+- `sort.ts`
+- `visibility.ts`
+
+Feature modules may use shared state types, constants, and read-only helpers from another feature.
+Cross-feature DOM mutation order remains the responsibility of `reconcile.ts`.
+
 ## State ownership
 
 `TableViewState` is the source of truth for changes that affect the displayed table:
@@ -69,7 +86,7 @@ changing controls or state transitions.
 - `state.test.ts` covers pure state transitions.
 - `controller.test.ts` covers controller policies and notifications without a DOM.
 - `enhancer-discovery.test.ts` covers GitHub URL and Markdown discovery rules.
-- `projections.test.ts` covers focused DOM projections.
+- `features/projections.test.ts` covers focused DOM projections.
 - `lifecycle.test.ts` covers mount, destroy, cleanup, and remount.
 - `table-enhancer.test.ts` remains the DOM integration and behavior regression suite.
 - `e2e/table-enhancer.spec.ts` verifies the built extension in Chromium.

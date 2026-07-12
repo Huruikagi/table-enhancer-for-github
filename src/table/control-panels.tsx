@@ -1,6 +1,6 @@
 import type { Ref, RefObject, VNode } from "preact";
 import { TABLE_CONTROLS_PANEL_CLASS } from "./constants";
-import type { CopyFormat } from "./copy";
+import type { CopyFormat } from "./features/copy";
 import type { FreezeOptions } from "./state";
 
 type FreezeInputKind = keyof FreezeOptions;

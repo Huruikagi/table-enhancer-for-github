@@ -3,11 +3,11 @@
  * This module coordinates projections but does not own state or browser event listeners.
  */
 import { WRAPPED_COLUMNS_DATA_ATTRIBUTE } from "./constants";
-import { applyTableFreeze } from "./freeze";
-import { applyTableColumnWidths } from "./resize";
-import { applyTableSort } from "./sort";
+import { applyTableFreeze } from "./features/freeze";
+import { applyTableColumnWidths } from "./features/resize";
+import { applyTableSort } from "./features/sort";
+import { applyTableVisibility } from "./features/visibility";
 import type { TableViewState } from "./state";
-import { applyTableVisibility } from "./visibility";
 
 function applyTableWrap(table: HTMLTableElement, isWrapped: boolean): void {
   if (isWrapped) {

@@ -5,7 +5,7 @@ import {
   MIN_COLUMN_WIDTH,
   RESIZED_COLUMNS_DATA_ATTRIBUTE,
   TABLE_COLUMN_RESIZE_HANDLE_CLASS,
-} from "./constants";
+} from "../constants";
 
 const FIT_COLUMN_MIN_WIDTH = 96;
 const FIT_COLUMN_MAX_WIDTH = 320;

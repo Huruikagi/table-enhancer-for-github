@@ -2,8 +2,8 @@ import {
   ORIGINAL_ROW_INDEX_DATA_ATTRIBUTE,
   SORT_COLUMN_INDEX_DATA_ATTRIBUTE,
   TABLE_SORT_BUTTON_CLASS,
-} from "./constants";
-import type { TableSort } from "./state";
+} from "../constants";
+import type { TableSort } from "../state";
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 
