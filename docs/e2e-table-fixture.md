@@ -26,6 +26,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Clicking Filter should show and focus a Filter rows input. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible.
 - The `.*` button should toggle regular-expression matching. A valid expression should match rows case-insensitively, while an invalid expression should show an error and leave all rows visible.
 - Pressing Escape inside Freeze, Filter, or Copy as should close the popup and return focus to its button.
+- Clicking outside an open Freeze, Filter, or Copy as popup should close it without moving focus away from the clicked element.
 - Icon-only controls should expose a descriptive tooltip on hover and an accessible name to assistive technology.
 - Controls should be ordered by task: Freeze, Filter, Copy as, Fit, Wrap, restore/reset actions, then Expand.
 - Clear filter should restore rows hidden only by the filter, while manually hidden rows remain hidden until Show hidden is clicked.

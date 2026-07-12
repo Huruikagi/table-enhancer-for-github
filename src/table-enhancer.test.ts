@@ -450,6 +450,22 @@ describe("wrapTable", () => {
     expect(document.activeElement).toBe(freezeButton);
   });
 
+  it("closes an open control panel when clicking outside it", () => {
+    renderMarkdownTables(`
+      <table><tbody><tr><td>one</td><td>two</td></tr></tbody></table>
+    `);
+
+    wrapTable(getTable());
+    openFreezeControls();
+
+    act(() => {
+      document.body.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true }));
+    });
+
+    expect(document.querySelector("input[aria-label='Frozen rows']")).toBeNull();
+    expect(getButton("Freeze").ariaExpanded).toBe("false");
+  });
+
   it("toggles wrapped column rendering from the table controls", () => {
     renderMarkdownTables(`
       <table>

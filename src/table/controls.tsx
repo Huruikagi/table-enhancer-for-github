@@ -66,6 +66,7 @@ function TableControls({
   const hasUserEditedValues = useRef(false);
   const copyToggleRef = useRef<HTMLButtonElement>(null);
   const copyFirstButtonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const freezeToggleRef = useRef<HTMLButtonElement>(null);
   const filterToggleRef = useRef<HTMLButtonElement>(null);
   const focusToggleRef = useRef<HTMLButtonElement>(null);
@@ -278,6 +279,36 @@ function TableControls({
     }
   }, [openPanel]);
 
+  useLayoutEffect(() => {
+    if (openPanel === null) {
+      return;
+    }
+
+    const activeToggle =
+      openPanel === "copy"
+        ? copyToggleRef.current
+        : openPanel === "filter"
+          ? filterToggleRef.current
+          : freezeToggleRef.current;
+    const handlePointerDown = (event: PointerEvent): void => {
+      if (
+        !(event.target instanceof Node) ||
+        panelRef.current?.contains(event.target) ||
+        activeToggle?.contains(event.target)
+      ) {
+        return;
+      }
+
+      setOpenPanel(null);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [openPanel]);
+
   useTableFocusMode(table, isFocusMode, setIsFocusMode, focusToggleRef);
 
   const closeFreezePanel = (): void => {
@@ -409,6 +440,7 @@ function TableControls({
           firstButtonRef={copyFirstButtonRef}
           onCopy={copyTable}
           onEscape={closeCopyPanel}
+          panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-copy`}
           status={copyStatus}
         />
@@ -425,6 +457,7 @@ function TableControls({
           onEscape={closeFilterPanel}
           onFilterQueryChange={setFilterQuery}
           onFilterUsesRegularExpressionChange={setFilterUsesRegularExpression}
+          panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-filter`}
         />
       )}
@@ -436,6 +469,7 @@ function TableControls({
           onClose={closeFreezePanel}
           onSaveDefault={onSaveDefault ? saveDefault : undefined}
           onUpdateValues={updateValues}
+          panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-freeze`}
           rowsInputRef={rowsInputRef}
           saveDefaultStatus={saveDefaultStatus}

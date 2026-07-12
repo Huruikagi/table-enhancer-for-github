@@ -27,6 +27,7 @@ type FilterPanelProps = {
   onFilterQueryChange: (filterQuery: string) => void;
   onFilterUsesRegularExpressionChange: (value: boolean) => void;
   onEscape: () => void;
+  panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
 };
 
@@ -34,6 +35,7 @@ type CopyPanelProps = {
   firstButtonRef: Ref<HTMLButtonElement>;
   onCopy: (format: CopyFormat) => void;
   onEscape: () => void;
+  panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
   status: CopyFormat | "failed" | "idle";
 };
@@ -45,6 +47,7 @@ type FreezePanelProps = {
   onClose: () => void;
   onSaveDefault?: () => void;
   onUpdateValues: (values: FreezeOptions) => FreezeOptions;
+  panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
   rowsInputRef: Ref<HTMLInputElement>;
   saveDefaultStatus: SaveDefaultStatus;
@@ -104,10 +107,11 @@ export function FilterPanel({
   onFilterQueryChange,
   onFilterUsesRegularExpressionChange,
   onEscape,
+  panelRef,
   positionAnchor,
 }: FilterPanelProps): VNode {
   return (
-    <div className={TABLE_CONTROLS_PANEL_CLASS} style={{ positionAnchor }}>
+    <div className={TABLE_CONTROLS_PANEL_CLASS} ref={panelRef} style={{ positionAnchor }}>
       <label htmlFor={`${inputIdPrefix}-filter`}>
         Filter rows
         <input
@@ -160,11 +164,17 @@ export function CopyPanel({
   firstButtonRef,
   onCopy,
   onEscape,
+  panelRef,
   positionAnchor,
   status,
 }: CopyPanelProps): VNode {
   return (
-    <div aria-live="polite" className={TABLE_CONTROLS_PANEL_CLASS} style={{ positionAnchor }}>
+    <div
+      aria-live="polite"
+      className={TABLE_CONTROLS_PANEL_CLASS}
+      ref={panelRef}
+      style={{ positionAnchor }}
+    >
       {(["markdown", "csv", "tsv"] as const).map((format) => (
         <button
           key={format}
@@ -194,6 +204,7 @@ export function FreezePanel({
   onClose,
   onSaveDefault,
   onUpdateValues,
+  panelRef,
   positionAnchor,
   rowsInputRef,
   saveDefaultStatus,
@@ -202,6 +213,7 @@ export function FreezePanel({
   return (
     <div
       className={`${TABLE_CONTROLS_PANEL_CLASS} ${TABLE_CONTROLS_PANEL_CLASS}--freeze`}
+      ref={panelRef}
       style={{ positionAnchor }}
     >
       <label htmlFor={`${inputIdPrefix}-rows`}>
