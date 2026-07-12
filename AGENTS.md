@@ -17,6 +17,10 @@
 - When adding or changing user-visible table behavior, update `docs/e2e-table-fixture.md` as needed so manual Chrome E2E coverage stays current.
 - When changing browser-visible table behavior, run `pnpm test:e2e` when the change affects extension loading, Chrome storage, table controls, scrolling, sticky freeze behavior, filtering, hiding, resizing, fit, wrap, or reset behavior.
 
+## Architecture
+
+- Before changing table state management, controls, DOM reconciliation, mounting, or lifecycle behavior, read `docs/architecture.md` and preserve the dependency direction documented there.
+
 ## Project commands
 
 - Use `mise install` to install the pinned tool versions.
