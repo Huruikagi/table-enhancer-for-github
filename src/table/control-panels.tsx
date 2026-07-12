@@ -1,4 +1,4 @@
-import type { Ref, VNode } from "preact";
+import type { Ref, RefObject, VNode } from "preact";
 import { TABLE_CONTROLS_PANEL_CLASS } from "./constants";
 import type { CopyFormat } from "./copy";
 import type { FreezeOptions } from "./freeze";
@@ -15,6 +15,7 @@ type FreezeNumberInputProps = {
   limits: FreezeOptions;
   onChange: (values: FreezeOptions) => FreezeOptions;
   onEscape: () => void;
+  onValidValueChange?: () => void;
   values: FreezeOptions;
 };
 
@@ -49,6 +50,7 @@ type FreezePanelProps = {
   onUpdateValues: (values: FreezeOptions) => FreezeOptions;
   panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
+  columnsInputRef: RefObject<HTMLInputElement>;
   rowsInputRef: Ref<HTMLInputElement>;
   saveDefaultStatus: SaveDefaultStatus;
   values: FreezeOptions;
@@ -68,6 +70,7 @@ function FreezeNumberInput({
   limits,
   onChange,
   onEscape,
+  onValidValueChange,
   values,
 }: FreezeNumberInputProps): VNode {
   return (
@@ -75,12 +78,30 @@ function FreezeNumberInput({
       aria-label={label}
       id={`${inputIdPrefix}-${kind}`}
       inputMode="numeric"
+      maxLength={1}
       max={String(limits[kind])}
       min="0"
-      onChange={(event) => {
+      onFocus={(event) => {
+        event.currentTarget.select();
+      }}
+      onInput={(event) => {
         const input = event.currentTarget;
+        const nextValue = Number(input.value);
+        const isValidValue =
+          /^[0-9]$/.test(input.value) &&
+          Number.isInteger(nextValue) &&
+          nextValue >= 0 &&
+          nextValue <= limits[kind];
+
+        if (!isValidValue) {
+          input.value = String(values[kind]);
+          return;
+        }
+
         const clampedValues = onChange({ ...values, [kind]: Number(input.value) });
         input.value = String(clampedValues[kind]);
+
+        onValidValueChange?.();
       }}
       onKeyDown={(event) => {
         if (event.key !== "Escape") {
@@ -92,7 +113,8 @@ function FreezeNumberInput({
         onEscape();
       }}
       ref={inputRef}
-      type="number"
+      pattern="[0-9]"
+      type="text"
       value={String(values[kind])}
     />
   );
@@ -206,6 +228,7 @@ export function FreezePanel({
   onUpdateValues,
   panelRef,
   positionAnchor,
+  columnsInputRef,
   rowsInputRef,
   saveDefaultStatus,
   values,
@@ -226,6 +249,7 @@ export function FreezePanel({
           limits={limits}
           onChange={onUpdateValues}
           onEscape={onClose}
+          onValidValueChange={() => columnsInputRef.current?.focus()}
           values={values}
         />
       </label>
@@ -233,6 +257,7 @@ export function FreezePanel({
         Columns
         <FreezeNumberInput
           inputIdPrefix={inputIdPrefix}
+          inputRef={columnsInputRef}
           kind="columns"
           label="Frozen columns"
           limits={limits}

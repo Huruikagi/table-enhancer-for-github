@@ -71,6 +71,7 @@ function TableControls({
   const filterToggleRef = useRef<HTMLButtonElement>(null);
   const focusToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
+  const columnsInputRef = useRef<HTMLInputElement>(null);
   const filterInputRef = useRef<HTMLInputElement>(null);
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -269,7 +270,9 @@ function TableControls({
 
   useLayoutEffect(() => {
     if (openPanel === "freeze") {
-      rowsInputRef.current?.focus();
+      const rowsInput = rowsInputRef.current;
+      rowsInput?.focus();
+      rowsInput?.select();
     }
   }, [openPanel]);
 
@@ -463,6 +466,7 @@ function TableControls({
       )}
       {openPanel === "freeze" && (
         <FreezePanel
+          columnsInputRef={columnsInputRef}
           headingText={headingText}
           inputIdPrefix={inputIdPrefix}
           limits={limits}
@@ -493,8 +497,8 @@ export function createTableControls(
       headingText={options.headingText}
       table={table}
       limits={{
-        rows: table.rows.length,
-        columns: table.rows[0]?.cells.length ?? 0,
+        rows: Math.min(table.rows.length, 5),
+        columns: Math.min(table.rows[0]?.cells.length ?? 0, 5),
       }}
       onChange={onChange}
       onSaveDefault={options.onSaveDefault}

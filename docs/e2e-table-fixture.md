@@ -10,7 +10,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Wide tables should scroll horizontally instead of forcing every column to become narrow.
 - Normal-width tables should still look like regular GitHub Markdown tables.
 - Each enhanced table should show a compact Freeze control above the table.
-- Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns.
+- Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns. The focused input selects its existing value; valid Rows input moves focus to Columns. Both values are capped at 5.
 - Tables with a preceding heading should show a Save default button in the Freeze control. Saved defaults apply only within the current repository.
 - Tables without a preceding heading should not offer Save default.
 - Clicking Save default should persist the current rows and columns for the nearest preceding heading text.
@@ -76,9 +76,10 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | Step | Area | Command Or Check | Expected Result |
 | --- | --- | --- | --- |
 | 01 | Setup | Open this fixture from a GitHub Markdown blob page. | The Freeze control appears above this table. |
-| 02 | Setup | Open the Freeze control. | Rows and Columns inputs are visible, and the Rows input is focused. |
-| 02a | Keyboard | Focus the Rows or Columns input, then press Escape. | The Freeze control panel closes and focus returns to the Freeze button. |
-| 02b | Narrow viewport | Resize the viewport until the Freeze panel no longer fits on one line. | The controls wrap within the viewport, and the Save default button remains fully visible. |
+| 02 | Setup | Open the Freeze control. | Rows and Columns inputs are visible, and the Rows input is focused with its value selected. |
+| 02a | Keyboard | Type a valid one-digit Rows value. | The Rows value updates and focus moves to Columns, ready for input. |
+| 02b | Keyboard | Focus the Rows or Columns input, then press Escape. | The Freeze control panel closes and focus returns to the Freeze button. |
+| 02c | Narrow viewport | Resize the viewport until the Freeze panel no longer fits on one line. | The controls wrap within the viewport, and the Save default button remains fully visible. |
 | 03 | Rows | Set Rows to `1`. | The first row stays visible while scrolling down. |
 | 04 | Rows | Set Rows to `2`. | The first two rows stay visible with a clear separator below the second frozen row. |
 | 05 | Columns | Set Columns to `1`. | The first column stays visible while scrolling horizontally. |

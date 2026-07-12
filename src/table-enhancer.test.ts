@@ -135,7 +135,7 @@ function setFreezeInput(label: string, value: string): void {
   const input = getFreezeInput(label);
   act(() => {
     input.value = value;
-    input.dispatchEvent(new Event("change"));
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   });
 }
 
@@ -349,12 +349,16 @@ describe("wrapTable", () => {
     }
   });
 
-  it("focuses the rows input when the freeze panel opens", () => {
+  it("selects the rows value when the freeze panel opens and moves to columns after a valid update", () => {
     renderMarkdownTables(`
       <table>
         <tbody>
           <tr><td>one</td><td>two</td></tr>
           <tr><td>three</td><td>four</td></tr>
+          <tr><td>five</td><td>six</td></tr>
+          <tr><td>seven</td><td>eight</td></tr>
+          <tr><td>nine</td><td>ten</td></tr>
+          <tr><td>eleven</td><td>twelve</td></tr>
         </tbody>
       </table>
     `);
@@ -362,7 +366,18 @@ describe("wrapTable", () => {
     wrapTable(getTable());
     openFreezeControls();
 
-    expect(document.activeElement).toBe(getFreezeInput("Frozen rows"));
+    const rowsInput = getFreezeInput("Frozen rows");
+    const columnsInput = getFreezeInput("Frozen columns");
+
+    expect(document.activeElement).toBe(rowsInput);
+    expect(rowsInput.selectionStart).toBe(0);
+    expect(rowsInput.selectionEnd).toBe(rowsInput.value.length);
+    expect(rowsInput.max).toBe("5");
+    expect(columnsInput.max).toBe("2");
+
+    setFreezeInput("Frozen rows", "1");
+
+    expect(document.activeElement).toBe(columnsInput);
   });
 
   it("expands a table into Focus mode and closes it without replacing the table", () => {
