@@ -313,6 +313,14 @@ function TableControls({
 
   return (
     <>
+      {isFocusMode && (
+        <div aria-live="polite" className="github-table-enhancer-focus-mode-status">
+          <strong>Focus mode</strong>
+          <span>Press</span>
+          <kbd>Esc</kbd>
+          <span>to return</span>
+        </div>
+      )}
       <button
         aria-expanded={openPanel === "freeze"}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
@@ -390,7 +398,7 @@ function TableControls({
         className={TABLE_CONTROLS_TOGGLE_CLASS}
         onClick={toggleFocusMode}
         ref={focusToggleRef}
-        title={isFocusMode ? "Close expanded view" : "Expand table view"}
+        title={isFocusMode ? "Close Focus mode (Esc)" : "Expand table view"}
         type="button"
       >
         <ControlIcon kind="expand" />

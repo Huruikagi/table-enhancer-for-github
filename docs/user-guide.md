@@ -80,7 +80,7 @@ This makes it easy to paste a focused subset into a comment, spreadsheet, or ano
 
 ## Focus mode
 
-Select the expand icon to open one table in a full-window workspace. Focus mode keeps your current filter, hidden items, wrapping, widths, and freeze settings. Select **Close** or press <kbd>Escape</kbd> to return to the GitHub file.
+Select the expand icon to open one table in a full-window workspace. Focus mode keeps your current filter, hidden items, wrapping, widths, and freeze settings. A persistent Focus mode indicator reminds you that you can select **Close** or press <kbd>Escape</kbd> to return to the GitHub file.
 
 ![A table open in full-window Focus mode.]({{ site.baseurl }}/store-assets/screenshots/user-guide-focus-mode.png)
 

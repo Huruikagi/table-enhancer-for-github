@@ -72,6 +72,31 @@ body.github-table-enhancer-focus-mode-open {
   top: 0;
 }
 
+.github-table-enhancer-focus-mode-status {
+  align-items: center;
+  color: var(--fgColor-muted, var(--color-fg-muted, #57606a));
+  display: inline-flex;
+  font-size: 12px;
+  gap: 5px;
+  margin-inline-end: auto;
+  white-space: nowrap;
+}
+
+.github-table-enhancer-focus-mode-status strong {
+  color: var(--fgColor-default, var(--color-fg-default, #24292f));
+}
+
+.github-table-enhancer-focus-mode-status kbd {
+  background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
+  border: 1px solid var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--fgColor-default, var(--color-fg-default, #24292f));
+  font: inherit;
+  line-height: 16px;
+  padding-inline: 4px;
+}
+
 .github-table-enhancer-controls-toggle,
 .github-table-enhancer-controls-panel button {
   appearance: none;

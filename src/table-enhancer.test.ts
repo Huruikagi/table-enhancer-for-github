@@ -386,6 +386,10 @@ describe("wrapTable", () => {
     expect(wrapper?.dataset.githubTableEnhancerFocusMode).toBe("true");
     expect(document.body.classList.contains("github-table-enhancer-focus-mode-open")).toBe(true);
     expect(getButton("Close").ariaPressed).toBe("true");
+    expect(wrapper?.querySelector(".github-table-enhancer-focus-mode-status")?.textContent).toBe(
+      "Focus modePressEscto return",
+    );
+    expect(getButton("Close").title).toBe("Close Focus mode (Esc)");
     expect(wrapper?.querySelector("table")).toBe(table);
     expect(wrapper?.style.getPropertyValue("--gte-focus-mode-controls-height")).toBe("48px");
 
@@ -394,6 +398,7 @@ describe("wrapTable", () => {
     expect(wrapper?.dataset.githubTableEnhancerFocusMode).toBeUndefined();
     expect(document.body.classList.contains("github-table-enhancer-focus-mode-open")).toBe(false);
     expect(getButton("Expand").ariaPressed).toBe("false");
+    expect(wrapper?.querySelector(".github-table-enhancer-focus-mode-status")).toBeNull();
     expect(wrapper?.querySelector("table")).toBe(table);
     expect(wrapper?.style.getPropertyValue("--gte-focus-mode-controls-height")).toBe("");
   });

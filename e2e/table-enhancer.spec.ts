@@ -215,6 +215,9 @@ test("expands one table into Focus mode and restores the page with Escape", asyn
 
   await expect(firstWrapper).toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
   await expect(page.locator("body")).toHaveClass(/github-table-enhancer-focus-mode-open/);
+  await expect(firstWrapper.locator(".github-table-enhancer-focus-mode-status")).toHaveText(
+    "Focus modePressEscto return",
+  );
   await expect(firstWrapper.getByRole("button", { name: "Close" })).toBeVisible();
   await expect(table).toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
 
