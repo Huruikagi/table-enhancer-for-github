@@ -46,14 +46,6 @@ export const englishMessages = {
 
 export type MessageKey = keyof typeof englishMessages;
 
-type ChromeI18n = {
-  getMessage(messageName: string, substitutions?: string | string[]): string;
-};
-
-type ChromeGlobal = typeof globalThis & {
-  chrome?: { i18n?: ChromeI18n };
-};
-
 function applySubstitutions(message: string, substitutions: readonly string[]): string {
   return substitutions.reduce(
     (result, substitution, index) => result.split(`$${index + 1}`).join(substitution),
@@ -66,7 +58,7 @@ export function translate(
   substitutions: readonly (number | string)[] = [],
 ): string {
   const normalizedSubstitutions = substitutions.map(String);
-  const i18n = (globalThis as ChromeGlobal).chrome?.i18n;
+  const i18n = typeof chrome === "undefined" ? undefined : chrome.i18n;
   let localized: string | undefined;
 
   try {

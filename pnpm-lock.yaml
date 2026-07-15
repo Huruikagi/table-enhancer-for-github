@@ -18,6 +18,9 @@ importers:
       '@playwright/test':
         specifier: ^1.61.1
         version: 1.61.1
+      chrome-types:
+        specifier: ^0.1.434
+        version: 0.1.434
       esbuild:
         specifier: ^0.28.1
         version: 0.28.1
@@ -627,6 +630,9 @@ packages:
   chai@6.2.2:
     resolution: {integrity: sha512-NUPRluOfOiTKBKvWPtSD4PhFvWCqOi0BGStNWs57X9js7XGTprSmFoz5F0tWhR4WPjNeR9jXqdC7/UpSJTnlRg==}
     engines: {node: '>=18'}
+
+  chrome-types@0.1.434:
+    resolution: {integrity: sha512-59hJuPxIEFZEhM8WmbzQJQtdRdMGVFzCVQgteBTsCt//tkCVJgr/W/MA3B++eLApibSf5vFP1/Zvbvv5HK6LYw==}
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
@@ -1296,6 +1302,8 @@ snapshots:
       require-from-string: 2.0.2
 
   chai@6.2.2: {}
+
+  chrome-types@0.1.434: {}
 
   convert-source-map@2.0.0: {}
 

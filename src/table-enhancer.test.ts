@@ -44,36 +44,31 @@ function installFakeChromeStorage(
 ): FakeChromeStorage {
   const storage = { ...initialStorage };
 
-  (
-    globalThis as typeof globalThis & {
-      chrome?: unknown;
-    }
-  ).chrome = {
-    storage: {
-      local: {
-        async get(key: string): Promise<Record<string, unknown>> {
-          return { [key]: storage[key] };
-        },
-        async set(items: Record<string, unknown>): Promise<void> {
-          if (options.setDelayMs !== undefined) {
-            await new Promise((resolve) => setTimeout(resolve, options.setDelayMs));
-          }
+  Object.defineProperty(globalThis, "chrome", {
+    configurable: true,
+    value: {
+      storage: {
+        local: {
+          async get(key: string): Promise<Record<string, unknown>> {
+            return { [key]: storage[key] };
+          },
+          async set(items: Record<string, unknown>): Promise<void> {
+            if (options.setDelayMs !== undefined) {
+              await new Promise((resolve) => setTimeout(resolve, options.setDelayMs));
+            }
 
-          Object.assign(storage, items);
+            Object.assign(storage, items);
+          },
         },
       },
     },
-  };
+  });
 
   return storage;
 }
 
 function uninstallFakeChromeStorage(): void {
-  delete (
-    globalThis as typeof globalThis & {
-      chrome?: unknown;
-    }
-  ).chrome;
+  Reflect.deleteProperty(globalThis, "chrome");
 }
 
 async function flushPromises(): Promise<void> {

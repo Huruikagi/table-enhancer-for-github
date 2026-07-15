@@ -7,21 +7,8 @@ export type FreezeRuleSettings = {
   repositoryRules: Record<string, Record<string, FreezeOptions>>;
 };
 
-type ChromeStorageArea = {
-  get(keys?: string | string[] | Record<string, unknown>): Promise<Record<string, unknown>>;
-  set(items: Record<string, unknown>): Promise<void>;
-};
-
-type ChromeGlobal = typeof globalThis & {
-  chrome?: {
-    storage?: {
-      local?: ChromeStorageArea;
-    };
-  };
-};
-
-function getStorageArea(): ChromeStorageArea | null {
-  return (globalThis as ChromeGlobal).chrome?.storage?.local ?? null;
+function getStorageArea(): chrome.storage.StorageArea | null {
+  return typeof chrome === "undefined" ? null : chrome.storage.local;
 }
 
 function isFreezeOptions(value: unknown): value is FreezeOptions {
