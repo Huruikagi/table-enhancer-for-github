@@ -10,7 +10,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Wide tables should scroll horizontally instead of forcing every column to become narrow.
 - Normal-width tables should still look like regular GitHub Markdown tables.
 - Each enhanced table should show a compact Freeze control above the table.
-- Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns. The focused input selects its existing value; valid Rows input moves focus to Columns. Both values are capped at 5.
+- Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns. The focused input selects its existing value; valid Rows input moves focus to Columns, and valid Columns input moves focus to Save default when that button is available. Both values are capped at 5.
 - Tables with a preceding heading should show a Save default button in the Freeze control. Saved defaults apply only within the current repository.
 - Tables without a preceding heading should not offer Save default.
 - Clicking Save default should persist the current rows and columns for the nearest preceding heading text.

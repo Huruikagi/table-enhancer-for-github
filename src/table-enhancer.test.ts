@@ -265,8 +265,9 @@ describe("wrapTable", () => {
     }
   });
 
-  it("selects the rows value when the freeze panel opens and moves to columns after a valid update", () => {
+  it("selects the rows value when the freeze panel opens and advances through the freeze inputs", () => {
     renderMarkdownTables(`
+      <h2>Release Matrix</h2>
       <table>
         <tbody>
           <tr><td>one</td><td>two</td></tr>
@@ -294,6 +295,10 @@ describe("wrapTable", () => {
     setFreezeInput("Frozen rows", "1");
 
     expect(document.activeElement).toBe(columnsInput);
+
+    setFreezeInput("Frozen columns", "1");
+
+    expect(document.activeElement).toBe(getButton("Save default"));
   });
 
   it("expands a table into Focus mode and closes it without replacing the table", () => {

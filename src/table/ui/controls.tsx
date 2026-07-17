@@ -43,6 +43,7 @@ function TableControls({
   const focusToggleRef = useRef<HTMLButtonElement>(null);
   const rowsInputRef = useRef<HTMLInputElement>(null);
   const columnsInputRef = useRef<HTMLInputElement>(null);
+  const saveDefaultButtonRef = useRef<HTMLButtonElement>(null);
   const filterInputRef = useRef<HTMLInputElement>(null);
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -374,6 +375,7 @@ function TableControls({
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-freeze`}
           rowsInputRef={rowsInputRef}
+          saveDefaultButtonRef={saveDefaultButtonRef}
           saveDefaultStatus={saveDefaultStatus}
           values={freeze}
         />

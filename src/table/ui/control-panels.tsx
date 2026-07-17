@@ -54,6 +54,7 @@ type FreezePanelProps = {
   positionAnchor: string;
   columnsInputRef: RefObject<HTMLInputElement>;
   rowsInputRef: Ref<HTMLInputElement>;
+  saveDefaultButtonRef: RefObject<HTMLButtonElement>;
   saveDefaultStatus: SaveDefaultStatus;
   values: FreezeOptions;
 };
@@ -247,6 +248,7 @@ export function FreezePanel({
   positionAnchor,
   columnsInputRef,
   rowsInputRef,
+  saveDefaultButtonRef,
   saveDefaultStatus,
   values,
 }: FreezePanelProps): VNode {
@@ -280,6 +282,7 @@ export function FreezePanel({
           limits={limits}
           onChange={onUpdateValues}
           onEscape={onClose}
+          onValidValueChange={() => saveDefaultButtonRef.current?.focus()}
           values={values}
         />
       </label>
@@ -291,6 +294,7 @@ export function FreezePanel({
           aria-live="polite"
           disabled={saveDefaultStatus === "saving"}
           onClick={onSaveDefault}
+          ref={saveDefaultButtonRef}
           type="button"
         >
           {saveDefaultStatus === "saving" && translate("saving")}
