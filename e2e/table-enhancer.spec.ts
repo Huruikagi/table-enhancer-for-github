@@ -143,14 +143,14 @@ test("localizes browser-visible controls in Japanese", async ({ japanesePage }) 
   await expect(wrapper.getByRole("button", { name: "固定" })).toBeVisible();
   await expect(wrapper.getByRole("button", { name: "フィルター" })).toHaveAttribute(
     "title",
-    "行をフィルター",
+    "フィルター",
   );
   await expect(wrapper.getByRole("button", { name: "2列目で並べ替え" })).toBeAttached();
 
   await wrapper.getByRole("button", { name: "フィルター" }).click();
-  await expect(wrapper.getByLabel("行をフィルター")).toHaveAttribute(
+  await expect(wrapper.getByRole("searchbox", { name: "フィルター" })).toHaveAttribute(
     "placeholder",
-    "行をフィルター...",
+    "条件...",
   );
 });
 

@@ -3,7 +3,7 @@
   "extensionDescription": {
     "message": "GitHubのMarkdownファイルプレビューにある横長の表を読みやすくする非公式の拡張機能です。"
   },
-  "clearFilter": { "message": "フィルターをクリア" },
+  "clearFilter": { "message": "クリア" },
   "close": { "message": "閉じる" },
   "closeFocusMode": { "message": "フォーカスモードを閉じる（Esc）" },
   "columns": { "message": "列" },
@@ -17,8 +17,8 @@
   "expandTableView": { "message": "表を拡大表示" },
   "failed": { "message": "失敗" },
   "filter": { "message": "フィルター" },
-  "filterRows": { "message": "行をフィルター" },
-  "filterRowsPlaceholder": { "message": "行をフィルター..." },
+  "filterRows": { "message": "フィルター" },
+  "filterRowsPlaceholder": { "message": "条件..." },
   "filterSummaryAllVisible": {
     "message": "$TOTAL$行中$MATCHING$行",
     "placeholders": { "matching": { "content": "$1" }, "total": { "content": "$2" } }
@@ -64,7 +64,7 @@
     "placeholders": { "number": { "content": "$1" } }
   },
   "rows": { "message": "行" },
-  "saveDefault": { "message": "既定値として保存" },
+  "saveDefault": { "message": "保存" },
   "saved": { "message": "保存しました" },
   "saving": { "message": "保存中..." },
   "showHidden": { "message": "非表示を戻す" },
