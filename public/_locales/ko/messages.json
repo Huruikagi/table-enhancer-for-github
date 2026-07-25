@@ -1,0 +1,83 @@
+{
+  "extensionName": { "message": "GitHub 테이블 향상 도구" },
+  "extensionDescription": {
+    "message": "GitHub Markdown 파일 미리보기의 넓은 표를 더 쉽게 읽을 수 있게 해 주는 비공식 확장 프로그램입니다."
+  },
+  "clearFilter": { "message": "필터 지우기" },
+  "close": { "message": "닫기" },
+  "closeFocusMode": { "message": "집중 모드 닫기(Esc)" },
+  "columns": { "message": "열" },
+  "copiedFormat": {
+    "message": "$FORMAT$ 형식으로 복사했습니다",
+    "placeholders": { "format": { "content": "$1" } }
+  },
+  "copyAs": { "message": "다음 형식으로 복사" },
+  "copyFailed": { "message": "복사 실패" },
+  "expand": { "message": "확장" },
+  "expandTableView": { "message": "표 보기 확장" },
+  "failed": { "message": "실패" },
+  "filter": { "message": "필터" },
+  "filterRows": { "message": "행 필터링" },
+  "filterRowsPlaceholder": { "message": "행 필터링..." },
+  "filterSummaryAllVisible": {
+    "message": "전체 $TOTAL$개 행 중 $MATCHING$개 일치",
+    "placeholders": { "matching": { "content": "$1" }, "total": { "content": "$2" } }
+  },
+  "filterSummarySomeVisible": {
+    "message": "$VISIBLE$개 표시 · $MATCHING$개 일치 · 총 $TOTAL$개",
+    "placeholders": {
+      "visible": { "content": "$1" },
+      "matching": { "content": "$2" },
+      "total": { "content": "$3" }
+    }
+  },
+  "fit": { "message": "맞춤" },
+  "fitColumns": { "message": "열 너비 맞춤" },
+  "focusMode": { "message": "집중 모드" },
+  "focusModeInstructionAfter": { "message": "키 누르기" },
+  "focusModeInstructionBefore": { "message": "돌아가려면" },
+  "freeze": { "message": "고정" },
+  "frozenColumns": { "message": "고정할 열 수" },
+  "frozenRows": { "message": "고정할 행 수" },
+  "hideColumn": {
+    "message": "$NUMBER$번째 열 숨기기",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "hideRow": {
+    "message": "$NUMBER$번째 행 숨기기",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "invalidRegularExpression": { "message": "잘못된 정규식" },
+  "matchingRowHidden": {
+    "message": "일치하는 행 $COUNT$개가 숨겨져 있습니다.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "matchingRowsHidden": {
+    "message": "일치하는 행 $COUNT$개가 숨겨져 있습니다.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "noRowsMatchFilter": { "message": "필터와 일치하는 행이 없습니다." },
+  "reset": { "message": "초기화" },
+  "resetTableView": { "message": "표 보기 초기화" },
+  "resizeColumn": {
+    "message": "$NUMBER$번째 열 너비 조정",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "rows": { "message": "행" },
+  "saveDefault": { "message": "기본값 저장" },
+  "saved": { "message": "저장됨" },
+  "saving": { "message": "저장 중..." },
+  "showHidden": { "message": "숨긴 항목 표시" },
+  "showHiddenRowsAndColumns": { "message": "숨긴 행과 열 표시" },
+  "sortByColumn": {
+    "message": "$NUMBER$번째 열 기준 정렬",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "sortByColumnHint": {
+    "message": "$LABEL$(오름차순, 내림차순, 원래 순서)",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "useRegularExpression": { "message": "정규식 사용" },
+  "wrap": { "message": "줄 바꿈" },
+  "wrapColumns": { "message": "열 내용 줄 바꿈" }
+}

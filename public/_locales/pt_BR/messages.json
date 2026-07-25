@@ -1,0 +1,83 @@
+{
+  "extensionName": { "message": "Aprimorador de tabelas para GitHub" },
+  "extensionDescription": {
+    "message": "Uma extensão não oficial que facilita a leitura de tabelas largas nas visualizações de arquivos Markdown do GitHub."
+  },
+  "clearFilter": { "message": "Limpar filtro" },
+  "close": { "message": "Fechar" },
+  "closeFocusMode": { "message": "Fechar modo de foco (Esc)" },
+  "columns": { "message": "Colunas" },
+  "copiedFormat": {
+    "message": "Copiado como $FORMAT$",
+    "placeholders": { "format": { "content": "$1" } }
+  },
+  "copyAs": { "message": "Copiar como" },
+  "copyFailed": { "message": "Falha ao copiar" },
+  "expand": { "message": "Expandir" },
+  "expandTableView": { "message": "Expandir visualização da tabela" },
+  "failed": { "message": "Falha" },
+  "filter": { "message": "Filtrar" },
+  "filterRows": { "message": "Filtrar linhas" },
+  "filterRowsPlaceholder": { "message": "Filtrar linhas..." },
+  "filterSummaryAllVisible": {
+    "message": "$MATCHING$ de $TOTAL$ linhas",
+    "placeholders": { "matching": { "content": "$1" }, "total": { "content": "$2" } }
+  },
+  "filterSummarySomeVisible": {
+    "message": "$VISIBLE$ exibidas · $MATCHING$ correspondências · $TOTAL$ no total",
+    "placeholders": {
+      "visible": { "content": "$1" },
+      "matching": { "content": "$2" },
+      "total": { "content": "$3" }
+    }
+  },
+  "fit": { "message": "Ajustar" },
+  "fitColumns": { "message": "Ajustar colunas" },
+  "focusMode": { "message": "Modo de foco" },
+  "focusModeInstructionAfter": { "message": "para voltar" },
+  "focusModeInstructionBefore": { "message": "Pressione" },
+  "freeze": { "message": "Fixar" },
+  "frozenColumns": { "message": "Colunas fixas" },
+  "frozenRows": { "message": "Linhas fixas" },
+  "hideColumn": {
+    "message": "Ocultar coluna $NUMBER$",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "hideRow": {
+    "message": "Ocultar linha $NUMBER$",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "invalidRegularExpression": { "message": "Expressão regular inválida" },
+  "matchingRowHidden": {
+    "message": "$COUNT$ linha correspondente está oculta.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "matchingRowsHidden": {
+    "message": "$COUNT$ linhas correspondentes estão ocultas.",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "noRowsMatchFilter": { "message": "Nenhuma linha corresponde a este filtro." },
+  "reset": { "message": "Redefinir" },
+  "resetTableView": { "message": "Redefinir visualização da tabela" },
+  "resizeColumn": {
+    "message": "Redimensionar coluna $NUMBER$",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "rows": { "message": "Linhas" },
+  "saveDefault": { "message": "Salvar padrão" },
+  "saved": { "message": "Salvo" },
+  "saving": { "message": "Salvando..." },
+  "showHidden": { "message": "Mostrar ocultos" },
+  "showHiddenRowsAndColumns": { "message": "Mostrar linhas e colunas ocultas" },
+  "sortByColumn": {
+    "message": "Ordenar pela coluna $NUMBER$",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "sortByColumnHint": {
+    "message": "$LABEL$ (crescente, decrescente, ordem original)",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "useRegularExpression": { "message": "Usar expressão regular" },
+  "wrap": { "message": "Quebrar texto" },
+  "wrapColumns": { "message": "Quebrar texto nas colunas" }
+}

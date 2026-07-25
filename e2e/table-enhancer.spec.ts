@@ -130,29 +130,78 @@ test("enhances GitHub Markdown blob tables from the loaded extension", async ({ 
   await expect(firstWrapper.locator("table")).toHaveAttribute("data-github-table-enhancer", "true");
 });
 
-test("localizes browser-visible controls in Japanese", async ({ japanesePage }) => {
-  await japanesePage.route(fixtureUrl, async (route) => {
-    await route.fulfill({
-      body: githubBlobFixture,
-      contentType: "text/html",
+const localizationCases = [
+  {
+    filter: "フィルター",
+    filterRows: "フィルター",
+    freeze: "固定",
+    locale: "ja",
+    name: "Japanese",
+    placeholder: "条件...",
+    sortColumnTwo: "2列目で並べ替え",
+  },
+  {
+    filter: "筛选",
+    filterRows: "筛选行",
+    freeze: "冻结",
+    locale: "zh-CN",
+    name: "Simplified Chinese",
+    placeholder: "筛选行...",
+    sortColumnTwo: "按第 2 列排序",
+  },
+  {
+    filter: "필터",
+    filterRows: "행 필터링",
+    freeze: "고정",
+    locale: "ko",
+    name: "Korean",
+    placeholder: "행 필터링...",
+    sortColumnTwo: "2번째 열 기준 정렬",
+  },
+  {
+    filter: "Filtrar",
+    filterRows: "Filtrar linhas",
+    freeze: "Fixar",
+    locale: "pt-BR",
+    name: "Brazilian Portuguese",
+    placeholder: "Filtrar linhas...",
+    sortColumnTwo: "Ordenar pela coluna 2",
+  },
+  {
+    filter: "Filtrar",
+    filterRows: "Filtrar filas",
+    freeze: "Fijar",
+    locale: "es",
+    name: "Spanish",
+    placeholder: "Filtrar filas...",
+    sortColumnTwo: "Ordenar por columna 2",
+  },
+] as const;
+
+for (const localization of localizationCases) {
+  test.describe(`${localization.name} localization`, () => {
+    test.use({ locale: localization.locale });
+
+    test("localizes browser-visible controls", async ({ page }) => {
+      await page.goto(fixtureUrl);
+
+      const wrapper = page.locator(".github-table-enhancer-scroll").first();
+      await expect(wrapper.getByRole("button", { name: localization.freeze })).toBeVisible();
+      await expect(wrapper.getByRole("button", { name: localization.filter })).toHaveAttribute(
+        "title",
+        localization.filterRows,
+      );
+      await expect(
+        wrapper.getByRole("button", { name: localization.sortColumnTwo }),
+      ).toBeAttached();
+
+      await wrapper.getByRole("button", { name: localization.filter }).click();
+      await expect(
+        wrapper.getByRole("searchbox", { name: localization.filterRows }),
+      ).toHaveAttribute("placeholder", localization.placeholder);
     });
   });
-  await japanesePage.goto(fixtureUrl);
-
-  const wrapper = japanesePage.locator(".github-table-enhancer-scroll").first();
-  await expect(wrapper.getByRole("button", { name: "固定" })).toBeVisible();
-  await expect(wrapper.getByRole("button", { name: "フィルター" })).toHaveAttribute(
-    "title",
-    "フィルター",
-  );
-  await expect(wrapper.getByRole("button", { name: "2列目で並べ替え" })).toBeAttached();
-
-  await wrapper.getByRole("button", { name: "フィルター" }).click();
-  await expect(wrapper.getByRole("searchbox", { name: "フィルター" })).toHaveAttribute(
-    "placeholder",
-    "条件...",
-  );
-});
+}
 
 test("filters rows and resets the current table view", async ({ page }) => {
   await page.goto(fixtureUrl);

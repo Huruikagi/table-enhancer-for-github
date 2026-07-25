@@ -32,7 +32,7 @@ Open a Markdown file containing a table. Table Enhancer places a compact toolbar
 
 The toolbar provides Freeze, Filter, Copy as, Fit, Wrap, Reset, and Focus mode. When rows or columns are hidden, it also shows **Show hidden**.
 
-The extension UI follows Chrome's display language. English is the default, and Japanese is also supported. If a translated message is unavailable, the English message is shown.
+The extension UI follows Chrome's display language. English is the default; Japanese, Simplified Chinese, Korean, Brazilian Portuguese, and Spanish are also supported. If a translated message is unavailable, the English message is shown.
 
 ## Freeze rows and columns
 

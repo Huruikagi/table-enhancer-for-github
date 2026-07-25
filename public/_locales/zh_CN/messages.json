@@ -1,0 +1,83 @@
+{
+  "extensionName": { "message": "GitHub 表格增强器" },
+  "extensionDescription": {
+    "message": "一款非官方扩展，让 GitHub Markdown 文件预览中的宽表格更易于阅读。"
+  },
+  "clearFilter": { "message": "清除筛选" },
+  "close": { "message": "关闭" },
+  "closeFocusMode": { "message": "关闭专注模式（Esc）" },
+  "columns": { "message": "列" },
+  "copiedFormat": {
+    "message": "已复制为 $FORMAT$",
+    "placeholders": { "format": { "content": "$1" } }
+  },
+  "copyAs": { "message": "复制为" },
+  "copyFailed": { "message": "复制失败" },
+  "expand": { "message": "展开" },
+  "expandTableView": { "message": "展开表格视图" },
+  "failed": { "message": "失败" },
+  "filter": { "message": "筛选" },
+  "filterRows": { "message": "筛选行" },
+  "filterRowsPlaceholder": { "message": "筛选行..." },
+  "filterSummaryAllVisible": {
+    "message": "匹配 $MATCHING$ 行（共 $TOTAL$ 行）",
+    "placeholders": { "matching": { "content": "$1" }, "total": { "content": "$2" } }
+  },
+  "filterSummarySomeVisible": {
+    "message": "显示 $VISIBLE$ 行 · 匹配 $MATCHING$ 行 · 共 $TOTAL$ 行",
+    "placeholders": {
+      "visible": { "content": "$1" },
+      "matching": { "content": "$2" },
+      "total": { "content": "$3" }
+    }
+  },
+  "fit": { "message": "自适应" },
+  "fitColumns": { "message": "自动调整列宽" },
+  "focusMode": { "message": "专注模式" },
+  "focusModeInstructionAfter": { "message": "返回" },
+  "focusModeInstructionBefore": { "message": "按" },
+  "freeze": { "message": "冻结" },
+  "frozenColumns": { "message": "冻结列数" },
+  "frozenRows": { "message": "冻结行数" },
+  "hideColumn": {
+    "message": "隐藏第 $NUMBER$ 列",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "hideRow": {
+    "message": "隐藏第 $NUMBER$ 行",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "invalidRegularExpression": { "message": "无效的正则表达式" },
+  "matchingRowHidden": {
+    "message": "$COUNT$ 个匹配行已隐藏。",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "matchingRowsHidden": {
+    "message": "$COUNT$ 个匹配行已隐藏。",
+    "placeholders": { "count": { "content": "$1" } }
+  },
+  "noRowsMatchFilter": { "message": "没有符合此筛选条件的行。" },
+  "reset": { "message": "重置" },
+  "resetTableView": { "message": "重置表格视图" },
+  "resizeColumn": {
+    "message": "调整第 $NUMBER$ 列的宽度",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "rows": { "message": "行" },
+  "saveDefault": { "message": "保存默认值" },
+  "saved": { "message": "已保存" },
+  "saving": { "message": "正在保存..." },
+  "showHidden": { "message": "显示隐藏项" },
+  "showHiddenRowsAndColumns": { "message": "显示隐藏的行和列" },
+  "sortByColumn": {
+    "message": "按第 $NUMBER$ 列排序",
+    "placeholders": { "number": { "content": "$1" } }
+  },
+  "sortByColumnHint": {
+    "message": "$LABEL$（升序、降序、原始顺序）",
+    "placeholders": { "label": { "content": "$1" } }
+  },
+  "useRegularExpression": { "message": "使用正则表达式" },
+  "wrap": { "message": "换行" },
+  "wrapColumns": { "message": "列内容换行" }
+}

@@ -46,7 +46,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Reset table view should restore the current table to its initial display by clearing freeze, hidden rows and columns, filters, wrap, fitted widths, and resized column widths.
 - Clicking Expand should show only that table in a full-window Focus mode while preserving its current filter, visibility, sizing, wrapping, and freeze state.
 - Clicking Close or pressing Escape should leave Focus mode and restore the GitHub file view without resetting the table state.
-- With Chrome's display language set to Japanese, toolbar labels, tooltips, panels, filter messages, and row/column controls should appear in Japanese. Unsupported or missing messages should fall back to English.
+- With Chrome's display language set to Japanese, Simplified Chinese, Korean, Brazilian Portuguese, or Spanish, toolbar labels, tooltips, panels, filter messages, and row/column controls should appear in that language. Unsupported or missing messages should fall back to English.
 
 ## Wide Release Matrix
 
