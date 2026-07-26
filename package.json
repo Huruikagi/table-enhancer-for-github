@@ -1,6 +1,6 @@
 {
   "name": "github-table-enhancer",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "An unofficial extension that makes wide tables easier to read in GitHub Markdown file previews.",
   "private": true,
   "license": "MIT",
