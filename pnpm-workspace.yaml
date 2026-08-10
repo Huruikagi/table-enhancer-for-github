@@ -1,5 +1,8 @@
 verifyDepsBeforeRun: warn
 enableGlobalVirtualStore: false
 
+overrides:
+  postcss: ">=8.5.23"
+
 allowBuilds:
   esbuild: true
