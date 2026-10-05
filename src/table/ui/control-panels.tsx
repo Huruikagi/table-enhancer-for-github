@@ -52,9 +52,9 @@ type FreezePanelProps = {
   onUpdateValues: (values: FreezeOptions) => FreezeOptions;
   panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
-  columnsInputRef: RefObject<HTMLInputElement>;
+  columnsInputRef: RefObject<HTMLInputElement | null>;
   rowsInputRef: Ref<HTMLInputElement>;
-  saveDefaultButtonRef: RefObject<HTMLButtonElement>;
+  saveDefaultButtonRef: RefObject<HTMLButtonElement | null>;
   saveDefaultStatus: SaveDefaultStatus;
   values: FreezeOptions;
 };
