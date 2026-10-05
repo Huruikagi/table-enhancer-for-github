@@ -12,7 +12,7 @@ export function useTableFocusMode(
   table: HTMLTableElement,
   isFocusMode: boolean,
   setIsFocusMode: (value: boolean) => void,
-  focusToggleRef: RefObject<HTMLButtonElement>,
+  focusToggleRef: RefObject<HTMLButtonElement | null>,
 ): void {
   useLayoutEffect(() => {
     const wrapper = table.closest<HTMLElement>(`.${TABLE_WRAPPER_CLASS}`);
