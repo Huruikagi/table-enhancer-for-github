@@ -33,6 +33,6 @@
     "vitest": "^5.0.0"
   },
   "dependencies": {
-    "preact": "^10.26.9"
+    "preact": "^11.0.0"
   }
 }
