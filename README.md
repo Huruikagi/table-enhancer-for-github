@@ -17,7 +17,7 @@ Issues and feature requests are welcome in English or Japanese.
 - Runs only on GitHub Markdown blob file preview pages, such as `https://github.com/owner/repo/blob/main/docs/file.md`.
 - Does not run on issues, pull requests, discussions, repository README landing pages, or rendered Markdown outside GitHub blob views.
 - Shows confirmed YAML frontmatter as a collapsible property panel, including flat metadata. Short scalar lists appear as tags; nested mappings and longer lists can be expanded.
-- Identifies frontmatter using Markdown already embedded in the current GitHub page, with no additional requests. Unknown payloads, mismatched files or previews, and unsupported YAML keep their native display. Other nested tables and ambiguous leading key/value tables receive no table controls.
+- Identifies frontmatter using Markdown already loaded by the current GitHub page, including its embedded data or in-memory cache, with no additional requests. Unknown payloads, mismatched files or previews, and unsupported YAML keep their native display. Other nested tables and ambiguous leading key/value tables receive no table controls.
 - Uses a content script on GitHub Markdown blob pages and the `storage` permission for heading-based freeze defaults.
 - This project is not affiliated with, sponsored by, or endorsed by GitHub.
 

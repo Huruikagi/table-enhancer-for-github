@@ -1,9 +1,9 @@
+import { CACHE_SOURCE_ATTRIBUTE } from "./cache-source";
 import { type MetadataSource, readMetadataSource } from "./source";
 import { createMetadataView, METADATA_CLASS } from "./view";
 
 const ORIGINAL_ATTRIBUTE = "data-gte-metadata-original";
-export const EMBEDDED_DATA_SELECTOR =
-  'script[type="application/json"][data-target="react-app.embeddedData"]';
+export const EMBEDDED_DATA_SELECTOR = `script[type="application/json"][data-target="react-app.embeddedData"], script[type="application/json"][${CACHE_SOURCE_ATTRIBUTE}]`;
 const sources = new WeakMap<Element, { json: string; source: MetadataSource | null }>();
 const views = new Map<
   HTMLElement,

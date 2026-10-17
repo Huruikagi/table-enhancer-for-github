@@ -69,8 +69,8 @@ export type MetadataSource = {
   tableHTML: string;
 };
 
-// GitHub's internal payload is deliberately isolated here. Unknown layouts fail
-// closed; no network fallback or access to page-world JavaScript is needed.
+// Both embedded JSON and the narrow page-cache projection use this validator.
+// Unknown layouts fail closed; neither path has a network fallback.
 export function readMetadataSource(json: string): MetadataSource | null {
   try {
     const payload = record(record(JSON.parse(json)).payload);

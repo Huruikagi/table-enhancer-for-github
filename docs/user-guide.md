@@ -30,7 +30,7 @@ When a Markdown file starts with supported YAML frontmatter, the extension shows
 in a collapsible **Metadata** panel. Select the panel heading to collapse or expand it. Short
 lists appear as tags; nested properties and longer lists can be expanded individually.
 
-Frontmatter is identified from Markdown already embedded in the current GitHub page, without
+Frontmatter is identified from Markdown already loaded by the current GitHub page, without
 additional network requests. If the source cannot be confirmed or the YAML is unsupported, the
 original GitHub display is preserved. Nested tables and ambiguous leading key/value tables do
 not receive table controls; ordinary body tables keep their usual controls.

@@ -178,3 +178,131 @@ test.describe("Japanese metadata", () => {
     await expect(page.locator(`${metadataSelector} > summary`)).toHaveText("メタデータ2項目");
   });
 });
+
+// UI Service removes serialized hydration data from the DOM. The only source
+// available here lives in the page's MAIN world, just like GitHub's query cache.
+function cacheQueries(lines: string[], table: string, file = "e2e-table-fixture.md") {
+  const data = payload(lines, table, file).payload;
+  const prefix = "/owner/github-table-enhancer";
+  const path = `main/docs/${file}`;
+  return [
+    [
+      "codeViewLayoutRoute",
+      "mainQuery",
+      `${prefix}/_layout`,
+      { payload: data.codeViewLayoutRoute },
+    ],
+    [
+      "codeViewBlobLayoutRoute",
+      "mainQuery",
+      `${prefix}/_layout/${path}`,
+      { payload: data.codeViewBlobLayoutRoute },
+    ],
+    [
+      "codeViewBlobRoute",
+      "mainQuery",
+      `${prefix}/blob/${path}`,
+      { payload: data.codeViewBlobRoute },
+    ],
+    [
+      "codeViewBlobLayoutRoute",
+      "codeViewBlobLayoutRoute.StyledBlob",
+      `${prefix}/_styled/${path}`,
+      data["codeViewBlobLayoutRoute.StyledBlob"],
+    ],
+  ].map(([route, name, pathname, data]) => ({
+    queryKey: ["code-view", route, "", name, { pathname }],
+    state: { data, status: "success", fetchStatus: "idle", isInvalidated: false },
+  }));
+}
+
+for (const shape of ["flat", "nested"] as const) {
+  test(`reads ${shape} metadata from the page cache with no embedded JSON or extra requests`, async ({
+    page,
+  }) => {
+    const table = shape === "flat" ? plainTable : nestedTable;
+    const lines = shape === "flat" ? flatLines : nestedLines;
+    type Query = ReturnType<typeof cacheQueries>[number];
+    const requests: string[] = [];
+    await page.route("**/*", async (route) => {
+      requests.push(route.request().url());
+      if (route.request().url() === fixtureUrl)
+        await route.fulfill({
+          body: fixture(table).replaceAll("react-app", "main"),
+          contentType: "text/html",
+        });
+      else await route.abort();
+    });
+    await page.addInitScript(
+      (initial: Query[]) => {
+        const listeners = new Set<(event: { query: Query }) => void>();
+        let queries: Query[] = [];
+        Object.assign(window, {
+          __TANSTACK_QUERY_CLIENT__: {
+            getQueryCache: () => ({
+              findAll: ({ predicate }: { predicate: (query: Query) => boolean }) =>
+                queries.filter(predicate),
+              subscribe: (listener: (event: { query: Query }) => void) => {
+                listeners.add(listener);
+                return () => listeners.delete(listener);
+              },
+            }),
+          },
+          updateFixtureCache(next: Query[]) {
+            const changed = [...queries, ...next];
+            queries = next;
+            for (const query of changed) for (const listener of [...listeners]) listener({ query });
+          },
+        });
+        // Hydration completes after content scripts have started.
+        setTimeout(() => {
+          queries = initial;
+          for (const query of queries) for (const listener of [...listeners]) listener({ query });
+        }, 300);
+      },
+      cacheQueries(lines, table),
+    );
+    await page.goto(fixtureUrl);
+    const view = page.locator(metadataSelector);
+    await expect(view).toBeVisible();
+    await expect(page.locator('script[data-target="react-app.embeddedData"]')).toHaveCount(0);
+    await expect(page.locator(nativeSelector)).toBeHidden();
+    await expect(page.locator(".github-table-enhancer-scroll")).toHaveCount(1);
+    await view.locator(":scope > summary").click();
+    await page.evaluate(() => {
+      const element = document.createElement("aside");
+      element.textContent = "Unrelated page update";
+      document.body.append(element);
+    });
+    await expect(view).not.toHaveAttribute("open");
+
+    const nextTable = plainTable.replace("Release checklist", "Next document");
+    await page.evaluate(
+      ({ table, content }) => {
+        history.pushState(null, "", "next.md");
+        const article = document.querySelector(".markdown-body");
+        if (article)
+          article.innerHTML = `<markdown-accessiblity-table>${table}</markdown-accessiblity-table>${content}`;
+      },
+      { table: nextTable, content: body },
+    );
+    await expect(view).toHaveCount(0);
+    await expect(page.locator(nativeSelector)).toBeVisible();
+    await page.evaluate(
+      (queries: Query[]) => {
+        (window as unknown as { updateFixtureCache: (data: Query[]) => void }).updateFixtureCache(
+          queries,
+        );
+      },
+      cacheQueries(["---", "title: Next document", "draft: false", "---"], nextTable, "next.md"),
+    );
+    await expect(view).toContainText("Next document");
+    await expect(view).toHaveCount(1);
+    await page.evaluate(() => {
+      (window as unknown as { updateFixtureCache: (data: Query[]) => void }).updateFixtureCache([]);
+    });
+    await expect(view).toHaveCount(0);
+    await expect(page.locator(nativeSelector)).toBeVisible();
+    expect(requests).toEqual([fixtureUrl]);
+  });
+}

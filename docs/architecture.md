@@ -1,17 +1,37 @@
 # Architecture
 
-GitHub Table Enhancer runs as one content script, but each enhanced table has an independent pure
+GitHub Table Enhancer keeps its UI in an isolated content script; a small MAIN-world script
+reads already-loaded GitHub metadata. Each enhanced table has an independent pure
 controller and browser runtime. The architecture keeps GitHub's original table DOM in place and
 projects a single table view state onto it. Confirmed YAML frontmatter uses a
 separate property view, described below, rather than a table controller.
 
 ## Frontmatter
 
-`src/frontmatter/source.ts` is the boundary for GitHub's internal embedded JSON.
+`src/frontmatter/source.ts` validates GitHub's internal source payload.
 It checks the repository, path, ref and commit consistency, reads source Markdown
 from `codeViewBlobLayoutRoute.StyledBlob.rawLines`, and parses its leading YAML
 mapping. Unsupported payloads, invalid YAML, aliases, complex keys, and metadata
 beyond the parsing limits fall back to native rendering. No network API is used.
+
+Legacy pages provide this payload through `react-app.embeddedData`. UI Service
+pages remove their hydration scripts, so `page-data.ts` runs a separate,
+read-only MAIN-world adapter. `frontmatter/cache-bridge.ts` uses the existing
+`window.__TANSTACK_QUERY_CLIENT__` and its query cache's `findAll`/`subscribe`
+methods. It never invokes fetch, prefetch, invalidation, or cache writes.
+`cache-source.ts` recognizes only the four code-view queries for the current
+repository/file and rejects incomplete, fetching, invalidated or ambiguous
+entries. It publishes a bounded JSON projection containing repository/path/ref
+identity, the leading YAML block, and the first table from the cached preview.
+No account data, other files, or document body is copied. The isolated content
+script revalidates this untrusted projection just like embedded JSON. The MAIN
+script has no extension API access and no additional permissions are required.
+
+The bridge subscribes to relevant cache updates, detects pathname changes, and
+briefly retries late hydration (up to 30 seconds), without permanent polling.
+Missing or changed GitHub APIs remove the projection and preserve native markup.
+These are private GitHub schemas, so new layouts may need an adapter update;
+table shape alone never authorizes rendering metadata.
 
 `runtime.ts` matches that source to the current URL and the first rendered table,
 including the table HTML supplied by `codeViewBlobRoute.richText` and its keys.
@@ -19,6 +39,8 @@ Only a confirmed match can hide the original element and insert the property
 view. The original DOM is retained and restored when the match is lost or the
 article is removed. Embedded data is cached per script/content; mutations to the
 article or JSON trigger reconciliation, including late data and navigation.
+The cache projection uses a separate `data-gte-metadata-source` script marker
+and follows the same mutation routing as legacy embedded JSON.
 
 `view.ts` renders values using text nodes, definition lists and native details
 elements. Top-level properties are open, nested collections are collapsed, and
@@ -28,8 +50,12 @@ tables. A conservative leading key/value shape check can exclude a table from
 controls, but can never authorize replacing it with a property view.
 
 `frontmatter.test.ts` covers parsing, binding, fallback and lifecycle;
+`cache-source.test.ts` covers cache projection, source validation, passive
+subscription, late hydration, navigation, and unavailable APIs;
 `e2e/frontmatter.spec.ts` covers the loaded extension, flat/nested metadata,
 keyboard interaction, themes, navigation and the absence of extra requests.
+It exercises both embedded JSON and a page-world-only query cache with no
+serialized data in the DOM, verifying the actual MAIN/isolated-world boundary.
 
 ## Runtime flow
 

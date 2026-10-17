@@ -22,8 +22,8 @@ const mode = getBuildMode(process.argv.slice(2), process.env);
 const isDevelopment = mode === "development";
 
 await build({
-  entryPoints: ["src/content.ts"],
-  outfile: "dist/content.js",
+  entryPoints: ["src/content.ts", "src/page-data.ts"],
+  outdir: "dist",
   bundle: true,
   format: "iife",
   target: "es2020",
