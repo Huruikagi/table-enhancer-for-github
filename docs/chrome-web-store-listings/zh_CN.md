@@ -36,6 +36,10 @@ GitHub 表格增强器会在 Markdown 文件预览页的表格上方添加紧凑
 - 将当前可见视图复制为 Markdown、CSV 或 TSV；隐藏和筛选掉的内容不会包含在副本中。
 - 随时重置临时更改，恢复原始视图。
 
+阅读文件元数据
+
+- 在可折叠的元数据面板中查看受支持的 YAML frontmatter。短列表显示为标签，嵌套属性可以展开查看，无需额外网络请求。
+
 本扩展仅在 GitHub Markdown 文件预览页（`github.com/.../blob/...`）运行。它不会修改文件，也不会在 Issue、Pull Request、Discussion 或仓库首页运行。
 
 冻结默认设置仅存储在本地 Chrome 中。我们不会收集、传输、出售或共享任何用户数据。

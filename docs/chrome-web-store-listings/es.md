@@ -36,6 +36,10 @@ Llévate solo la parte útil
 - Copia la vista actual como Markdown, CSV o TSV. El contenido oculto o filtrado queda fuera de la copia.
 - Restablece los cambios temporales siempre que quieras volver a la vista original.
 
+Lee los metadatos del archivo
+
+- Consulta el frontmatter YAML compatible en un panel de metadatos plegable. Las listas cortas aparecen como etiquetas y las propiedades anidadas se pueden expandir. No se necesitan solicitudes de red adicionales.
+
 La extensión funciona únicamente en las páginas de vista previa de archivos Markdown de GitHub (`github.com/.../blob/...`). No modifica tus archivos ni se ejecuta en issues, pull requests, discussions o páginas principales de repositorios.
 
 Los valores predeterminados de fijación se almacenan localmente en Chrome. No se recopilan, transmiten, venden ni comparten datos del usuario.

@@ -39,6 +39,11 @@ Take the useful part with you
   copy.
 - Reset temporary changes whenever you want to return to the original view.
 
+Read file metadata
+
+- View supported YAML frontmatter in a collapsible Metadata panel, with tags for short lists and
+  expandable nested properties. No additional network requests are needed.
+
 The extension works only on GitHub Markdown file preview pages (`github.com/.../blob/...`). It does
 not alter your files or run on issues, pull requests, discussions, or repository landing pages.
 

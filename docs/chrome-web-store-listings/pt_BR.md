@@ -36,6 +36,10 @@ Leve com você apenas a parte útil
 - Copie a visualização atual como Markdown, CSV ou TSV. O conteúdo oculto ou filtrado fica fora da cópia.
 - Redefina as alterações temporárias sempre que quiser voltar à visualização original.
 
+Leia os metadados do arquivo
+
+- Veja o frontmatter YAML compatível em um painel de metadados recolhível. Listas curtas aparecem como etiquetas, e propriedades aninhadas podem ser expandidas. Não são necessárias solicitações de rede adicionais.
+
 A extensão funciona somente nas páginas de visualização de arquivos Markdown do GitHub (`github.com/.../blob/...`). Ela não altera seus arquivos nem é executada em issues, pull requests, discussions ou páginas iniciais de repositórios.
 
 Os padrões de fixação são armazenados localmente no Chrome. Nenhum dado do usuário é coletado, transmitido, vendido ou compartilhado.

@@ -24,6 +24,17 @@ https://github.com/owner/repository/blob/main/docs/guide.md
 
 It does not run on issues, pull requests, discussions, repository home pages, or Markdown rendered outside a GitHub blob view.
 
+## Read YAML frontmatter
+
+When a Markdown file starts with supported YAML frontmatter, the extension shows its properties
+in a collapsible **Metadata** panel. Select the panel heading to collapse or expand it. Short
+lists appear as tags; nested properties and longer lists can be expanded individually.
+
+Frontmatter is identified from Markdown already embedded in the current GitHub page, without
+additional network requests. If the source cannot be confirmed or the YAML is unsupported, the
+original GitHub display is preserved. Nested tables and ambiguous leading key/value tables do
+not receive table controls; ordinary body tables keep their usual controls.
+
 ## Start with the table controls
 
 Open a Markdown file containing a table. Table Enhancer places a compact toolbar immediately above each table. The table stays inside its own horizontal scroll area, preserving the surrounding GitHub page layout.
