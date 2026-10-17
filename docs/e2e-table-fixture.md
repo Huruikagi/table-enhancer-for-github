@@ -1,3 +1,12 @@
+---
+title: E2E Table Fixture
+metadata:
+  purpose: Nested frontmatter regression coverage
+  environments:
+    - Chrome
+    - GitHub Markdown blob preview
+---
+
 # E2E Table Fixture
 
 Use this page to manually verify the extension on an actual GitHub Markdown blob page in Chrome.
@@ -9,6 +18,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Each table should remain readable inside the GitHub Markdown preview.
 - Wide tables should scroll horizontally instead of forcing every column to become narrow.
 - Normal-width tables should still look like regular GitHub Markdown tables.
+- The YAML frontmatter above this heading should keep GitHub's native nested table display, with no extension toolbar, hide/sort buttons, resize handles, or scroll wrappers on either the outer table or its children. Regular body tables below should still be enhanced. Reload and navigate away/back to check both initial and dynamically loaded previews.
 - Each enhanced table should show a compact Freeze icon control above the table. Its accessible name and tooltip should be `Freeze`.
 - Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns. The focused input selects its existing value; valid Rows input moves focus to Columns, and valid Columns input moves focus to Save default when that button is available. Both values are capped at 5.
 - Tables with a preceding heading should show a Save default button in the Freeze control. Saved defaults apply only within the current repository.

@@ -130,6 +130,63 @@ test("enhances GitHub Markdown blob tables from the loaded extension", async ({ 
   await expect(firstWrapper.locator("table")).toHaveAttribute("data-github-table-enhancer", "true");
 });
 
+// Matches GitHub's rendered frontmatter: a key/value table with nested mappings
+// and sequences, wrapped once in markdown-accessiblity-table.
+const nestedFrontmatter = `<markdown-accessiblity-table data-testid="frontmatter">
+  <table><tbody>
+    <tr><th>title</th><td>E2E Table Fixture</td></tr>
+    <tr><th>metadata</th><td>
+      <table><thead><tr><th>environments</th></tr></thead><tbody><tr><td>
+        <table><tbody><tr><td><div dir="auto">Chrome</div></td></tr></tbody></table>
+      </td></tr></tbody></table>
+    </td></tr>
+  </tbody></table>
+</markdown-accessiblity-table>`;
+
+for (const timing of ["initial", "dynamic"] as const) {
+  test(`keeps ${timing} nested frontmatter native while enhancing body tables`, async ({
+    page,
+  }) => {
+    if (timing === "initial") {
+      await page.route(fixtureUrl, (route) =>
+        route.fulfill({
+          body: githubBlobFixture.replace(
+            '<article class="markdown-body">',
+            `<article class="markdown-body">${nestedFrontmatter}`,
+          ),
+          contentType: "text/html",
+        }),
+      );
+    }
+
+    await page.goto(fixtureUrl);
+    const wrappers = page.locator(".github-table-enhancer-scroll");
+    await expect(wrappers).toHaveCount(2);
+
+    if (timing === "dynamic") {
+      await page.locator(".markdown-body").evaluate((article, markup) => {
+        article.insertAdjacentHTML("afterbegin", markup);
+      }, nestedFrontmatter);
+    }
+
+    const metadata = page.getByTestId("frontmatter");
+    await expect(metadata.locator("table")).toHaveCount(3);
+    await expect(metadata.getByText("Chrome", { exact: true })).toBeVisible();
+
+    // Exercise regular controls and give the page observer time to process the
+    // inserted group before asserting that the metadata DOM is still pristine.
+    await wrappers.first().getByRole("button", { name: "Freeze", exact: true }).click();
+    await expect(wrappers.first().getByLabel("Frozen rows")).toBeVisible();
+    expect(
+      await metadata.evaluate((element, markup) => {
+        const expected = new DOMParser().parseFromString(markup, "text/html");
+        return element.outerHTML === expected.body.firstElementChild?.outerHTML;
+      }, nestedFrontmatter),
+    ).toBe(true);
+    await expect(wrappers).toHaveCount(2);
+  });
+}
+
 const localizationCases = [
   {
     filter: "フィルター",

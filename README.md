@@ -16,6 +16,7 @@ Issues and feature requests are welcome in English or Japanese.
 
 - Runs only on GitHub Markdown blob file preview pages, such as `https://github.com/owner/repo/blob/main/docs/file.md`.
 - Does not run on issues, pull requests, discussions, repository README landing pages, or rendered Markdown outside GitHub blob views.
+- Leaves nested table groups, including structured YAML frontmatter, in GitHub's native display without adding table controls.
 - Uses a content script on GitHub Markdown blob pages and the `storage` permission for heading-based freeze defaults.
 - This project is not affiliated with, sponsored by, or endorsed by GitHub.
 

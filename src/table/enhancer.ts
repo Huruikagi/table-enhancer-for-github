@@ -56,6 +56,12 @@ export function findPreviousHeadingText(table: HTMLTableElement): string | null 
 }
 
 export function wrapTable(table: HTMLTableElement): void {
+  // GitHub renders structured frontmatter as nested tables. Keep the whole
+  // group native so parent and child controls cannot interfere with each other.
+  if (table.parentElement?.closest("table") || table.querySelector("table")) {
+    return;
+  }
+
   if (table.dataset.githubTableEnhancer === "true") {
     return;
   }
