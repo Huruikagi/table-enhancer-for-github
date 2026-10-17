@@ -43,18 +43,18 @@ and [creating a high-quality listing page](https://developer.chrome.com/docs/web
 - Recheck that localized descriptions do not add unsupported features or omit material privacy or
   scope details.
 
-## v1.5.0 Update Checklist
+## v1.5.1 Update Checklist
 
-For the v1.5.0 update:
+For the v1.5.1 update:
 
-- Upload `table-enhancer-for-github-v1.5.0.zip` from the
-  [v1.5.0 GitHub Release](https://github.com/Huruikagi/table-enhancer-for-github/releases/tag/v1.5.0).
-- Confirm the uploaded package reports version `1.5.0` before submitting it for review.
+- Upload `table-enhancer-for-github-v1.5.1.zip` from the
+  [v1.5.1 GitHub Release](https://github.com/Huruikagi/table-enhancer-for-github/releases/tag/v1.5.1).
+- Confirm the uploaded package reports version `1.5.1` before submitting it for review.
 - Update all six localized detailed descriptions with the locale drafts, including the new
   collapsible YAML frontmatter panel.
 - Keep each locale's name and short description aligned with the packaged manifest messages.
 - Recheck the Privacy tab against [chrome-web-store-privacy.md](chrome-web-store-privacy.md).
-  v1.5.0 does not add permissions, remote code, network requests, or data collection.
+  v1.5.1 does not add permissions, remote code, network requests, or data collection.
 - Preview the listing and verify the version, descriptions, screenshots, support URL, and privacy
   policy before submitting the update.
 
@@ -72,7 +72,7 @@ that requirement are:
 - `docs/store-assets/screenshots/user-guide-fit-and-wrap.png`
 - `docs/store-assets/screenshots/user-guide-focus-mode.png`
 
-The store accepts up to five screenshots. For v1.5.0, prioritize images that show the toolbar
+The store accepts up to five screenshots. For v1.5.1, prioritize images that show the toolbar
 overview, filtering, Freeze controls, Fit/Wrap, and Focus mode. Do not upload
 `github-table-freeze-annotated.png`; its 1294 x 1081 dimensions do not meet the store screenshot
 requirement.
