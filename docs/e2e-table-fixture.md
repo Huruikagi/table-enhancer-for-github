@@ -18,7 +18,11 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Each table should remain readable inside the GitHub Markdown preview.
 - Wide tables should scroll horizontally instead of forcing every column to become narrow.
 - Normal-width tables should still look like regular GitHub Markdown tables.
-- The YAML frontmatter above this heading should keep GitHub's native nested table display, with no extension toolbar, hide/sort buttons, resize handles, or scroll wrappers on either the outer table or its children. Regular body tables below should still be enhanced. Reload and navigate away/back to check both initial and dynamically loaded previews.
+- The YAML frontmatter above this heading should appear in a Metadata property panel when GitHub embeds matching source Markdown and preview HTML. The top-level properties are visible; expand `metadata` to see its values and the environment tags. There should be no table toolbar, hide/sort buttons, resize handles, or scroll wrappers inside this panel.
+- Collapse and expand the whole Metadata panel and nested values with the mouse and with Enter/Space on their summaries. Values should remain readable in light/dark themes and a narrow viewport, including long keys, multiline strings, and literal HTML text.
+- Open [the flat metadata fixture](e2e-frontmatter-flat.md): it should use the same property panel despite having no nested tables.
+- Reload and navigate away/back to verify both initial and dynamically loaded previews. Regular body tables should still be enhanced, with a single toolbar per table. An old file's metadata must never appear on a newly navigated file.
+- When embedded source is unavailable, unsupported, or does not match the current preview, preserve the native frontmatter display. Leading key/value tables and nested tables stay free of table controls. No fallback network request should occur.
 - Each enhanced table should show a compact Freeze icon control above the table. Its accessible name and tooltip should be `Freeze`.
 - Opening the Freeze control should show a popup below the button with inputs for frozen rows and frozen columns. The focused input selects its existing value; valid Rows input moves focus to Columns, and valid Columns input moves focus to Save default when that button is available. Both values are capped at 5.
 - Tables with a preceding heading should show a Save default button in the Freeze control. Saved defaults apply only within the current repository.

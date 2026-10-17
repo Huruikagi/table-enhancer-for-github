@@ -1,4 +1,7 @@
 {
+  "metadata": { "message": "メタデータ" },
+  "metadataItem": { "message": "$1項目" },
+  "metadataItems": { "message": "$1項目" },
   "extensionName": { "message": "GitHub Table Enhancer" },
   "extensionDescription": {
     "message": "GitHubのMarkdownファイルプレビューにある横長の表を読みやすくする非公式の拡張機能です。"

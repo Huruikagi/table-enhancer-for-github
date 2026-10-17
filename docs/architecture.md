@@ -2,7 +2,34 @@
 
 GitHub Table Enhancer runs as one content script, but each enhanced table has an independent pure
 controller and browser runtime. The architecture keeps GitHub's original table DOM in place and
-projects a single table view state onto it.
+projects a single table view state onto it. Confirmed YAML frontmatter uses a
+separate property view, described below, rather than a table controller.
+
+## Frontmatter
+
+`src/frontmatter/source.ts` is the boundary for GitHub's internal embedded JSON.
+It checks the repository, path, ref and commit consistency, reads source Markdown
+from `codeViewBlobLayoutRoute.StyledBlob.rawLines`, and parses its leading YAML
+mapping. Unsupported payloads, invalid YAML, aliases, complex keys, and metadata
+beyond the parsing limits fall back to native rendering. No network API is used.
+
+`runtime.ts` matches that source to the current URL and the first rendered table,
+including the table HTML supplied by `codeViewBlobRoute.richText` and its keys.
+Only a confirmed match can hide the original element and insert the property
+view. The original DOM is retained and restored when the match is lost or the
+article is removed. Embedded data is cached per script/content; mutations to the
+article or JSON trigger reconciliation, including late data and navigation.
+
+`view.ts` renders values using text nodes, definition lists and native details
+elements. Top-level properties are open, nested collections are collapsed, and
+short scalar lists use tags. This view has no table controller, storage, or
+network operations. The table discovery boundary excludes metadata and nested
+tables. A conservative leading key/value shape check can exclude a table from
+controls, but can never authorize replacing it with a property view.
+
+`frontmatter.test.ts` covers parsing, binding, fallback and lifecycle;
+`e2e/frontmatter.spec.ts` covers the loaded extension, flat/nested metadata,
+keyboard interaction, themes, navigation and the absence of extra requests.
 
 ## Runtime flow
 

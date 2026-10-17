@@ -1,4 +1,7 @@
 {
+  "metadata": { "message": "元数据" },
+  "metadataItem": { "message": "$1 项" },
+  "metadataItems": { "message": "$1 项" },
   "extensionName": { "message": "GitHub 表格增强器" },
   "extensionDescription": {
     "message": "一款非官方扩展，让 GitHub Markdown 文件预览中的宽表格更易于阅读。"

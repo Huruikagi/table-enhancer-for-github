@@ -1,4 +1,7 @@
 {
+  "metadata": { "message": "메타데이터" },
+  "metadataItem": { "message": "$1개 항목" },
+  "metadataItems": { "message": "$1개 항목" },
   "extensionName": { "message": "GitHub 테이블 향상 도구" },
   "extensionDescription": {
     "message": "GitHub Markdown 파일 미리보기의 넓은 표를 더 쉽게 읽을 수 있게 해 주는 비공식 확장 프로그램입니다."

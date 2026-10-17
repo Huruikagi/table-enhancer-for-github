@@ -1,4 +1,7 @@
 {
+  "metadata": { "message": "Metadatos" },
+  "metadataItem": { "message": "$1 elemento" },
+  "metadataItems": { "message": "$1 elementos" },
   "extensionName": { "message": "Mejorador de tablas para GitHub" },
   "extensionDescription": {
     "message": "Una extensión no oficial que facilita la lectura de tablas anchas en las vistas previas de archivos Markdown de GitHub."

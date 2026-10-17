@@ -1,4 +1,7 @@
 {
+  "metadata": { "message": "Metadata" },
+  "metadataItem": { "message": "$1 item" },
+  "metadataItems": { "message": "$1 items" },
   "extensionName": { "message": "Table Enhancer for GitHub" },
   "extensionDescription": {
     "message": "An unofficial extension that makes wide tables easier to read in GitHub Markdown file previews."

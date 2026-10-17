@@ -1,3 +1,4 @@
+import { isMetadataTable, reconcileFrontmatter } from "../frontmatter/runtime";
 import { TABLE_WRAPPER_CLASS } from "./constants";
 import { readHeadingFreezeRule, saveHeadingFreezeRule } from "./freeze-rule-storage";
 import { destroyDetachedTableRuntimes, mountManagedTable } from "./lifecycle";
@@ -56,9 +57,13 @@ export function findPreviousHeadingText(table: HTMLTableElement): string | null 
 }
 
 export function wrapTable(table: HTMLTableElement): void {
-  // GitHub renders structured frontmatter as nested tables. Keep the whole
-  // group native so parent and child controls cannot interfere with each other.
-  if (table.parentElement?.closest("table") || table.querySelector("table")) {
+  // Metadata has its own property view or native fallback. Other nested table
+  // groups stay native so parent and child controls cannot interfere.
+  if (
+    isMetadataTable(table) ||
+    table.parentElement?.closest("table") ||
+    table.querySelector("table")
+  ) {
     return;
   }
 
@@ -98,6 +103,11 @@ export function wrapTable(table: HTMLTableElement): void {
 }
 
 export function enhanceTables(root: ParentNode = document): void {
+  reconcileFrontmatter();
+  enhanceMarkdownTables(root);
+}
+
+function enhanceMarkdownTables(root: ParentNode): void {
   if (!isMarkdownBlobPage()) {
     return;
   }
@@ -114,10 +124,12 @@ export function enhanceTables(root: ParentNode = document): void {
 
 export function startTableEnhancer(): MutationObserver {
   const observer = new MutationObserver((mutations) => {
+    // Embedded JSON may arrive or change after the rendered article.
+    reconcileFrontmatter();
     for (const mutation of mutations) {
       for (const node of mutation.addedNodes) {
         if (node instanceof Element) {
-          enhanceTables(node);
+          enhanceMarkdownTables(node);
         }
       }
 
@@ -132,6 +144,7 @@ export function startTableEnhancer(): MutationObserver {
   observer.observe(document.documentElement, {
     childList: true,
     subtree: true,
+    characterData: true,
   });
 
   enhanceTables();
