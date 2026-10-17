@@ -1,16 +1,13 @@
 import { act } from "preact/test-utils";
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
+import { useTableFixture } from "../test/table-fixture";
 import { FOCUS_MODE_BODY_CLASS, TABLE_CONTROLS_TAG, TABLE_HIDE_BUTTON_CLASS } from "./constants";
-import { startTableEnhancer, wrapTable } from "./enhancer";
+import { wrapTable } from "./enhancer";
 import { destroyDetachedTableRuntimes, destroyManagedTable } from "./lifecycle";
 
-describe("table session lifecycle", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    document.body.classList.remove(FOCUS_MODE_BODY_CLASS);
-    window.history.replaceState(null, "", "/owner/repo/blob/main/docs/index.md");
-  });
+const { startTableEnhancer, cleanup } = useTableFixture();
 
+describe("table session lifecycle", () => {
   it("unmounts controls and removes table behaviors when its wrapper is detached", () => {
     document.body.innerHTML = `
       <article class="markdown-body">
@@ -78,5 +75,25 @@ describe("table session lifecycle", () => {
 
     expect(table?.dataset.githubTableEnhancer).toBeUndefined();
     expect(document.body.classList.contains(FOCUS_MODE_BODY_CLASS)).toBe(false);
+  });
+
+  it("cleans up detached tables and disconnects observation through the shared fixture", async () => {
+    document.body.innerHTML =
+      '<article class="markdown-body"><table><tr><td>one</td></tr></table></article>';
+    startTableEnhancer();
+    const table = document.querySelector("table");
+    const expand = document.querySelector<HTMLButtonElement>('button[aria-label="Expand"]');
+    act(() => expand?.click());
+    expect(document.body.classList.contains(FOCUS_MODE_BODY_CLASS)).toBe(true);
+    table?.parentElement?.remove();
+
+    cleanup();
+
+    expect(table?.dataset.githubTableEnhancer).toBeUndefined();
+    expect(document.body.classList.contains(FOCUS_MODE_BODY_CLASS)).toBe(false);
+    document.body.innerHTML =
+      '<article class="markdown-body"><table><tr><td>next</td></tr></table></article>';
+    await act(async () => Promise.resolve());
+    expect(document.querySelector(TABLE_CONTROLS_TAG)).toBeNull();
   });
 });

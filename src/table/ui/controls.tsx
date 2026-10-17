@@ -14,6 +14,8 @@ import { getFilterRegularExpressionError, getTableFilterResult } from "../featur
 import type { FreezeOptions } from "../state";
 import { ControlIcon } from "./control-icons";
 import { CopyPanel, FilterPanel, FreezePanel, type SaveDefaultStatus } from "./control-panels";
+import { useControlPanels } from "./use-control-panels";
+import { useTransientStatus } from "./use-transient-status";
 
 type TableControlsProps = {
   controller: TableController;
@@ -24,8 +26,6 @@ type TableControlsProps = {
   table: HTMLTableElement;
 };
 
-type OpenPanel = "copy" | "filter" | "freeze" | null;
-
 function TableControls({
   controller,
   headingText,
@@ -35,21 +35,25 @@ function TableControls({
   table,
 }: TableControlsProps): VNode {
   const inputIdPrefix = useId();
-  const copyToggleRef = useRef<HTMLButtonElement>(null);
-  const copyFirstButtonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const freezeToggleRef = useRef<HTMLButtonElement>(null);
-  const filterToggleRef = useRef<HTMLButtonElement>(null);
+  const {
+    openPanel,
+    panelRef,
+    copyToggleRef,
+    filterToggleRef,
+    freezeToggleRef,
+    copyFirstButtonRef,
+    filterInputRef,
+    rowsInputRef,
+    togglePanel,
+    closePanel,
+  } = useControlPanels();
   const focusToggleRef = useRef<HTMLButtonElement>(null);
-  const rowsInputRef = useRef<HTMLInputElement>(null);
   const columnsInputRef = useRef<HTMLInputElement>(null);
   const saveDefaultButtonRef = useRef<HTMLButtonElement>(null);
-  const filterInputRef = useRef<HTMLInputElement>(null);
-  const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [viewState, setViewState] = useState(controller.getState());
-  const [copyStatus, setCopyStatus] = useState<CopyFormat | "failed" | "idle">("idle");
-  const [saveDefaultStatus, setSaveDefaultStatus] = useState<SaveDefaultStatus>("idle");
+  const [copyStatus, setCopyStatus] = useTransientStatus<CopyFormat | "failed" | "idle">("idle");
+  const [saveDefaultStatus, setSaveDefaultStatus] = useTransientStatus<SaveDefaultStatus>("idle");
   const { filterQuery, filterUsesRegularExpression, freeze, hiddenColumns, hiddenRows, isWrapped } =
     viewState;
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
@@ -101,10 +105,7 @@ function TableControls({
   const copyTable = async (format: CopyFormat): Promise<void> => {
     try {
       await onCopy(format);
-      setCopyStatus(format);
-      window.setTimeout(() => {
-        setCopyStatus((currentStatus) => (currentStatus === format ? "idle" : currentStatus));
-      }, 1500);
+      setCopyStatus(format, 1500);
     } catch {
       setCopyStatus("failed");
     }
@@ -119,12 +120,7 @@ function TableControls({
 
     try {
       await onSaveDefault();
-      setSaveDefaultStatus("saved");
-      window.setTimeout(() => {
-        setSaveDefaultStatus((currentStatus) =>
-          currentStatus === "saved" ? "idle" : currentStatus,
-        );
-      }, 1500);
+      setSaveDefaultStatus("saved", 1500);
     } catch {
       setSaveDefaultStatus("failed");
     }
@@ -132,118 +128,7 @@ function TableControls({
 
   useLayoutEffect(() => controller.subscribe((state) => setViewState(state)), [controller]);
 
-  useLayoutEffect(() => {
-    if (openPanel === "copy") {
-      copyFirstButtonRef.current?.focus();
-    }
-  }, [openPanel]);
-
-  useLayoutEffect(() => {
-    if (openPanel === "freeze") {
-      const rowsInput = rowsInputRef.current;
-      rowsInput?.focus();
-      rowsInput?.select();
-    }
-  }, [openPanel]);
-
-  useLayoutEffect(() => {
-    if (openPanel === "filter") {
-      filterInputRef.current?.focus();
-    }
-  }, [openPanel]);
-
-  useLayoutEffect(() => {
-    if (openPanel === null) {
-      return;
-    }
-
-    const activeToggle =
-      openPanel === "copy"
-        ? copyToggleRef.current
-        : openPanel === "filter"
-          ? filterToggleRef.current
-          : freezeToggleRef.current;
-    const handlePointerDown = (event: PointerEvent): void => {
-      if (
-        !(event.target instanceof Node) ||
-        panelRef.current?.contains(event.target) ||
-        activeToggle?.contains(event.target)
-      ) {
-        return;
-      }
-
-      setOpenPanel(null);
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-    };
-  }, [openPanel]);
-
-  useLayoutEffect(() => {
-    if (openPanel === null) {
-      return;
-    }
-
-    const panel = panelRef.current;
-    const activeToggle =
-      openPanel === "copy"
-        ? copyToggleRef.current
-        : openPanel === "filter"
-          ? filterToggleRef.current
-          : freezeToggleRef.current;
-    const containingBlock = panel?.offsetParent;
-    if (!panel || !activeToggle || !(containingBlock instanceof HTMLElement)) {
-      return;
-    }
-
-    const positionPanel = (): void => {
-      const maximumLeft = Math.max(0, containingBlock.clientWidth - panel.offsetWidth);
-      panel.style.left = `${Math.min(activeToggle.offsetLeft, maximumLeft)}px`;
-    };
-
-    positionPanel();
-    window.addEventListener("resize", positionPanel);
-    const resizeObserver = new ResizeObserver(positionPanel);
-    resizeObserver.observe(containingBlock);
-    resizeObserver.observe(panel);
-
-    return () => {
-      window.removeEventListener("resize", positionPanel);
-      resizeObserver.disconnect();
-    };
-  }, [openPanel]);
-
   useTableFocusMode(table, isFocusMode, setIsFocusMode, focusToggleRef);
-
-  const closeFreezePanel = (): void => {
-    setOpenPanel(null);
-    freezeToggleRef.current?.focus();
-  };
-
-  const closeCopyPanel = (): void => {
-    setOpenPanel(null);
-    copyToggleRef.current?.focus();
-  };
-
-  const closeFilterPanel = (): void => {
-    setOpenPanel(null);
-    filterToggleRef.current?.focus();
-  };
-
-  const toggleCopyPanel = (): void => {
-    setOpenPanel((currentPanel) => (currentPanel === "copy" ? null : "copy"));
-  };
-
-  const toggleFreezePanel = (): void => {
-    setOpenPanel((currentPanel) => (currentPanel === "freeze" ? null : "freeze"));
-  };
-
-  const toggleFilterPanel = (): void => {
-    setOpenPanel((currentPanel) => (currentPanel === "filter" ? null : "filter"));
-  };
 
   const toggleFocusMode = (): void => {
     setIsFocusMode((currentValue) => !currentValue);
@@ -263,7 +148,7 @@ function TableControls({
         aria-expanded={openPanel === "freeze"}
         aria-label={translate("freeze")}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
-        onClick={toggleFreezePanel}
+        onClick={() => togglePanel("freeze")}
         ref={freezeToggleRef}
         style={{ anchorName: `${anchorPrefix}-freeze` }}
         title={translate("freeze")}
@@ -275,7 +160,7 @@ function TableControls({
         aria-expanded={openPanel === "filter"}
         aria-label={translate("filter")}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
-        onClick={toggleFilterPanel}
+        onClick={() => togglePanel("filter")}
         ref={filterToggleRef}
         style={{ anchorName: `${anchorPrefix}-filter` }}
         title={translate("filterRows")}
@@ -287,7 +172,7 @@ function TableControls({
         aria-expanded={openPanel === "copy"}
         aria-label={translate("copyAs")}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
-        onClick={toggleCopyPanel}
+        onClick={() => togglePanel("copy")}
         ref={copyToggleRef}
         style={{ anchorName: `${anchorPrefix}-copy` }}
         title={translate("copyAs")}
@@ -374,7 +259,7 @@ function TableControls({
         <CopyPanel
           firstButtonRef={copyFirstButtonRef}
           onCopy={copyTable}
-          onEscape={closeCopyPanel}
+          onEscape={closePanel}
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-copy`}
           status={copyStatus}
@@ -390,7 +275,7 @@ function TableControls({
           filterUsesRegularExpression={filterUsesRegularExpression}
           resultSummary={filterResultSummary}
           inputIdPrefix={inputIdPrefix}
-          onEscape={closeFilterPanel}
+          onEscape={closePanel}
           onFilterQueryChange={(value) =>
             controller.dispatch({ type: "filterQueryChanged", value })
           }
@@ -407,7 +292,7 @@ function TableControls({
           headingText={headingText}
           inputIdPrefix={inputIdPrefix}
           limits={controller.limits}
-          onClose={closeFreezePanel}
+          onClose={closePanel}
           onSaveDefault={onSaveDefault ? saveDefault : undefined}
           onUpdateValues={updateValues}
           panelRef={panelRef}

@@ -47,6 +47,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Clear filter should restore rows hidden only by the filter, while manually hidden rows remain hidden until Show hidden is clicked.
 - Clicking the Copy as icon control should offer Markdown, CSV, and TSV copy actions. Its accessible name and tooltip should be `Copy as`.
 - Copy as should copy only the current visible table view, excluding hidden rows, filtered rows, and hidden columns.
+- A successful copy or Save default should show feedback for about 1.5 seconds. Repeating the operation should restart that duration; navigating away while an operation is pending should not leave feedback in the next preview.
 - Opening Freeze, Filter, or Copy as while another panel is open should close the previously open panel.
 - Freeze, Filter, and Copy as panels should open from the left edge of their button, shifting left only as far as needed to remain inside the table's scroll area.
 - Setting frozen rows should keep the first N displayed rows visible while scrolling vertically.

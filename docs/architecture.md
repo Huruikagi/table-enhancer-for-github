@@ -35,13 +35,20 @@ keyboard interaction, themes, navigation and the absence of extra requests.
 
 ```text
 content.ts
-  -> enhancer.ts discovers GitHub Markdown tables
+  -> page-runtime.ts routes page mutations to frontmatter and table runtimes
+  -> table/discovery.ts discovers GitHub Markdown tables
   -> lifecycle.ts owns one browser runtime per table
   -> mount.ts wires DOM events, controls, and external adapters
   -> ui/controls.tsx dispatches actions to TableController
   -> controller.ts and state.ts produce TableViewState
   -> mount.ts invokes reconcile.ts to project state onto the DOM
 ```
+
+`page-runtime.ts` reconciles only articles affected by a mutation. Embedded JSON changes
+invalidate articles within the same `react-app` (or the document when unscoped), and a pathname
+change invalidates all articles. Detached articles are restored before any new metadata view is
+mounted. Unrelated page mutations do not trigger metadata reconciliation. `table/enhancer.ts`
+preserves the existing exports as a compatibility facade without owning page observation.
 
 `TableController` is independent of Preact, browser APIs, and table DOM. `mount.ts` is the
 composition boundary: it installs table interactions, subscribes DOM reconciliation to controller
@@ -70,6 +77,8 @@ Preact toolbar presentation lives under `src/table/ui/`:
 - `controls.tsx`
 - `control-panels.tsx`
 - `control-icons.tsx`
+- `use-control-panels.ts` owns panel focus, dismissal, and positioning
+- `use-transient-status.ts` owns feedback timers and ignores completions after unmount
 
 UI modules may dispatch controller actions and call browser-operation callbacks supplied by
 `mount.ts`; they must not own persistent table view state or directly orchestrate feature DOM
@@ -125,7 +134,13 @@ changing controls or state transitions.
 - `enhancer-discovery.test.ts` covers GitHub URL and Markdown discovery rules.
 - `features/projections.test.ts` covers focused DOM projections.
 - `lifecycle.test.ts` covers mount, destroy, cleanup, and remount.
-- `table-enhancer.test.ts` remains the DOM integration and behavior regression suite.
+- `table-enhancer.test.ts` covers mounting and dynamically discovered tables.
+- `toolbar.test.ts`, `filter.test.ts`, `freeze-defaults.test.ts`, and `layout.test.ts` cover
+  feature-focused DOM integration and behavior regressions.
+- `ui/controls.test.ts` covers feedback timing and async completion after destruction.
+- `page-runtime.test.ts` covers mutation scope and navigation invalidation.
+- `test/table-fixture.ts` tracks mounted runtimes and page observers; its cleanup destroys even
+  detached runtimes, disconnects observation, restores metadata and browser stubs, and clears the DOM.
 - `e2e/table-enhancer.spec.ts` verifies the built extension in Chromium.
 
 New behavior should normally begin with a state transition test, add DOM integration coverage when

@@ -1,7 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { enhanceTables, startTableEnhancer, TABLE_WRAPPER_CLASS } from "../table/enhancer";
+import { beforeEach, describe, expect, it } from "vitest";
+import { enhanceTables, TABLE_WRAPPER_CLASS } from "../table/enhancer";
+import { useTableFixture } from "../test/table-fixture";
 import { EMBEDDED_DATA_SELECTOR, reconcileFrontmatter } from "./runtime";
 import { parseFrontmatter, readMetadataSource } from "./source";
+
+const { startTableEnhancer } = useTableFixture();
 
 const pathname = "/owner/repo/blob/main/docs/test.md";
 const table = "<table><tbody><tr><th>title</th><td>Example</td></tr></tbody></table>";
@@ -39,13 +42,7 @@ function install(data: unknown = embedded(), markup = native): HTMLScriptElement
 }
 
 beforeEach(() => {
-  document.body.innerHTML = "";
-  reconcileFrontmatter();
   window.history.replaceState(null, "", pathname);
-});
-afterEach(() => {
-  document.body.innerHTML = "";
-  reconcileFrontmatter();
 });
 
 describe("frontmatter parsing", () => {

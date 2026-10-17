@@ -1,3 +1,3 @@
-import { startTableEnhancer } from "./table/enhancer";
+import { startTableEnhancer } from "./page-runtime";
 
 startTableEnhancer();

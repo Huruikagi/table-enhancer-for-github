@@ -77,11 +77,14 @@ function restore(article: HTMLElement): void {
   views.delete(article);
 }
 
-export function reconcileFrontmatter(): void {
+export function reconcileFrontmatter(
+  articles: Iterable<HTMLElement> = document.querySelectorAll<HTMLElement>(".markdown-body"),
+): void {
   for (const [article] of views) {
     if (!article.isConnected) restore(article);
   }
-  for (const article of Array.from(document.querySelectorAll<HTMLElement>(".markdown-body"))) {
+  for (const article of articles) {
+    if (!article.isConnected) continue;
     const candidate = firstTable(article);
     const source = sourceFor(article);
     const existing = views.get(article);
