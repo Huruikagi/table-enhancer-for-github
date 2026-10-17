@@ -42,7 +42,7 @@ Take the useful part with you
 Read file metadata
 
 - View supported YAML frontmatter in a collapsible Metadata panel, with tags for short lists and
-  expandable nested properties. No additional network requests are needed.
+  expandable nested properties.
 
 The extension works only on GitHub Markdown file preview pages (`github.com/.../blob/...`). It does
 not alter your files or run on issues, pull requests, discussions, or repository landing pages.

@@ -38,7 +38,7 @@ GitHub Table Enhancerは、Markdownファイルプレビューの表にコンパ
 
 ファイルのメタデータを読む
 
-- 対応するYAML frontmatterを折りたたみ可能なメタデータパネルに表示。短いリストはタグとして、入れ子のプロパティは展開して確認できます。追加の通信は行いません。
+- 対応するYAML frontmatterを折りたたみ可能なメタデータパネルに表示。短いリストはタグとして、入れ子のプロパティは展開して確認できます。
 
 動作するのは、GitHubのMarkdownファイルプレビューページ（`github.com/.../blob/...`）だけです。ファイル自体は変更せず、Issue、Pull Request、Discussion、リポジトリトップページでは動作しません。
 

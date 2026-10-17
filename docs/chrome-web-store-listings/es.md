@@ -38,7 +38,7 @@ Llévate solo la parte útil
 
 Lee los metadatos del archivo
 
-- Consulta el frontmatter YAML compatible en un panel de metadatos plegable. Las listas cortas aparecen como etiquetas y las propiedades anidadas se pueden expandir. No se necesitan solicitudes de red adicionales.
+- Consulta el frontmatter YAML compatible en un panel de metadatos plegable. Las listas cortas aparecen como etiquetas y las propiedades anidadas se pueden expandir.
 
 La extensión funciona únicamente en las páginas de vista previa de archivos Markdown de GitHub (`github.com/.../blob/...`). No modifica tus archivos ni se ejecuta en issues, pull requests, discussions o páginas principales de repositorios.
 

@@ -38,7 +38,7 @@ GitHub 表格增强器会在 Markdown 文件预览页的表格上方添加紧凑
 
 阅读文件元数据
 
-- 在可折叠的元数据面板中查看受支持的 YAML frontmatter。短列表显示为标签，嵌套属性可以展开查看，无需额外网络请求。
+- 在可折叠的元数据面板中查看受支持的 YAML frontmatter。短列表显示为标签，嵌套属性可以展开查看。
 
 本扩展仅在 GitHub Markdown 文件预览页（`github.com/.../blob/...`）运行。它不会修改文件，也不会在 Issue、Pull Request、Discussion 或仓库首页运行。
 
