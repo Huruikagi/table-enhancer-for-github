@@ -101,6 +101,7 @@ mounting, reconciliation, lifecycle, discovery, and storage. Individual table be
 - `focus-mode.ts`
 - `freeze.ts`
 - `hide-controls.ts`
+- `row-selection.ts`
 - `resize.ts`
 - `sort.ts`
 - `visibility.ts`
@@ -130,6 +131,7 @@ mutations.
 - sort order
 - wrapping
 - fitted or manually resized column widths
+- draft row selection (eligible row identities and checked identities); applying adds unchecked rows to hidden rows
 
 Short-lived toolbar presentation state, such as the open popup, Focus mode, and success messages,
 stays inside the Preact controls. Controls depend on `TableController` for persistent state and
@@ -142,7 +144,7 @@ fixed order:
 
 1. sort rows
 2. apply hidden rows, hidden columns, and filtering
-3. apply wrapping and column widths
+3. apply wrapping, row-selection controls, and column widths
 4. recalculate frozen row and column layout
 
 Feature modules should mutate only their own projection. If one feature changes layout needed by

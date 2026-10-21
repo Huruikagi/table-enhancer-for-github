@@ -4,9 +4,8 @@ import {
   HIDE_INDEX_DATA_ATTRIBUTE,
   TABLE_HIDE_BUTTON_CLASS,
 } from "../constants";
-import { getOriginalRowIndex, initializeOriginalRowIndexes } from "./sort";
 
-export type HideAction = "hide-row" | "hide-column";
+export type HideAction = "hide-column";
 
 export type HideControlClick = {
   action: HideAction;
@@ -15,10 +14,8 @@ export type HideControlClick = {
 
 function createHideButton(action: HideAction, index: number): HTMLButtonElement {
   const button = document.createElement("button");
-  const labelKind = action === "hide-row" ? "row" : "column";
-
-  button.ariaLabel = translate(action === "hide-row" ? "hideRow" : "hideColumn", [index + 1]);
-  button.className = `${TABLE_HIDE_BUTTON_CLASS} ${TABLE_HIDE_BUTTON_CLASS}--${labelKind}`;
+  button.ariaLabel = translate("hideColumn", [index + 1]);
+  button.className = `${TABLE_HIDE_BUTTON_CLASS} ${TABLE_HIDE_BUTTON_CLASS}--column`;
   button.dataset[HIDE_ACTION_DATA_ATTRIBUTE] = action;
   button.dataset[HIDE_INDEX_DATA_ATTRIBUTE] = String(index);
   button.title = button.ariaLabel;
@@ -36,15 +33,6 @@ export function resetTableHideControls(table: HTMLTableElement): void {
 
 export function installTableHideControls(table: HTMLTableElement): void {
   resetTableHideControls(table);
-  initializeOriginalRowIndexes(table);
-
-  for (const row of Array.from(table.rows)) {
-    const firstCell = row.cells[0];
-
-    if (firstCell) {
-      firstCell.appendChild(createHideButton("hide-row", getOriginalRowIndex(row)));
-    }
-  }
 
   const columnControlRow = table.tHead?.rows[0] ?? table.rows[0];
 
@@ -74,7 +62,7 @@ export function getHideControlClick(
   const action = button.dataset[HIDE_ACTION_DATA_ATTRIBUTE];
   const index = Number(button.dataset[HIDE_INDEX_DATA_ATTRIBUTE]);
 
-  if ((action !== "hide-row" && action !== "hide-column") || !Number.isInteger(index)) {
+  if (action !== "hide-column" || !Number.isInteger(index)) {
     return null;
   }
 

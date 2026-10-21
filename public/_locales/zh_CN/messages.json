@@ -1,4 +1,13 @@
 {
+  "selectRows": { "message": "选择行" },
+  "selectAllRows": { "message": "选择所有可见行" },
+  "selectRow": { "message": "选择第$ROW$行", "placeholders": { "row": { "content": "$1" } } },
+  "showSelectedRows": { "message": "显示选中的行" },
+  "cancelSelection": { "message": "取消" },
+  "selectedRowsSummary": {
+    "message": "已选择$SELECTED$行，共$TOTAL$行",
+    "placeholders": { "selected": { "content": "$1" }, "total": { "content": "$2" } }
+  },
   "metadata": { "message": "元数据" },
   "metadataItem": { "message": "$1 项" },
   "metadataItems": { "message": "$1 项" },
@@ -44,10 +53,6 @@
   "frozenRows": { "message": "冻结行数" },
   "hideColumn": {
     "message": "隐藏第 $NUMBER$ 列",
-    "placeholders": { "number": { "content": "$1" } }
-  },
-  "hideRow": {
-    "message": "隐藏第 $NUMBER$ 行",
     "placeholders": { "number": { "content": "$1" } }
   },
   "invalidRegularExpression": { "message": "无效的正则表达式" },

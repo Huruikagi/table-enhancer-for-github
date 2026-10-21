@@ -1,4 +1,10 @@
 export const englishMessages = {
+  selectRows: "Select rows",
+  selectAllRows: "Select all visible rows",
+  selectRow: "Select row $1",
+  showSelectedRows: "Show selected rows",
+  cancelSelection: "Cancel",
+  selectedRowsSummary: "$1 of $2 rows selected",
   clearFilter: "Clear filter",
   close: "Close",
   closeFocusMode: "Close Focus mode (Esc)",
@@ -23,7 +29,6 @@ export const englishMessages = {
   frozenColumns: "Frozen columns",
   frozenRows: "Frozen rows",
   hideColumn: "Hide column $1",
-  hideRow: "Hide row $1",
   invalidRegularExpression: "Invalid regular expression",
   matchingRowHidden: "$1 matching row is hidden.",
   matchingRowsHidden: "$1 matching rows are hidden.",

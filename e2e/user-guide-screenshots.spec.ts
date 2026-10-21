@@ -168,6 +168,12 @@ test("captures the user guide screenshots", async ({ page }) => {
 
   await screenshot(page, "user-guide-overview.png");
 
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  await wrapper.getByRole("checkbox", { name: "Select all visible rows" }).uncheck();
+  await table.locator("tbody tr").first().getByRole("checkbox").check();
+  await screenshot(page, "user-guide-row-selection.png");
+  await wrapper.getByRole("button", { name: "Cancel", exact: true }).click();
+
   await wrapper.getByRole("button", { name: "Freeze" }).click();
   await wrapper.getByLabel("Frozen rows").fill("1");
   await wrapper.getByLabel("Frozen columns").fill("1");

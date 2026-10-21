@@ -10,6 +10,7 @@ import {
   getTable,
   HIDDEN_COLUMN_DATA_ATTRIBUTE,
   HIDDEN_ROW_DATA_ATTRIBUTE,
+  hideRow,
   openFreezeControls,
   renderMarkdownTables,
   STICKY_CELL_DATA_ATTRIBUTE,
@@ -135,7 +136,7 @@ describe("table layout and visibility interactions", () => {
     expect(table.style.width).toBe("312px");
   });
 
-  it("adds hover controls that hide rows and columns", () => {
+  it("selects rows to hide and keeps column hover controls", () => {
     renderMarkdownTables(`
       <table>
         <tbody>
@@ -147,10 +148,10 @@ describe("table layout and visibility interactions", () => {
     const table = getTable();
 
     wrapTable(table);
-    clickButton("Hide row 2");
+    hideRow(2);
     clickButton("Hide column 2");
 
-    expect(table.querySelectorAll(`.${TABLE_HIDE_BUTTON_CLASS}`)).toHaveLength(4);
+    expect(table.querySelectorAll(`.${TABLE_HIDE_BUTTON_CLASS}`)).toHaveLength(2);
     expect(table.rows[1]?.dataset[HIDDEN_ROW_DATA_ATTRIBUTE]).toBe("true");
     expect(table.rows[0]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBe("true");
     expect(table.rows[1]?.cells[1]?.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE]).toBe("true");
@@ -204,7 +205,7 @@ describe("table layout and visibility interactions", () => {
     const table = getTable();
 
     wrapTable(table);
-    clickButton("Hide row 3");
+    hideRow(3);
     clickButton("Sort by column 1");
 
     expect(table.tBodies[0]?.rows[0]?.cells[0]?.textContent).toContain("Alpha");
@@ -261,7 +262,7 @@ describe("table layout and visibility interactions", () => {
     const table = getTable();
 
     wrapTable(table);
-    clickButton("Hide row 2");
+    hideRow(2);
     clickButton("Hide column 2");
     openFreezeControls();
     clickButton("Show hidden");
@@ -287,7 +288,7 @@ describe("table layout and visibility interactions", () => {
     openFreezeControls();
     setFreezeInput("Frozen rows", "1");
     setFreezeInput("Frozen columns", "1");
-    clickButton("Hide row 2");
+    hideRow(2);
     clickButton("Hide column 2");
     clickButton("Wrap");
     clickButton("Filter");

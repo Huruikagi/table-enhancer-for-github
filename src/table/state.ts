@@ -25,11 +25,16 @@ export type TableViewState = {
   sort: TableSort;
   isWrapped: boolean;
   columnWidths: readonly number[] | null;
+  rowSelection: { rows: readonly number[]; selected: readonly number[] } | null;
 };
 
 export type TableViewAction =
+  | { type: "rowSelectionStarted"; rows: readonly number[] }
+  | { type: "rowSelectionToggled"; index: number }
+  | { type: "rowSelectionAllToggled" }
+  | { type: "rowSelectionApplied" }
+  | { type: "rowSelectionCancelled" }
   | { type: "freezeChanged"; value: FreezeOptions }
-  | { type: "rowHidden"; index: number }
   | { type: "columnHidden"; index: number }
   | { type: "hiddenShown" }
   | { type: "filterQueryChanged"; value: string }
@@ -50,6 +55,7 @@ export function createInitialTableViewState(): TableViewState {
     sort: null,
     isWrapped: false,
     columnWidths: null,
+    rowSelection: null,
   };
 }
 
@@ -66,21 +72,62 @@ export function reduceTableViewState(
   limits: FreezeOptions,
 ): TableViewState {
   switch (action.type) {
+    case "rowSelectionStarted": {
+      const rows = [...new Set(action.rows)].filter(
+        (index) => Number.isInteger(index) && index >= 0,
+      );
+      return { ...state, rowSelection: { rows, selected: [...rows] } };
+    }
+    case "rowSelectionToggled": {
+      const selection = state.rowSelection;
+      if (!selection?.rows.includes(action.index)) return state;
+      const selected = selection.selected.includes(action.index)
+        ? selection.selected.filter((index) => index !== action.index)
+        : [...selection.selected, action.index];
+      return { ...state, rowSelection: { ...selection, selected } };
+    }
+    case "rowSelectionAllToggled": {
+      const selection = state.rowSelection;
+      if (!selection) return state;
+      return {
+        ...state,
+        rowSelection: {
+          ...selection,
+          selected: selection.selected.length === selection.rows.length ? [] : [...selection.rows],
+        },
+      };
+    }
+    case "rowSelectionApplied": {
+      const selection = state.rowSelection;
+      if (!selection) return state;
+      const selected = new Set(selection.selected);
+      return {
+        ...state,
+        hiddenRows: [
+          ...new Set([
+            ...state.hiddenRows,
+            ...selection.rows.filter((index) => !selected.has(index)),
+          ]),
+        ].sort((a, b) => a - b),
+        rowSelection: null,
+      };
+    }
+    case "rowSelectionCancelled":
+      return { ...state, rowSelection: null };
     case "freezeChanged":
       return { ...state, freeze: clampFreezeOptions(action.value, limits) };
-    case "rowHidden":
-      return { ...state, hiddenRows: addUniqueSortedIndex(state.hiddenRows, action.index) };
     case "columnHidden":
       return {
         ...state,
+        rowSelection: null,
         hiddenColumns: addUniqueSortedIndex(state.hiddenColumns, action.index),
       };
     case "hiddenShown":
-      return { ...state, hiddenRows: [], hiddenColumns: [] };
+      return { ...state, hiddenRows: [], hiddenColumns: [], rowSelection: null };
     case "filterQueryChanged":
-      return { ...state, filterQuery: action.value };
+      return { ...state, filterQuery: action.value, rowSelection: null };
     case "filterRegularExpressionChanged":
-      return { ...state, filterUsesRegularExpression: action.value };
+      return { ...state, filterUsesRegularExpression: action.value, rowSelection: null };
     case "sortChanged":
       return { ...state, sort: action.value };
     case "wrapChanged":

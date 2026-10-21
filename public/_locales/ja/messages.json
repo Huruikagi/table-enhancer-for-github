@@ -1,4 +1,13 @@
 {
+  "selectRows": { "message": "行を選択" },
+  "selectAllRows": { "message": "表示中の行をすべて選択" },
+  "selectRow": { "message": "$ROW$行目を選択", "placeholders": { "row": { "content": "$1" } } },
+  "showSelectedRows": { "message": "選んだ行を表示" },
+  "cancelSelection": { "message": "キャンセル" },
+  "selectedRowsSummary": {
+    "message": "$TOTAL$行中$SELECTED$行を選択",
+    "placeholders": { "selected": { "content": "$1" }, "total": { "content": "$2" } }
+  },
   "metadata": { "message": "メタデータ" },
   "metadataItem": { "message": "$1項目" },
   "metadataItems": { "message": "$1項目" },
@@ -44,10 +53,6 @@
   "frozenRows": { "message": "固定する行数" },
   "hideColumn": {
     "message": "$NUMBER$列目を非表示",
-    "placeholders": { "number": { "content": "$1" } }
-  },
-  "hideRow": {
-    "message": "$NUMBER$行目を非表示",
     "placeholders": { "number": { "content": "$1" } }
   },
   "invalidRegularExpression": { "message": "正規表現が無効です" },

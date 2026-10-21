@@ -200,6 +200,12 @@ export function getButton(label: string): HTMLButtonElement {
   return button;
 }
 
+export function hideRow(rowNumber: number): void {
+  clickButton("Select rows");
+  act(() => getInput(`Select row ${rowNumber}`).click());
+  clickButton("Show selected rows");
+}
+
 export function createRect(width: number): DOMRect {
   return {
     bottom: 0,

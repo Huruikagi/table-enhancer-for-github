@@ -229,6 +229,7 @@ body.github-table-enhancer-focus-mode-open {
 }
 
 .github-table-enhancer-controls-toggle,
+.github-table-enhancer-selection-actions button,
 .github-table-enhancer-controls-panel button {
   appearance: none;
   background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
@@ -260,11 +261,13 @@ body.github-table-enhancer-focus-mode-open {
 }
 
 .github-table-enhancer-controls-toggle:hover,
+.github-table-enhancer-selection-actions button:hover,
 .github-table-enhancer-controls-panel button:hover {
   background: var(--button-default-bgColor-hover, var(--color-btn-hover-bg, #f3f4f6));
 }
 
-.github-table-enhancer-controls-panel button:disabled {
+.github-table-enhancer-controls-panel button:disabled,
+.github-table-enhancer-selection-actions button:disabled {
   color: var(--fgColor-disabled, var(--color-primer-fg-disabled, #8c959f));
   cursor: default;
 }
@@ -422,10 +425,27 @@ body.github-table-enhancer-focus-mode-open {
   z-index: 6;
 }
 
-.github-table-enhancer-hide-button--row {
-  left: 2px;
-  top: 50%;
-  transform: translateY(-50%);
+.github-table-enhancer-selection-actions {
+  align-items: center;
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  font-size: 12px;
+}
+
+.github-table-enhancer-scroll input.github-table-enhancer-row-selection {
+  accent-color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+}
+
+.github-table-enhancer-scroll tr:has(input.github-table-enhancer-row-selection:checked) > td {
+  background-color: var(--bgColor-accent-muted, var(--color-accent-subtle, #ddf4ff));
 }
 
 .github-table-enhancer-sort-button {

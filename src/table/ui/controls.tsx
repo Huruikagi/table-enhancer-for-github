@@ -22,6 +22,7 @@ type TableControlsProps = {
   headingText?: string | null;
   onCopy: (format: CopyFormat) => Promise<void>;
   onFitColumns: () => void;
+  onSelectRows: () => void;
   onSaveDefault?: () => Promise<void>;
   table: HTMLTableElement;
 };
@@ -31,6 +32,7 @@ function TableControls({
   headingText,
   onCopy,
   onFitColumns,
+  onSelectRows,
   onSaveDefault,
   table,
 }: TableControlsProps): VNode {
@@ -48,6 +50,7 @@ function TableControls({
     closePanel,
   } = useControlPanels();
   const focusToggleRef = useRef<HTMLButtonElement>(null);
+  const selectRowsRef = useRef<HTMLButtonElement>(null);
   const columnsInputRef = useRef<HTMLInputElement>(null);
   const saveDefaultButtonRef = useRef<HTMLButtonElement>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -181,6 +184,22 @@ function TableControls({
         <ControlIcon kind="copy" />
       </button>
       <button
+        aria-label={translate("selectRows")}
+        data-gte-select-rows="true"
+        aria-pressed={viewState.rowSelection !== null}
+        className={TABLE_CONTROLS_TOGGLE_CLASS}
+        ref={selectRowsRef}
+        title={translate("selectRows")}
+        type="button"
+        onClick={() => {
+          closePanel();
+          if (viewState.rowSelection) controller.dispatch({ type: "rowSelectionCancelled" });
+          else onSelectRows();
+        }}
+      >
+        <ControlIcon kind="select" />
+      </button>
+      <button
         aria-label={translate("fit")}
         className={TABLE_CONTROLS_TOGGLE_CLASS}
         onClick={fitTableView}
@@ -231,6 +250,35 @@ function TableControls({
         <ControlIcon kind="expand" />
       </button>
 
+      {viewState.rowSelection && (
+        <div className="github-table-enhancer-selection-actions">
+          <span aria-live="polite">
+            {translate("selectedRowsSummary", [
+              viewState.rowSelection.selected.length,
+              viewState.rowSelection.rows.length,
+            ])}
+          </span>
+          <button
+            type="button"
+            disabled={viewState.rowSelection.rows.length === 0}
+            onClick={() => {
+              controller.dispatch({ type: "rowSelectionApplied" });
+              selectRowsRef.current?.focus();
+            }}
+          >
+            {translate("showSelectedRows")}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              controller.dispatch({ type: "rowSelectionCancelled" });
+              selectRowsRef.current?.focus();
+            }}
+          >
+            {translate("cancelSelection")}
+          </button>
+        </div>
+      )}
       {filterResult?.visibleRows === 0 && (
         <div aria-live="polite" className="github-table-enhancer-filter-empty-state" role="status">
           <span>

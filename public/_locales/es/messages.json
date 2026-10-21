@@ -1,4 +1,16 @@
 {
+  "selectRows": { "message": "Seleccionar filas" },
+  "selectAllRows": { "message": "Seleccionar todas las filas visibles" },
+  "selectRow": {
+    "message": "Seleccionar fila $ROW$",
+    "placeholders": { "row": { "content": "$1" } }
+  },
+  "showSelectedRows": { "message": "Mostrar filas seleccionadas" },
+  "cancelSelection": { "message": "Cancelar" },
+  "selectedRowsSummary": {
+    "message": "$SELECTED$ de $TOTAL$ filas seleccionadas",
+    "placeholders": { "selected": { "content": "$1" }, "total": { "content": "$2" } }
+  },
   "metadata": { "message": "Metadatos" },
   "metadataItem": { "message": "$1 elemento" },
   "metadataItems": { "message": "$1 elementos" },
@@ -44,10 +56,6 @@
   "frozenRows": { "message": "Filas fijadas" },
   "hideColumn": {
     "message": "Ocultar columna $NUMBER$",
-    "placeholders": { "number": { "content": "$1" } }
-  },
-  "hideRow": {
-    "message": "Ocultar fila $NUMBER$",
     "placeholders": { "number": { "content": "$1" } }
   },
   "invalidRegularExpression": { "message": "Expresión regular no válida" },

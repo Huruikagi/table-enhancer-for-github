@@ -16,6 +16,11 @@ import {
   resetTableColumnResizeControls,
 } from "./features/resize";
 import {
+  getRowSelectionClick,
+  getSelectableRows,
+  ROW_SELECTION_CLASS,
+} from "./features/row-selection";
+import {
   getNextTableSort,
   getSortColumnClick,
   installTableSortControls,
@@ -58,6 +63,16 @@ export function mountTableRuntime(
     reconcileTable(table, previousState, state);
   });
   const handleClick = (event: MouseEvent): void => {
+    const selection = getRowSelectionClick(table, event.target);
+    if (selection !== null) {
+      event.stopPropagation();
+      controller.dispatch(
+        selection === "all"
+          ? { type: "rowSelectionAllToggled" }
+          : { type: "rowSelectionToggled", index: selection },
+      );
+      return;
+    }
     const sortColumn = getSortColumnClick(table, event.target);
     const hideControlClick = getHideControlClick(table, event.target);
 
@@ -77,11 +92,7 @@ export function mountTableRuntime(
 
     event.preventDefault();
     event.stopPropagation();
-    controller.dispatch(
-      hideControlClick.action === "hide-row"
-        ? { type: "rowHidden", index: hideControlClick.index }
-        : { type: "columnHidden", index: hideControlClick.index },
-    );
+    controller.dispatch({ type: "columnHidden", index: hideControlClick.index });
   };
 
   table.addEventListener("click", handleClick);
@@ -91,6 +102,10 @@ export function mountTableRuntime(
   const controls = createTableControls({
     controller,
     headingText: options.headingText,
+    onSelectRows: () => {
+      controller.dispatch({ type: "rowSelectionStarted", rows: getSelectableRows(table) });
+      table.querySelector<HTMLInputElement>(`.${ROW_SELECTION_CLASS}`)?.focus();
+    },
     onCopy: (format) => (options.copy ?? copyVisibleTable)(table, format),
     onFitColumns: () => {
       controller.dispatch({
@@ -103,6 +118,15 @@ export function mountTableRuntime(
       : undefined,
     table,
   });
+  const handleSelectionEscape = (event: KeyboardEvent): void => {
+    if (event.key !== "Escape" || !controller.getState().rowSelection) return;
+    event.preventDefault();
+    event.stopPropagation();
+    controller.dispatch({ type: "rowSelectionCancelled" });
+    controls.querySelector<HTMLButtonElement>("[data-gte-select-rows]")?.focus();
+  };
+  table.addEventListener("keydown", handleSelectionEscape);
+  controls.addEventListener("keydown", handleSelectionEscape);
 
   options.defaultValuesPromise
     ?.then((defaultValues) => {
@@ -124,6 +148,8 @@ export function mountTableRuntime(
       controller.dispatch({ type: "reset" });
       isDestroyed = true;
       table.removeEventListener("click", handleClick);
+      table.removeEventListener("keydown", handleSelectionEscape);
+      controls.removeEventListener("keydown", handleSelectionEscape);
       removeResizeBehavior();
       removeProjection();
       destroyTableControls(controls);

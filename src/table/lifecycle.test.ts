@@ -54,7 +54,7 @@ describe("table session lifecycle", () => {
     wrapTable(table);
 
     expect(table.parentElement?.querySelectorAll(TABLE_CONTROLS_TAG)).toHaveLength(1);
-    expect(table.querySelectorAll(`.${TABLE_HIDE_BUTTON_CLASS}`)).toHaveLength(3);
+    expect(table.querySelectorAll(`.${TABLE_HIDE_BUTTON_CLASS}`)).toHaveLength(2);
   });
 
   it("destroys a runtime when the page observer sees GitHub detach its wrapper", async () => {

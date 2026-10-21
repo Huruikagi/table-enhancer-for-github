@@ -1,4 +1,13 @@
 {
+  "selectRows": { "message": "Select rows" },
+  "selectAllRows": { "message": "Select all visible rows" },
+  "selectRow": { "message": "Select row $ROW$", "placeholders": { "row": { "content": "$1" } } },
+  "showSelectedRows": { "message": "Show selected rows" },
+  "cancelSelection": { "message": "Cancel" },
+  "selectedRowsSummary": {
+    "message": "$SELECTED$ of $TOTAL$ rows selected",
+    "placeholders": { "selected": { "content": "$1" }, "total": { "content": "$2" } }
+  },
   "metadata": { "message": "Metadata" },
   "metadataItem": { "message": "$1 item" },
   "metadataItems": { "message": "$1 items" },
@@ -46,7 +55,6 @@
     "message": "Hide column $NUMBER$",
     "placeholders": { "number": { "content": "$1" } }
   },
-  "hideRow": { "message": "Hide row $NUMBER$", "placeholders": { "number": { "content": "$1" } } },
   "invalidRegularExpression": { "message": "Invalid regular expression" },
   "matchingRowHidden": {
     "message": "$COUNT$ matching row is hidden.",

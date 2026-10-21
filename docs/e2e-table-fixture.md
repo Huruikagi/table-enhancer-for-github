@@ -32,11 +32,11 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Clicking Save default should persist the current rows and columns for the nearest preceding heading text.
 - Reloading the page should apply the saved default to tables with the same preceding heading text.
 - Hovering a table header cell should show its column hide button and unsorted sort button.
-- Hovering the first cell in a row should show a row hide button.
+- Select rows should show checked boxes in the first visible column for visible body rows and a select-all checkbox in the header. No row hide buttons should appear.
 - Dragging a column edge should resize that displayed column without changing the surrounding GitHub layout.
 - Clicking Fit should set readable column widths and enable wrapped cell rendering in one step.
 - Clicking Wrap should switch resized cells from ellipsis clipping to wrapped content.
-- Clicking a hide button should remove that displayed row or column without changing the surrounding GitHub layout.
+- Unchecking rows should leave the table visible until Show selected rows is clicked. Column hide buttons still hide their column immediately.
 - Clicking a column header sort button should cycle body rows through ascending, descending, and original Markdown order while leaving header rows in place.
 - Show hidden should restore hidden rows and columns.
 - Clicking Filter should show and focus a Filter rows input. The input and `.*` toggle should stay together on the first row. Typing a runtime, package, status, or keyword should temporarily show only matching body rows while keeping header rows visible. The panel should remain below its button and wrap its result details instead of growing excessively wide.
@@ -110,7 +110,12 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | 10 | Reset | Click Reset. | The wrapper no longer needs to keep frozen rows visible. |
 | 11 | Reapply | Set Rows to `1` again. | Sticky row styles are applied again cleanly. |
 | 12 | Reapply | Set Columns to `2`. | The first two columns stay visible with a clear separator to the right of the second frozen column. |
-| 13 | Hide row | Hover the first cell of this row and click the hide button. | The row disappears and nearby rows remain readable. |
+| 13 | Select rows | Open Select rows, uncheck this row, and click Show selected rows. | Nothing hides before applying; this row then disappears and nearby rows remain readable. |
+| 13a | Select all / clear all | Open Select rows, clear the header checkbox, check two rows, then apply. | The header checkbox is mixed when some rows are selected; only the two checked body rows remain. Headers remain visible. |
+| 13b | Cancel selection | Show hidden, open Select rows, change checks, then Cancel or press Escape from a checkbox. | All previous visibility is preserved, checkboxes disappear, and focus returns to Select rows. |
+| 13c | Filtered selection | Filter the table, open Select rows, uncheck a match and apply, then clear the filter. | Only the unchecked match is manually hidden; rows outside the filter return. |
+| 13d | Selection combinations | Hide the first column, freeze rows/columns, enter Focus mode, select rows, sort and apply; copy the view. | Checkboxes use the first visible column; selection follows row identity, freeze stays aligned, and copied data has no selection column. |
+| 13e | Empty selection | Clear every checkbox and apply, then Show hidden. | Body rows hide while the header and restore action remain available; Show hidden restores the rows. |
 | 14 | Hide column | Hover a header cell and click the hide button. | The column disappears while the table remains horizontally scrollable. |
 | 15 | Resize column | Drag the right edge of a header cell wider. | That column widens and the table remains horizontally scrollable. |
 | 16 | Resize column | Drag the same edge narrower. | That column narrows without collapsing below a usable width. |

@@ -26,7 +26,7 @@ Issues and feature requests are welcome in English or Japanese.
 - Wraps Markdown preview tables in a horizontal scroll container so wide rows remain readable.
 - Adds a compact Freeze control for keeping the first N displayed rows or columns visible while scrolling.
 - Saves Freeze defaults per nearest preceding heading, then reapplies them when the same heading is viewed again.
-- Lets you temporarily hide displayed rows or columns and restore them with Show hidden.
+- Lets you select which displayed rows to keep, hide columns, and restore hidden items with Show hidden.
 - Lets you temporarily filter table rows by case-insensitive text or regular expressions without saving the filter.
 - Sorts body rows from column headers in ascending, descending, or original Markdown order.
 - Lets you copy the currently visible table view as Markdown, CSV, or TSV.
@@ -83,7 +83,7 @@ production URL match is exercised without depending on live GitHub pages.
 Markdown preview tables are wrapped in a horizontal scroll container so long cell content does not force every column to become narrow.
 Each table gets compact controls above it. The Freeze panel can temporarily freeze the first N displayed rows and the first N left columns, reset those values, and save defaults for tables that have a preceding heading. Saved defaults apply only to matching headings in the same GitHub repository.
 
-Hide buttons appear while hovering table cells. Row hide buttons appear on the first cell in each row, and column hide buttons appear on header cells. Hidden rows and columns are temporary and can be restored with Show hidden.
+Select rows opens checkboxes for the currently visible body rows, initially all checked. Use the header checkbox to select or clear all visible rows, then choose Show selected rows to hide unchecked rows. To keep only a few rows, clear all and check those rows; to hide a few, simply uncheck them. The table stays visible until you apply; Cancel or Escape discards the selection. Existing filters and hidden items are preserved. Column hide buttons appear on header cells. Hidden rows and columns are temporary and can be restored with Show hidden.
 
 The Filter control can temporarily show only body rows whose row text contains a case-insensitive search term. Regular expression mode supports more precise matching and reports invalid expressions without hiding rows. Header rows stay visible, Clear filter restores filtered rows, and manually hidden rows remain hidden until Show hidden is used.
 

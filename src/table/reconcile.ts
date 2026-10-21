@@ -5,6 +5,7 @@
 import { WRAPPED_COLUMNS_DATA_ATTRIBUTE } from "./constants";
 import { applyTableFreeze } from "./features/freeze";
 import { applyTableColumnWidths } from "./features/resize";
+import { applyRowSelection } from "./features/row-selection";
 import { applyTableSort } from "./features/sort";
 import { applyTableVisibility } from "./features/visibility";
 import type { TableViewState } from "./state";
@@ -35,6 +36,7 @@ export function reconcileTable(
     (previousState.columnWidths !== state.columnWidths ||
       previousState.hiddenColumns !== state.hiddenColumns);
   const freezeChanged = !previousState || previousState.freeze !== state.freeze;
+  const selectionChanged = !previousState || previousState.rowSelection !== state.rowSelection;
 
   if (sortChanged) {
     applyTableSort(table, state.sort);
@@ -53,11 +55,20 @@ export function reconcileTable(
     applyTableWrap(table, state.isWrapped);
   }
 
+  if (selectionChanged) applyRowSelection(table, state.rowSelection);
+
   if (widthsChanged || (!previousState && state.columnWidths)) {
     applyTableColumnWidths(table, state.columnWidths, new Set(state.hiddenColumns));
   }
 
-  if (sortChanged || visibilityChanged || wrapChanged || widthsChanged || freezeChanged) {
+  if (
+    sortChanged ||
+    visibilityChanged ||
+    wrapChanged ||
+    widthsChanged ||
+    freezeChanged ||
+    selectionChanged
+  ) {
     applyTableFreeze(table, state.freeze);
   }
 }

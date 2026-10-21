@@ -41,7 +41,7 @@ Open a Markdown file containing a table. Table Enhancer places a compact toolbar
 
 ![A GitHub Markdown table with Table Enhancer controls above it.]({{ site.baseurl }}/store-assets/screenshots/user-guide-overview.png)
 
-The toolbar provides Freeze, Filter, Copy as, Fit, Wrap, Reset, and Focus mode. When rows or columns are hidden, it also shows **Show hidden**.
+The toolbar provides Freeze, Filter, Copy as, Select rows, Fit, Wrap, Reset, and Focus mode. When rows or columns are hidden, it also shows **Show hidden**.
 
 The extension UI follows Chrome's display language. English is the default; Japanese, Simplified Chinese, Korean, Brazilian Portuguese, and Spanish are also supported. If a translated message is unavailable, the English message is shown.
 
@@ -71,7 +71,17 @@ Sorting is temporary. It preserves the identity of manually hidden and filtered 
 
 ## Hide and restore rows or columns
 
-Hover a header cell to reveal its column hide button, or hover the first cell of a row to reveal its row hide button. Hidden items are removed only from your current table view.
+Choose **Select rows** to show checkboxes in the first visible column. Currently visible body rows start checked; headers remain visible. The header checkbox selects or clears all visible body rows and shows a mixed state when only some are selected.
+
+- To keep a few rows, clear all with the header checkbox, then check the rows you want.
+- To hide a few rows, uncheck those rows.
+- Choose **Show selected rows** to apply, or **Cancel** / <kbd>Escape</kbd> to discard the selection. Rows stay visible until you apply. Applying with no rows checked hides all current body rows; **Show hidden** restores them.
+
+Selection applies only to the current visible rows, preserving existing filters and hidden items. Changing the filter or hiding a column cancels an unfinished selection; sorting keeps selections attached to the same rows. Use **Show hidden** before selecting again if you want to include previously hidden rows.
+
+![Selecting rows before applying the view.]({{ site.baseurl }}/store-assets/screenshots/user-guide-row-selection.png)
+
+Hover a header cell to reveal its column hide button. Hidden items are removed only from your current table view.
 
 ![A table with a hidden column and the Show hidden control available.]({{ site.baseurl }}/store-assets/screenshots/user-guide-hide-and-restore.png)
 

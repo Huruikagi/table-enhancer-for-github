@@ -7,6 +7,7 @@ import {
   getInput,
   getTable,
   HIDDEN_ROW_DATA_ATTRIBUTE,
+  hideRow,
   openFreezeControls,
   renderMarkdownTables,
   STICKY_CELL_DATA_ATTRIBUTE,
@@ -159,7 +160,9 @@ describe("table row filtering", () => {
     );
 
     setFilterInput("node");
-    clickButton("Hide row 2");
+    hideRow(2);
+
+    clickButton("Filter");
 
     expect(document.querySelector(".github-table-enhancer-filter-summary")?.textContent).toBe(
       "0 shown · 1 matches · 2 total",
@@ -182,7 +185,7 @@ describe("table row filtering", () => {
     wrapTable(table);
     clickButton("Filter");
     setFilterInput("node");
-    clickButton("Hide row 2");
+    hideRow(2);
     const emptyState = document.querySelector<HTMLElement>(
       ".github-table-enhancer-filter-empty-state",
     );
@@ -231,7 +234,7 @@ describe("table row filtering", () => {
     const table = getTable();
 
     wrapTable(table);
-    clickButton("Hide row 2");
+    hideRow(2);
     clickButton("Filter");
     setFilterInput("node");
 

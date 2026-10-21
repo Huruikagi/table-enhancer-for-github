@@ -1,4 +1,13 @@
 {
+  "selectRows": { "message": "행 선택" },
+  "selectAllRows": { "message": "표시된 모든 행 선택" },
+  "selectRow": { "message": "$ROW$행 선택", "placeholders": { "row": { "content": "$1" } } },
+  "showSelectedRows": { "message": "선택한 행 표시" },
+  "cancelSelection": { "message": "취소" },
+  "selectedRowsSummary": {
+    "message": "$TOTAL$개 행 중 $SELECTED$개 선택",
+    "placeholders": { "selected": { "content": "$1" }, "total": { "content": "$2" } }
+  },
   "metadata": { "message": "메타데이터" },
   "metadataItem": { "message": "$1개 항목" },
   "metadataItems": { "message": "$1개 항목" },
@@ -44,10 +53,6 @@
   "frozenRows": { "message": "고정할 행 수" },
   "hideColumn": {
     "message": "$NUMBER$번째 열 숨기기",
-    "placeholders": { "number": { "content": "$1" } }
-  },
-  "hideRow": {
-    "message": "$NUMBER$번째 행 숨기기",
     "placeholders": { "number": { "content": "$1" } }
   },
   "invalidRegularExpression": { "message": "잘못된 정규식" },

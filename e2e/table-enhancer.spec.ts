@@ -193,6 +193,8 @@ const localizationCases = [
     filterRows: "フィルター",
     freeze: "固定",
     locale: "ja",
+    selectRows: "行を選択",
+    selectAllRows: "表示中の行をすべて選択",
     name: "Japanese",
     placeholder: "条件...",
     sortColumnTwo: "2列目で並べ替え",
@@ -202,6 +204,8 @@ const localizationCases = [
     filterRows: "筛选行",
     freeze: "冻结",
     locale: "zh-CN",
+    selectRows: "选择行",
+    selectAllRows: "选择所有可见行",
     name: "Simplified Chinese",
     placeholder: "筛选行...",
     sortColumnTwo: "按第 2 列排序",
@@ -211,6 +215,8 @@ const localizationCases = [
     filterRows: "행 필터링",
     freeze: "고정",
     locale: "ko",
+    selectRows: "행 선택",
+    selectAllRows: "표시된 모든 행 선택",
     name: "Korean",
     placeholder: "행 필터링...",
     sortColumnTwo: "2번째 열 기준 정렬",
@@ -220,6 +226,8 @@ const localizationCases = [
     filterRows: "Filtrar linhas",
     freeze: "Fixar",
     locale: "pt-BR",
+    selectRows: "Selecionar linhas",
+    selectAllRows: "Selecionar todas as linhas visíveis",
     name: "Brazilian Portuguese",
     placeholder: "Filtrar linhas...",
     sortColumnTwo: "Ordenar pela coluna 2",
@@ -229,6 +237,8 @@ const localizationCases = [
     filterRows: "Filtrar filas",
     freeze: "Fijar",
     locale: "es",
+    selectRows: "Seleccionar filas",
+    selectAllRows: "Seleccionar todas las filas visibles",
     name: "Spanish",
     placeholder: "Filtrar filas...",
     sortColumnTwo: "Ordenar por columna 2",
@@ -256,6 +266,16 @@ for (const localization of localizationCases) {
       await expect(
         wrapper.getByRole("searchbox", { name: localization.filterRows }),
       ).toHaveAttribute("placeholder", localization.placeholder);
+      await wrapper.getByRole("button", { name: localization.selectRows, exact: true }).click();
+      await expect(
+        wrapper.getByRole("checkbox", { name: localization.selectAllRows }),
+      ).toBeChecked();
+      if (localization.locale === "ja") {
+        await expect(wrapper.locator(".github-table-enhancer-selection-actions")).toContainText(
+          "2行中2行を選択",
+        );
+        await expect(wrapper.getByRole("button", { name: "選んだ行を表示" })).toBeVisible();
+      }
     });
   });
 }
@@ -322,6 +342,86 @@ test("keeps an expanded filter panel visible with a capped width", async ({ page
   expect(panelBox.x + panelBox.width).toBeLessThanOrEqual(wrapperBox.x + wrapperBox.width);
 });
 
+test("selects visible rows with all, mixed, cancel, and apply states", async ({
+  page,
+}, testInfo) => {
+  await page.goto(fixtureUrl);
+  const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+  const bodyRows = wrapper.locator("tbody tr");
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  const all = wrapper.getByRole("checkbox", { name: "Select all visible rows" });
+  await expect(all).toBeChecked();
+  await expect(all).toBeFocused();
+  await all.uncheck();
+  await bodyRows.nth(1).getByRole("checkbox").check();
+  await bodyRows.nth(3).getByRole("checkbox").check();
+  await expect(all).toBeChecked({ indeterminate: true });
+  await expect(wrapper.locator("tbody tr:visible")).toHaveCount(4);
+  await expect(wrapper.locator(".github-table-enhancer-selection-actions")).toContainText(
+    "2 of 4 rows selected",
+  );
+  await wrapper.screenshot({ path: testInfo.outputPath("row-selection.png") });
+  await wrapper.getByRole("button", { name: "Show selected rows" }).click();
+  await expect(wrapper.locator("tbody tr:visible")).toHaveCount(2);
+  await expect(bodyRows.nth(1)).toBeVisible();
+  await expect(bodyRows.nth(3)).toBeVisible();
+  await expect(wrapper.locator("thead")).toBeVisible();
+  await expect(wrapper.getByRole("checkbox")).toHaveCount(0);
+  await expect(wrapper.getByRole("button", { name: "Select rows", exact: true })).toBeFocused();
+  await wrapper.getByRole("button", { name: "Show hidden", exact: true }).click();
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  await all.uncheck();
+  await wrapper.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(wrapper.locator("tbody tr:visible")).toHaveCount(4);
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  await expect(all).toBeChecked();
+  await all.uncheck();
+  await all.press("Space");
+  await expect(all).toBeChecked();
+  await all.press("Escape");
+  await expect(wrapper.getByRole("checkbox")).toHaveCount(0);
+  await expect(wrapper.locator("tbody tr:visible")).toHaveCount(4);
+  await expect(
+    page.locator(".github-table-enhancer-scroll").first().getByRole("checkbox"),
+  ).toHaveCount(0);
+});
+
+test("keeps row selection usable with a hidden first column, freezing, sorting, and Focus mode", async ({
+  page,
+}) => {
+  await page.goto(fixtureUrl);
+  const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+  await wrapper.getByRole("button", { name: "Expand", exact: true }).click();
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  await wrapper.getByLabel("Frozen rows").fill("1");
+  await wrapper.getByLabel("Frozen columns").fill("1");
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  // Narrow headers can overlap the existing sort and hide buttons; use the keyboard action.
+  await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).focus();
+  await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).press("Space");
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  const originalRow = wrapper
+    .locator("tbody tr")
+    .filter({ hasText: "The rebuilt content script is active." });
+  await expect(originalRow.locator("td").nth(1).getByRole("checkbox")).toBeVisible();
+  await originalRow.getByRole("checkbox").uncheck();
+  await wrapper.locator("th").nth(1).hover();
+  await wrapper.getByRole("button", { name: "Sort by column 2", exact: true }).click();
+  await expect(originalRow.getByRole("checkbox")).not.toBeChecked();
+  await wrapper.getByRole("button", { name: "Show selected rows" }).click();
+  await expect(originalRow).toBeHidden();
+  await expect(wrapper.locator("tbody tr:visible")).toHaveCount(3);
+  await expect(wrapper.locator("th").nth(1)).toHaveAttribute(
+    "data-github-table-enhancer-sticky",
+    "true",
+  );
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  await wrapper.getByRole("checkbox", { name: "Select all visible rows" }).press("Escape");
+  await expect(wrapper).toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).press("Escape");
+  await expect(wrapper).not.toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
+});
+
 test("explains why a filter leaves no visible rows", async ({ page }) => {
   await page.goto(fixtureUrl);
 
@@ -337,8 +437,9 @@ test("explains why a filter leaves no visible rows", async ({ page }) => {
 
   await filterInput.fill("rebuilt content script is active");
   const matchingRow = wrapper.locator("tbody tr").nth(2);
-  await matchingRow.locator("td").first().hover();
-  await matchingRow.getByRole("button", { name: /Hide row/ }).click();
+  await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+  await matchingRow.getByRole("checkbox").uncheck();
+  await wrapper.getByRole("button", { name: "Show selected rows" }).click();
 
   await expect(wrapper.getByRole("status")).toContainText("1 matching row is hidden.");
   await wrapper.getByRole("status").getByRole("button", { name: "Show hidden" }).click();
