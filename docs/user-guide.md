@@ -45,6 +45,12 @@ The toolbar provides Freeze, Filter, Copy as, Select rows, Fit, Wrap, Reset, and
 
 The extension UI follows Chrome's display language. English is the default; Japanese, Simplified Chinese, Korean, Brazilian Portuguese, and Spanish are also supported. If a translated message is unavailable, the English message is shown.
 
+## Follow a row and column
+
+Hover a cell to softly highlight its row and column. The cell under the pointer gets a stronger tint, helping you follow wide tables back to their row label and column heading. Highlights follow scrolling and disappear when you leave the table. They work with hidden columns, sorting, frozen cells, row selection, and Focus mode, and do not change copied content or saved settings.
+
+![A hovered cell highlighting its row and column.]({{ site.baseurl }}/store-assets/screenshots/user-guide-hover.png)
+
 ## Freeze rows and columns
 
 Select **Freeze** to keep the first displayed rows and leftmost columns in view as you scroll. Enter the number of rows and columns to freeze; use **Reset** in the panel to clear only the freeze settings.

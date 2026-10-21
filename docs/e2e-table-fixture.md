@@ -33,6 +33,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Reloading the page should apply the saved default to tables with the same preceding heading text.
 - Hovering a table header cell should show its column hide button and unsorted sort button.
 - Header sort and hide buttons should sit side by side above the heading text. Resize a column to its minimum width and confirm both buttons and the resize edge remain individually clickable, including with Wrap, frozen rows/columns, and Focus mode.
+- Hover body and header cells: the matching visible row and column should receive a light tint, with the hovered cell slightly stronger. Leave the table to clear it. Check light/dark themes, links and checkboxes inside cells, hidden rows/columns, sorting, frozen cells, horizontal scrolling, and Focus mode. Scrolling with a stationary pointer should update the highlighted cell; copying should contain only the original values.
 - Select rows should show checked boxes in the first visible column for visible body rows and a select-all checkbox in the header. No row hide buttons should appear.
 - Dragging a column edge should resize that displayed column without changing the surrounding GitHub layout.
 - Clicking Fit should set readable column widths and enable wrapped cell rendering in one step.

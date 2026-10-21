@@ -9,6 +9,7 @@ import {
   installTableHideControls,
   resetTableHideControls,
 } from "./features/hide-controls";
+import { installTableHover } from "./features/hover";
 import {
   installColumnResizeBehavior,
   installTableColumnResizeControls,
@@ -58,9 +59,11 @@ export function mountTableRuntime(
   installTableColumnResizeControls(table);
   installTableSortControls(table);
   reconcileTable(table, null, controller.getState());
+  const hover = installTableHover(table);
 
   const removeProjection = controller.subscribe((state, previousState) => {
     reconcileTable(table, previousState, state);
+    hover.refresh();
   });
   const handleClick = (event: MouseEvent): void => {
     const selection = getRowSelectionClick(table, event.target);
@@ -147,6 +150,7 @@ export function mountTableRuntime(
 
       controller.dispatch({ type: "reset" });
       isDestroyed = true;
+      hover.destroy();
       table.removeEventListener("click", handleClick);
       table.removeEventListener("keydown", handleSelectionEscape);
       controls.removeEventListener("keydown", handleSelectionEscape);

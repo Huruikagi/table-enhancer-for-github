@@ -101,6 +101,7 @@ mounting, reconciliation, lifecycle, discovery, and storage. Individual table be
 - `focus-mode.ts`
 - `freeze.ts`
 - `hide-controls.ts`
+- `hover.ts`
 - `row-selection.ts`
 - `resize.ts`
 - `sort.ts`
@@ -136,6 +137,11 @@ mutations.
 Short-lived toolbar presentation state, such as the open popup, Focus mode, and success messages,
 stays inside the Preact controls. Controls depend on `TableController` for persistent state and
 receive browser operations as callbacks; they do not directly mutate table layout.
+
+Pointer hover is transient browser feedback owned by `features/hover.ts`, outside `TableViewState`.
+The mount runtime refreshes it after reconciliation and destroys its listeners and pending frame
+with the table. It paints only data attributes, coalesces scroll hit testing, and leaves cell
+content, geometry, persistent settings, and other feature projections unchanged.
 
 ## DOM reconciliation
 

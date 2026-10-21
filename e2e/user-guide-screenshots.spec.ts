@@ -88,7 +88,8 @@ const guideFixture = `<!doctype html>
   </body>
 </html>`;
 
-async function screenshot(page: Page, name: string): Promise<void> {
+async function screenshot(page: Page, name: string, keepPointer = false): Promise<void> {
+  if (!keepPointer) await page.mouse.move(0, 0);
   const screenshotPath = path.join(screenshotDirectory, name);
   const candidate = await page.screenshot({ fullPage: true });
 
@@ -167,6 +168,9 @@ test("captures the user guide screenshots", async ({ page }) => {
   const table = wrapper.locator("table");
 
   await screenshot(page, "user-guide-overview.png");
+
+  await table.locator("tbody tr").nth(1).locator("td").nth(2).hover();
+  await screenshot(page, "user-guide-hover.png", true);
 
   await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
   await wrapper.getByRole("checkbox", { name: "Select all visible rows" }).uncheck();

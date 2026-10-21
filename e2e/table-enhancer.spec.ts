@@ -505,6 +505,116 @@ for (const focusMode of [false, true]) {
   });
 }
 
+for (const theme of ["light", "dark"] as const) {
+  test(`highlights hovered rows and columns in ${theme} theme`, async ({ page }, testInfo) => {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto(fixtureUrl);
+    await page.addStyleTag({
+      content: `
+      :root { --bgColor-default: #fff; --fgColor-default: #1f2328; --fgColor-muted: #59636e; --fgColor-accent: #0969da; --bgColor-accent-muted: #ddf4ff; --button-default-bgColor-rest: #f6f8fa; --button-default-borderColor-rest: #d1d9e0; }
+      @media (prefers-color-scheme: dark) { :root { --bgColor-default: #0d1117; --fgColor-default: #e6edf3; --fgColor-muted: #9198a1; --fgColor-accent: #4493f8; --bgColor-accent-muted: #122c42; --button-default-bgColor-rest: #212830; --button-default-borderColor-rest: #3d444d; } }
+      body { background: var(--bgColor-default); color: var(--fgColor-default); }
+    `,
+    });
+    const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+    const rows = wrapper.locator("tbody tr");
+    const target = rows.nth(1).locator("td").nth(2);
+    await target.hover();
+    await expect(target).toHaveAttribute("data-github-table-enhancer-hover", "cell");
+    await expect(wrapper.locator("[data-github-table-enhancer-hover]")).toHaveCount(8);
+    await expect(wrapper.locator("th").nth(2)).toHaveAttribute(
+      "data-github-table-enhancer-hover",
+      "axis",
+    );
+    await expect(rows.nth(0).locator("td").nth(0)).not.toHaveAttribute(
+      "data-github-table-enhancer-hover",
+    );
+    await expect(
+      page
+        .locator(".github-table-enhancer-scroll")
+        .first()
+        .locator("[data-github-table-enhancer-hover]"),
+    ).toHaveCount(0);
+    await page.locator("h1").hover();
+    await expect(wrapper.locator("[data-github-table-enhancer-hover]")).toHaveCount(0);
+
+    await wrapper.getByRole("button", { name: "Expand", exact: true }).click();
+    await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+    await wrapper.getByLabel("Frozen rows").fill("1");
+    await wrapper.getByLabel("Frozen columns").fill("1");
+    await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+    await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+    const selectedCell = rows.nth(1).locator("td").first();
+    const before = await selectedCell.evaluate((cell) => getComputedStyle(cell).backgroundColor);
+    await selectedCell.hover();
+    await expect(selectedCell).toHaveAttribute("data-github-table-enhancer-hover", "cell");
+    await expect(selectedCell).toHaveAttribute("data-github-table-enhancer-sticky", "true");
+    await expect(selectedCell).toHaveCSS("background-color", before);
+    expect(await selectedCell.evaluate((cell) => getComputedStyle(cell).boxShadow)).not.toBe(
+      "none",
+    );
+    await expect(selectedCell.getByRole("checkbox")).toBeChecked();
+    await expect(wrapper.locator("th").first()).toHaveAttribute(
+      "data-github-table-enhancer-hover",
+      "axis",
+    );
+    await wrapper.screenshot({ path: testInfo.outputPath(`hover-${theme}.png`) });
+    await wrapper.getByRole("button", { name: "Cancel", exact: true }).click();
+    await wrapper.locator("th").first().hover();
+    await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).click();
+    await rows.nth(1).locator("td").nth(1).hover();
+    await expect(wrapper.locator("th").nth(1)).toHaveAttribute(
+      "data-github-table-enhancer-hover",
+      "axis",
+    );
+    await expect(
+      wrapper.locator(
+        '[data-github-table-enhancer-hidden-column="true"][data-github-table-enhancer-hover]',
+      ),
+    ).toHaveCount(0);
+    await wrapper.getByRole("button", { name: "Filter", exact: true }).click();
+    await wrapper.getByLabel("Filter rows").fill("rebuilt content script");
+    await rows.nth(2).locator("td").nth(2).hover();
+    await expect(rows.nth(2).locator("td").nth(2)).toHaveAttribute(
+      "data-github-table-enhancer-hover",
+      "cell",
+    );
+    await expect(
+      wrapper.locator(
+        '[data-github-table-enhancer-filtered-row="true"] [data-github-table-enhancer-hover]',
+      ),
+    ).toHaveCount(0);
+  });
+}
+
+test("tracks horizontal scrolling under a stationary pointer", async ({ page }) => {
+  await page.goto(fixtureUrl);
+  const wrapper = page.locator(".github-table-enhancer-scroll").first();
+  const cell = wrapper.locator("tbody tr").first().locator("td").first();
+  const box = await cell.boundingBox();
+  if (!box) throw new Error("Expected a visible cell");
+  const position = { x: box.x + 20, y: box.y + box.height / 2 };
+  await page.mouse.move(position.x, position.y);
+  await expect(cell).toHaveAttribute("data-github-table-enhancer-hover", "cell");
+  await wrapper.evaluate((element) => {
+    element.scrollLeft = 260;
+  });
+  await expect(cell).toHaveAttribute("data-github-table-enhancer-hover", "axis");
+  await expect(wrapper.locator("th").first()).not.toHaveAttribute(
+    "data-github-table-enhancer-hover",
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(({ x, y }) => {
+        const underPointer = document.elementFromPoint(x, y)?.closest("td");
+        return underPointer?.getAttribute("data-github-table-enhancer-hover");
+      }, position),
+    )
+    .toBe("cell");
+  await page.locator("h1").hover();
+  await expect(page.locator("[data-github-table-enhancer-hover]")).toHaveCount(0);
+});
+
 test("explains why a filter leaves no visible rows", async ({ page }) => {
   await page.goto(fixtureUrl);
 

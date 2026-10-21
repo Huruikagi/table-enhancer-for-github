@@ -24,6 +24,7 @@ Issues and feature requests are welcome in English or Japanese.
 ## Features
 
 - Wraps Markdown preview tables in a horizontal scroll container so wide rows remain readable.
+- Highlights the row and column under the pointer, with a stronger tint on the current cell.
 - Adds a compact Freeze control for keeping the first N displayed rows or columns visible while scrolling.
 - Saves Freeze defaults per nearest preceding heading, then reapplies them when the same heading is viewed again.
 - Lets you select which displayed rows to keep, hide columns, and restore hidden items with Show hidden.

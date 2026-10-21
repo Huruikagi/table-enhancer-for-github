@@ -598,6 +598,23 @@ body.github-table-enhancer-focus-mode-open {
   white-space: nowrap;
 }
 
+.github-table-enhancer-scroll > table [data-github-table-enhancer-hover] {
+  --gte-hover-tint: color-mix(
+    in srgb,
+    var(--fgColor-accent, var(--color-accent-fg, #0969da)) 12%,
+    transparent
+  );
+  box-shadow: inset 0 0 0 9999px var(--gte-hover-tint);
+}
+
+.github-table-enhancer-scroll > table [data-github-table-enhancer-hover="cell"] {
+  --gte-hover-tint: color-mix(
+    in srgb,
+    var(--fgColor-accent, var(--color-accent-fg, #0969da)) 22%,
+    transparent
+  );
+}
+
 .github-table-enhancer-scroll > table[data-github-table-enhancer-wrapped-columns="true"] td code,
 .github-table-enhancer-scroll > table[data-github-table-enhancer-wrapped-columns="true"] th code {
   overflow-wrap: anywhere;
