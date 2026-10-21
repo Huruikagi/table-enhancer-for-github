@@ -8,7 +8,7 @@ import * as mount from "../table/mount";
 
 /** Tracks mounted runtimes even after their tables leave the document. */
 export function useTableFixture() {
-  const observers = new Set<MutationObserver>();
+  const observers = new Set<ReturnType<typeof startPageEnhancer>>();
   let cleanup = (): void => {};
 
   beforeEach(() => {
@@ -47,7 +47,7 @@ export function useTableFixture() {
 
   return {
     cleanup: (): void => cleanup(),
-    startTableEnhancer: (): MutationObserver => {
+    startTableEnhancer: (): ReturnType<typeof startPageEnhancer> => {
       const observer = startPageEnhancer();
       observers.add(observer);
       return observer;

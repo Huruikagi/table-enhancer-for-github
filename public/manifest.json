@@ -13,13 +13,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://github.com/*/*/blob/*/*.md"],
+      "matches": ["https://github.com/*"],
       "js": ["page-data.js"],
       "world": "MAIN",
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://github.com/*/*/blob/*/*.md"],
+      "matches": ["https://github.com/*"],
       "js": ["content.js"],
       "css": ["styles.css"],
       "run_at": "document_idle"

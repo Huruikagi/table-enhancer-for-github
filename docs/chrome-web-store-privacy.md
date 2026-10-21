@@ -20,6 +20,8 @@ The extension does not sync, transmit, sell, or share this data.
 
 ## User Data Handling
 
+Content scripts load on `https://github.com/*` to detect same-document navigation from repository listings and other GitHub pages into Markdown blob previews. Table enhancement and reading already-loaded metadata are limited to Markdown blob file previews. No additional network requests are made.
+
 This extension does not collect, transmit, sell, or share user data.
 
 It stores table display preferences locally in the user's browser using `chrome.storage.local`. These preferences are used only by the extension to restore the user's repository-specific table freeze defaults on matching GitHub Markdown blob pages.

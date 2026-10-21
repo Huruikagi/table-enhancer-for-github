@@ -59,6 +59,16 @@ serialized data in the DOM, verifying the actual MAIN/isolated-world boundary.
 
 ## Runtime flow
 
+Both content scripts and their scoped styles load on `https://github.com/*` so same-document
+navigation from a repository listing or another GitHub page can activate the extension. Table
+discovery and cache reads remain restricted to Markdown blob paths. `page-navigation.ts` observes
+committed Navigation API entries plus `popstate`/`pageshow` in each script world, without patching
+GitHub's history methods. Page mutations remain a fallback for pathname changes. Navigation
+rescans existing tables as well as new nodes, including when rendering preceded the URL change.
+Disconnecting the page runtime releases both mutation observation and navigation listeners.
+The metadata bridge restarts its bounded hydration retries after navigation and unsubscribes
+from the cache outside Markdown previews.
+
 ```text
 content.ts
   -> page-runtime.ts routes page mutations to frontmatter and table runtimes

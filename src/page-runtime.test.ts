@@ -16,6 +16,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 
 async function observe() {
@@ -27,6 +28,39 @@ async function observe() {
 }
 
 describe("page mutation routing", () => {
+  it("handles URL-only navigation and releases navigation listeners on disconnect", async () => {
+    const navigation = new EventTarget();
+    vi.stubGlobal("navigation", navigation);
+    window.history.replaceState(null, "", "/owner/repo/tree/main");
+    const article = document.querySelector("article");
+    if (!article) throw new Error("Expected preview article");
+    article.innerHTML = "<h2>Releases</h2><table><tbody><tr><td>Ready</td></tr></tbody></table>";
+    const observer = startTableEnhancer();
+    window.history.replaceState(null, "", "/owner/repo/blob/main/test.md");
+    navigation.dispatchEvent(new Event("currententrychange"));
+    await flushMutations();
+    expect(document.querySelector("table")?.dataset.githubTableEnhancer).toBe("true");
+    const reconcile = vi.spyOn(frontmatter, "reconcileFrontmatter");
+    navigation.dispatchEvent(new Event("currententrychange"));
+    observer.disconnect();
+    window.dispatchEvent(new Event("pageshow"));
+    await flushMutations();
+    expect(reconcile).not.toHaveBeenCalled();
+  });
+
+  it("rediscovers existing tables after a pathname change", async () => {
+    window.history.replaceState(null, "", "/owner/repo/tree/main");
+    const article = document.querySelector("article");
+    if (!article) throw new Error("Expected preview article");
+    article.innerHTML = "<h2>Releases</h2><table><tbody><tr><td>Ready</td></tr></tbody></table>";
+    await observe();
+    expect(document.querySelector("[data-github-table-enhancer]")).toBeNull();
+    window.history.replaceState(null, "", "/owner/repo/blob/main/test.md");
+    document.querySelector("aside")?.append(" navigated");
+    await flushMutations();
+    expect(document.querySelector("table")?.dataset.githubTableEnhancer).toBe("true");
+  });
+
   it("skips frontmatter reconciliation for unrelated page changes", async () => {
     const reconcile = await observe();
     document.querySelector("aside")?.append(" changed");

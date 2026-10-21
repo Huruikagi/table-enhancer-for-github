@@ -216,17 +216,19 @@ function cacheQueries(lines: string[], table: string, file = "e2e-table-fixture.
   }));
 }
 
-for (const shape of ["flat", "nested"] as const) {
+for (const shape of ["flat", "nested", "after navigation"] as const) {
   test(`reads ${shape} metadata from the page cache with no embedded JSON or extra requests`, async ({
     page,
   }) => {
-    const table = shape === "flat" ? plainTable : nestedTable;
-    const lines = shape === "flat" ? flatLines : nestedLines;
+    const table = shape === "nested" ? nestedTable : plainTable;
+    const lines = shape === "nested" ? nestedLines : flatLines;
+    const entryUrl =
+      shape === "after navigation" ? "https://github.com/owner/github-table-enhancer" : fixtureUrl;
     type Query = ReturnType<typeof cacheQueries>[number];
     const requests: string[] = [];
     await page.route("**/*", async (route) => {
       requests.push(route.request().url());
-      if (route.request().url() === fixtureUrl)
+      if (route.request().url() === entryUrl)
         await route.fulfill({
           body: fixture(table).replaceAll("react-app", "main"),
           contentType: "text/html",
@@ -262,7 +264,12 @@ for (const shape of ["flat", "nested"] as const) {
       },
       cacheQueries(lines, table),
     );
-    await page.goto(fixtureUrl);
+    await page.goto(entryUrl);
+    if (shape === "after navigation") {
+      await expect(page.locator(metadataSelector)).toHaveCount(0);
+      await expect(page.locator(".github-table-enhancer-scroll")).toHaveCount(0);
+      await page.evaluate((url) => history.pushState(null, "", url), fixtureUrl);
+    }
     const view = page.locator(metadataSelector);
     await expect(view).toBeVisible();
     await expect(page.locator('script[data-target="react-app.embeddedData"]')).toHaveCount(0);
@@ -303,6 +310,6 @@ for (const shape of ["flat", "nested"] as const) {
     });
     await expect(view).toHaveCount(0);
     await expect(page.locator(nativeSelector)).toBeVisible();
-    expect(requests).toEqual([fixtureUrl]);
+    expect(requests).toEqual([entryUrl]);
   });
 }

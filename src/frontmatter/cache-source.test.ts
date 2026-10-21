@@ -133,6 +133,44 @@ describe("UI Service cache source", () => {
 });
 
 describe("passive cache bridge", () => {
+  it("waits outside Markdown and retries late hydration again after navigation", async () => {
+    vi.useFakeTimers();
+    const navigation = new EventTarget();
+    vi.stubGlobal("navigation", navigation);
+    window.history.replaceState(null, "", "/owner/repo");
+    const unsubscribe = vi.fn();
+    const cache = { findAll: () => queries(), subscribe: () => unsubscribe };
+    const getQueryCache = vi.fn(() => undefined as typeof cache | undefined);
+    vi.stubGlobal("__TANSTACK_QUERY_CLIENT__", { getQueryCache });
+    stop = startMetadataCacheBridge();
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(getQueryCache).not.toHaveBeenCalled();
+    expect(vi.getTimerCount()).toBe(0);
+
+    window.history.pushState(null, "", pathname);
+    navigation.dispatchEvent(new Event("currententrychange"));
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(getQueryCache).toHaveBeenCalledTimes(30);
+    expect(vi.getTimerCount()).toBe(0);
+
+    window.history.pushState(null, "", "/owner/repo/tree/main");
+    navigation.dispatchEvent(new Event("currententrychange"));
+    await vi.advanceTimersByTimeAsync(0);
+    window.history.pushState(null, "", pathname);
+    navigation.dispatchEvent(new Event("currententrychange"));
+    await vi.advanceTimersByTimeAsync(0);
+    getQueryCache.mockReturnValue(cache);
+    await vi.advanceTimersByTimeAsync(1_000);
+    expect(document.querySelector(`[${CACHE_SOURCE_ATTRIBUTE}]`)?.textContent).toContain("Example");
+
+    window.history.pushState(null, "", "/owner/repo");
+    navigation.dispatchEvent(new Event("currententrychange"));
+    await vi.advanceTimersByTimeAsync(0);
+    expect(unsubscribe).toHaveBeenCalledOnce();
+    expect(document.querySelector(`[${CACHE_SOURCE_ATTRIBUTE}]`)).toBeNull();
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
   it("handles late hydration, cache updates, navigation, and cleanup without fetching", async () => {
     vi.useFakeTimers();
     const fetch = vi.fn();

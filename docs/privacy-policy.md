@@ -5,7 +5,7 @@ permalink: /privacy-policy/
 
 # Privacy Policy
 
-Effective date: July 10, 2026
+Effective date: October 21, 2026
 
 Table Enhancer for GitHub is an unofficial Chrome extension that improves readability and navigation for wide tables on GitHub Markdown blob file preview pages.
 
@@ -25,13 +25,13 @@ The extension does not send network requests and does not load remote code.
 
 ## Website Access
 
-The extension runs only on GitHub Markdown blob file preview pages that match this pattern:
+The extension loads content scripts on GitHub pages matching this pattern so it can detect navigation into Markdown file previews without a full page reload:
 
 ```text
-https://github.com/*/*/blob/*/*.md
+https://github.com/*
 ```
 
-It does not run on GitHub issues, pull requests, discussions, repository README landing pages, or rendered Markdown outside GitHub blob file previews.
+Table enhancement and metadata display activate only on Markdown blob file preview pages, such as `https://github.com/owner/repo/blob/main/docs/file.md`. Tables on GitHub issues, pull requests, discussions, and repository README landing pages remain unchanged. The metadata adapter reads the current file's already-loaded source only on supported Markdown blob pages.
 
 ## Changes
 

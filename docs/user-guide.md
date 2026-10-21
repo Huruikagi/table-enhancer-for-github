@@ -16,13 +16,13 @@ Table Enhancer for GitHub is a small, unofficial Chrome extension for making wid
 
 ## Where it works
 
-The extension runs only on GitHub Markdown blob pages, for example:
+The extension enhances tables only on GitHub Markdown blob pages, for example:
 
 ```text
 https://github.com/owner/repository/blob/main/docs/guide.md
 ```
 
-It does not run on issues, pull requests, discussions, repository home pages, or Markdown rendered outside a GitHub blob view.
+Tables on issues, pull requests, discussions, repository home pages, and Markdown rendered outside a GitHub blob view remain unchanged. Opening a supported preview from another GitHub page automatically applies the extension without reloading.
 
 ## Read YAML frontmatter
 

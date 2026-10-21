@@ -1,11 +1,10 @@
 import { isMetadataTable } from "../frontmatter/runtime";
+import { isMarkdownBlobPage } from "../page-navigation";
 import { TABLE_WRAPPER_CLASS } from "./constants";
 import { readHeadingFreezeRule, saveHeadingFreezeRule } from "./freeze-rule-storage";
 import { mountManagedTable } from "./lifecycle";
 
-export function isMarkdownBlobPage(pathname = window.location.pathname): boolean {
-  return /^\/[^/]+\/[^/]+\/blob\/.+\.md$/i.test(pathname);
-}
+export { isMarkdownBlobPage } from "../page-navigation";
 
 export function getRepositoryKey(pathname = window.location.pathname): string | null {
   const match = /^\/([^/]+)\/([^/]+)\/blob\//.exec(pathname);

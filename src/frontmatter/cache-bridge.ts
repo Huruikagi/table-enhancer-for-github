@@ -1,3 +1,4 @@
+import { isMarkdownBlobPage, observePageNavigation } from "../page-navigation";
 import {
   CACHE_SOURCE_ATTRIBUTE,
   type CachedQuery,
@@ -42,6 +43,13 @@ export function startMetadataCacheBridge(): () => void {
     queued = false;
     if (stopped) return;
     pathname = window.location.pathname;
+    if (!isMarkdownBlobPage(pathname)) {
+      unsubscribe?.();
+      unsubscribe = undefined;
+      cache = undefined;
+      publish(null);
+      return;
+    }
     try {
       const next = (window as PageWindow).__TANSTACK_QUERY_CLIENT__?.getQueryCache();
       if (next !== cache) {
@@ -71,22 +79,27 @@ export function startMetadataCacheBridge(): () => void {
   // rely on relevant cache events and navigation, with no permanent polling.
   const connect = () => {
     refresh();
-    if (!cache && !stopped && ++attempts < 30) timer = setTimeout(connect, 1_000);
+    if (isMarkdownBlobPage() && !cache && !stopped && ++attempts < 30) {
+      timer = setTimeout(connect, 1_000);
+    }
+  };
+  const reconnect = () => {
+    clearTimeout(timer);
+    attempts = 0;
+    connect();
   };
   const observer = new MutationObserver(() => {
-    if (pathname !== window.location.pathname) schedule();
+    if (pathname !== window.location.pathname) reconnect();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
-  window.addEventListener("popstate", schedule);
-  window.addEventListener("pageshow", schedule);
+  const stopNavigation = observePageNavigation(reconnect);
   connect();
   return () => {
     stopped = true;
     clearTimeout(timer);
     unsubscribe?.();
     observer.disconnect();
-    window.removeEventListener("popstate", schedule);
-    window.removeEventListener("pageshow", schedule);
+    stopNavigation();
     publish(null);
   };
 }

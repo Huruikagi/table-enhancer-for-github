@@ -1,3 +1,4 @@
+import { isMarkdownBlobPage } from "../page-navigation";
 import { CACHE_SOURCE_ATTRIBUTE } from "./cache-source";
 import { type MetadataSource, readMetadataSource } from "./source";
 import { createMetadataView, METADATA_CLASS } from "./view";
@@ -47,6 +48,7 @@ export function isMetadataTable(table: HTMLTableElement): boolean {
 }
 
 function sourceFor(article: HTMLElement): MetadataSource | null {
+  if (!isMarkdownBlobPage()) return null;
   const scope = article.closest("react-app") ?? document;
   const matches: MetadataSource[] = [];
   let pathname: string;

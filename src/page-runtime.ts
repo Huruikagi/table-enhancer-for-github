@@ -1,4 +1,5 @@
 import { EMBEDDED_DATA_SELECTOR, reconcileFrontmatter } from "./frontmatter/runtime";
+import { isMarkdownBlobPage, observePageNavigation } from "./page-navigation";
 import { enhanceMarkdownTables } from "./table/discovery";
 import { destroyDetachedTableRuntimes } from "./table/lifecycle";
 
@@ -27,17 +28,32 @@ function containsEmbeddedData(node: Node): boolean {
 }
 
 /** Routes page mutations to metadata reconciliation, discovery, and runtime cleanup. */
-export function startTableEnhancer(): MutationObserver {
+export function startTableEnhancer(): Pick<MutationObserver, "disconnect"> {
   let pathname = window.location.pathname;
+  const stopNavigation = observePageNavigation(() => {
+    pathname = window.location.pathname;
+    enhanceTables();
+  });
   const observer = new MutationObserver((mutations) => {
     const articles = new Set<HTMLElement>();
     const sourceScopes = new Set<ParentNode>();
     const added = new Set<Element>();
     const removed = new Set<Element>();
 
-    if (pathname !== window.location.pathname) {
+    const navigated = pathname !== window.location.pathname;
+    if (navigated) {
       pathname = window.location.pathname;
       sourceScopes.add(document);
+    }
+    // Scripts stay available on other GitHub routes only to catch navigation.
+    if (!isMarkdownBlobPage()) {
+      if (navigated) reconcileFrontmatter();
+      for (const mutation of mutations) {
+        for (const node of mutation.removedNodes) {
+          if (node instanceof Element) destroyDetachedTableRuntimes(node);
+        }
+      }
+      return;
     }
     for (const mutation of mutations) {
       // Changes inside an article affect that article, not every Markdown preview.
@@ -64,8 +80,9 @@ export function startTableEnhancer(): MutationObserver {
       }
     }
     if (articles.size > 0) reconcileFrontmatter(articles);
-    for (const node of added) enhanceMarkdownTables(node);
     for (const node of removed) destroyDetachedTableRuntimes(node);
+    if (navigated) enhanceMarkdownTables(document);
+    else for (const node of added) if (node.isConnected) enhanceMarkdownTables(node);
   });
 
   observer.observe(document.documentElement, {
@@ -74,5 +91,10 @@ export function startTableEnhancer(): MutationObserver {
     characterData: true,
   });
   enhanceTables();
-  return observer;
+  return {
+    disconnect: () => {
+      observer.disconnect();
+      stopNavigation();
+    },
+  };
 }
