@@ -3,6 +3,7 @@
  * State transition rules remain in the controller and state modules.
  */
 import { createTableController, type TableController } from "./controller";
+import { measureFitTableColumnWidths } from "./features/column-measurement";
 import { type CopyFormat, copyVisibleTable } from "./features/copy";
 import {
   getHideControlClick,
@@ -13,7 +14,6 @@ import { installTableHover } from "./features/hover";
 import {
   installColumnResizeBehavior,
   installTableColumnResizeControls,
-  measureFitTableColumnWidths,
   resetTableColumnResizeControls,
 } from "./features/resize";
 import {
@@ -28,6 +28,7 @@ import {
   resetTableSortControls,
 } from "./features/sort";
 import { reconcileTable } from "./reconcile";
+import { initializeOriginalRowIndexes } from "./row-dom";
 import type { FreezeOptions } from "./state";
 import { createTableControls, destroyTableControls } from "./ui/controls";
 
@@ -55,6 +56,7 @@ export function mountTableRuntime(
   });
   let isDestroyed = false;
 
+  initializeOriginalRowIndexes(table);
   installTableHideControls(table);
   installTableColumnResizeControls(table);
   installTableSortControls(table);

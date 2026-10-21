@@ -4,7 +4,7 @@ import {
   HIDDEN_COLUMN_DATA_ATTRIBUTE,
   HIDDEN_ROW_DATA_ATTRIBUTE,
 } from "../constants";
-import { getOriginalRowIndex, initializeOriginalRowIndexes } from "./sort";
+import { getOriginalRowIndex, initializeOriginalRowIndexes, isHeaderRow } from "../row-dom";
 
 export type TableVisibility = {
   rows: readonly number[];
@@ -32,21 +32,12 @@ export function getFilterRegularExpressionError(filterQuery: string): string | n
   }
 }
 
-function isHeaderRow(table: HTMLTableElement, row: HTMLTableRowElement, rowIndex: number): boolean {
-  if (table.tHead) {
-    return table.tHead.contains(row);
-  }
-
-  return rowIndex === 0;
-}
-
 function isFilteredRow(
   table: HTMLTableElement,
   row: HTMLTableRowElement,
-  rowIndex: number,
   matchesFilter: ((text: string) => boolean) | null,
 ): boolean {
-  if (!matchesFilter || isHeaderRow(table, row, rowIndex)) {
+  if (!matchesFilter || isHeaderRow(table, row)) {
     return false;
   }
 
@@ -78,7 +69,6 @@ export function getTableFilterResult(
   table: HTMLTableElement,
   visibility: TableVisibility,
 ): TableFilterResult | null {
-  initializeOriginalRowIndexes(table);
   const filterQuery = visibility.filterQuery ?? "";
   const matchesFilter = createFilterMatcher(filterQuery, visibility.filterUsesRegularExpression);
 
@@ -91,8 +81,8 @@ export function getTableFilterResult(
   let totalRows = 0;
   let visibleRows = 0;
 
-  for (const [rowIndex, row] of Array.from(table.rows).entries()) {
-    if (isHeaderRow(table, row, rowIndex)) {
+  for (const row of Array.from(table.rows)) {
+    if (isHeaderRow(table, row)) {
       continue;
     }
 
@@ -118,14 +108,14 @@ export function applyTableVisibility(table: HTMLTableElement, visibility: TableV
   const matchesFilter = createFilterMatcher(filterQuery, visibility.filterUsesRegularExpression);
   const columns = table.querySelectorAll<HTMLTableColElement>(":scope > colgroup > col");
 
-  for (const [rowIndex, row] of Array.from(table.rows).entries()) {
+  for (const row of Array.from(table.rows)) {
     if (hiddenRows.has(getOriginalRowIndex(row))) {
       row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE] = "true";
     } else {
       delete row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE];
     }
 
-    if (isFilteredRow(table, row, rowIndex, matchesFilter)) {
+    if (isFilteredRow(table, row, matchesFilter)) {
       row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] = "true";
     } else {
       delete row.dataset[FILTERED_ROW_DATA_ATTRIBUTE];

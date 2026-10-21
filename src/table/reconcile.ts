@@ -3,8 +3,8 @@
  * This module coordinates projections but does not own state or browser event listeners.
  */
 import { WRAPPED_COLUMNS_DATA_ATTRIBUTE } from "./constants";
+import { applyTableColumnWidths } from "./features/column-widths";
 import { applyTableFreeze } from "./features/freeze";
-import { applyTableColumnWidths } from "./features/resize";
 import { applyRowSelection } from "./features/row-selection";
 import { applyTableSort } from "./features/sort";
 import { applyTableVisibility } from "./features/visibility";

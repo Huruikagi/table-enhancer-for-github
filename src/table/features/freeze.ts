@@ -11,7 +11,7 @@ import {
 } from "../constants";
 import type { FreezeOptions } from "../state";
 import { clampInteger } from "../utils";
-import { getStickyColumnWidth } from "./resize";
+import { getAppliedColumnWidths, getStickyColumnWidth } from "./column-measurement";
 
 type StickyCellLayout = {
   cell: HTMLTableCellElement;
@@ -75,6 +75,7 @@ function getStickyZIndex(isFrozenRow: boolean, isFrozenColumn: boolean): number 
 
 function getStickyCellLayouts(table: HTMLTableElement, options: FreezeOptions): StickyCellLayout[] {
   const rows = Array.from(table.rows);
+  const appliedWidths = options.columns > 0 ? getAppliedColumnWidths(table) : [];
   const layouts: StickyCellLayout[] = [];
   let top = 0;
 
@@ -101,7 +102,7 @@ function getStickyCellLayouts(table: HTMLTableElement, options: FreezeOptions): 
       });
 
       if (isFrozenColumn) {
-        left += getStickyColumnWidth(table, cell, columnIndex);
+        left += getStickyColumnWidth(table, cell, columnIndex, appliedWidths);
       }
     });
 

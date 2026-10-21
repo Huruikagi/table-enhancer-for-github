@@ -1,8 +1,4 @@
-import {
-  FILTERED_ROW_DATA_ATTRIBUTE,
-  HIDDEN_COLUMN_DATA_ATTRIBUTE,
-  HIDDEN_ROW_DATA_ATTRIBUTE,
-} from "../constants";
+import { isVisibleColumnCell, isVisibleRow } from "../row-dom";
 
 export type CopyFormat = "markdown" | "csv" | "tsv";
 
@@ -22,16 +18,8 @@ function getCellText(cell: HTMLTableCellElement): string {
 
 export function getVisibleTableData(table: HTMLTableElement): string[][] {
   return Array.from(table.rows)
-    .filter(
-      (row) =>
-        row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE] !== "true" &&
-        row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] !== "true",
-    )
-    .map((row) =>
-      Array.from(row.cells)
-        .filter((cell) => cell.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE] !== "true")
-        .map(getCellText),
-    )
+    .filter(isVisibleRow)
+    .map((row) => Array.from(row.cells).filter(isVisibleColumnCell).map(getCellText))
     .filter((row) => row.length > 0);
 }
 

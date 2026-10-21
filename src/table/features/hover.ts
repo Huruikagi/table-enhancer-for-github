@@ -1,8 +1,4 @@
-import {
-  FILTERED_ROW_DATA_ATTRIBUTE,
-  HIDDEN_COLUMN_DATA_ATTRIBUTE,
-  HIDDEN_ROW_DATA_ATTRIBUTE,
-} from "../constants";
+import { isVisibleCell } from "../row-dom";
 
 export const HOVER_DATA_ATTRIBUTE = "githubTableEnhancerHover";
 
@@ -21,21 +17,12 @@ export function installTableHover(table: HTMLTableElement): {
     painted.clear();
     active = null;
   };
-  const visible = (cell: HTMLTableCellElement): boolean => {
-    const row = cell.parentElement;
-    return (
-      !!row &&
-      row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE] !== "true" &&
-      row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] !== "true" &&
-      cell.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE] !== "true"
-    );
-  };
   const paint = (target: EventTarget | null): void => {
     const candidate = target instanceof Element ? target.closest("th, td") : null;
     const cell =
       candidate instanceof HTMLTableCellElement &&
       candidate.closest("table") === table &&
-      visible(candidate)
+      isVisibleCell(candidate)
         ? candidate
         : null;
     if (cell === active) return;
@@ -44,7 +31,7 @@ export function installTableHover(table: HTMLTableElement): {
     active = cell;
     const row = cell.parentElement as HTMLTableRowElement;
     const mark = (item: HTMLTableCellElement | undefined): void => {
-      if (!item || !visible(item)) return;
+      if (!item || !isVisibleCell(item)) return;
       item.dataset[HOVER_DATA_ATTRIBUTE] = item === cell ? "cell" : "axis";
       painted.add(item);
     };

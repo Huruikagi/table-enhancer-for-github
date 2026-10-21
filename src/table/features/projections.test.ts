@@ -1,7 +1,10 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { measureFitTableColumnWidths } from "./column-measurement";
+import { applyTableColumnWidths } from "./column-widths";
 import { getVisibleTableData, serializeTableData } from "./copy";
 import { applyTableFreeze } from "./freeze";
-import { applyTableVisibility } from "./visibility";
+import { applyTableSort } from "./sort";
+import { applyTableVisibility, getTableFilterResult } from "./visibility";
 
 const STICKY_CELL_DATA_ATTRIBUTE = "githubTableEnhancerSticky";
 const FROZEN_ROW_BOUNDARY_DATA_ATTRIBUTE = "githubTableEnhancerFrozenRowBoundary";
@@ -21,6 +24,98 @@ function getTable(): HTMLTableElement {
 describe("table DOM projections", () => {
   beforeEach(() => {
     document.body.innerHTML = "";
+  });
+
+  it("reads filter summaries without DOM writes before mounting or after sorting", () => {
+    document.body.innerHTML = `
+      <table><thead><tr><th>Runtime</th></tr></thead><tbody>
+        <tr><td>Node.js</td></tr><tr><td>Ruby</td></tr><tr><td>Node.js LTS</td></tr>
+      </tbody></table>
+    `;
+    const table = getTable();
+    const observer = new MutationObserver(() => undefined);
+    observer.observe(table, { attributes: true, childList: true, subtree: true });
+    try {
+      const visibility = { rows: [1], columns: [], filterQuery: "node" };
+      expect(getTableFilterResult(table, visibility)).toEqual({
+        matchingRows: 2,
+        totalRows: 3,
+        visibleRows: 1,
+      });
+      expect(observer.takeRecords()).toEqual([]);
+
+      applyTableSort(table, { column: 0, direction: "descending" });
+      applyTableVisibility(table, visibility);
+      observer.takeRecords();
+      expect(getTableFilterResult(table, visibility)).toEqual({
+        matchingRows: 2,
+        totalRows: 3,
+        visibleRows: 1,
+      });
+      expect(getVisibleTableData(table)).toEqual([["Runtime"], ["Node.js LTS"]]);
+      expect(observer.takeRecords()).toEqual([]);
+    } finally {
+      observer.disconnect();
+    }
+  });
+
+  it("restores applied widths and hidden columns after successful or failed Fit measurement", () => {
+    document.body.innerHTML = `
+      <table><thead><tr><th>Name</th><th>Status</th></tr></thead>
+        <tbody><tr><td>Node.js</td><td>Ready</td></tr></tbody>
+      </table>
+    `;
+    const table = getTable();
+    applyTableColumnWidths(table, [180, 220], new Set([1]));
+    applyTableVisibility(table, { rows: [], columns: [1] });
+    const readLayout = () => ({
+      resized: table.dataset.githubTableEnhancerResizedColumns,
+      width: table.style.width,
+      minWidth: table.style.minWidth,
+      columns: Array.from(table.querySelectorAll("col"), (column) => ({
+        width: column.style.width,
+        display: column.style.display,
+      })),
+    });
+    const before = readLayout();
+    expect(measureFitTableColumnWidths(table)).toHaveLength(2);
+    expect(readLayout()).toEqual(before);
+
+    const measurement = vi
+      .spyOn(table.rows[0].cells[0], "getBoundingClientRect")
+      .mockImplementationOnce(() => {
+        throw new Error("measurement failed");
+      });
+    try {
+      expect(() => measureFitTableColumnWidths(table)).toThrow("measurement failed");
+      expect(readLayout()).toEqual(before);
+    } finally {
+      measurement.mockRestore();
+    }
+  });
+
+  it("uses applied widths and per-cell fallbacks for frozen column offsets", () => {
+    document.body.innerHTML = `
+      <table><colgroup><col style="width: 120px"></colgroup><tbody>
+        <tr><td>one</td><td>two</td><td>three</td></tr>
+        <tr><td>four</td><td>five</td><td>six</td></tr>
+      </tbody></table>
+    `;
+    const table = getTable();
+    const measurements = Array.from(table.rows, (row, index) =>
+      vi
+        .spyOn(row.cells[1], "getBoundingClientRect")
+        .mockReturnValue({ width: 70 + index * 20 } as DOMRect),
+    );
+    try {
+      applyTableFreeze(table, { rows: 0, columns: 3 });
+      expect(table.rows[0].cells[1].style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("120px");
+      expect(table.rows[1].cells[1].style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("120px");
+      expect(table.rows[0].cells[2].style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("190px");
+      expect(table.rows[1].cells[2].style.getPropertyValue(STICKY_LEFT_PROPERTY)).toBe("210px");
+    } finally {
+      for (const measurement of measurements) measurement.mockRestore();
+    }
   });
 
   it("clears previous sticky styles before applying new freeze values", () => {

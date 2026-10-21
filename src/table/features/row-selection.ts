@@ -1,29 +1,16 @@
 import { translate } from "../../i18n";
-import {
-  FILTERED_ROW_DATA_ATTRIBUTE,
-  HIDDEN_COLUMN_DATA_ATTRIBUTE,
-  HIDDEN_ROW_DATA_ATTRIBUTE,
-} from "../constants";
+import { getOriginalRowIndex, isHeaderRow, isVisibleColumnCell, isVisibleRow } from "../row-dom";
 import type { TableViewState } from "../state";
-import { getOriginalRowIndex } from "./sort";
 
 export const ROW_SELECTION_CLASS = "github-table-enhancer-row-selection";
 
 function firstVisibleCell(row: HTMLTableRowElement): HTMLTableCellElement | undefined {
-  return Array.from(row.cells).find(
-    (cell) => cell.dataset[HIDDEN_COLUMN_DATA_ATTRIBUTE] !== "true",
-  );
+  return Array.from(row.cells).find(isVisibleColumnCell);
 }
 
 export function getSelectableRows(table: HTMLTableElement): number[] {
   return Array.from(table.rows)
-    .filter(
-      (row, index) =>
-        !(table.tHead ? table.tHead.contains(row) : index === 0) &&
-        row.dataset[HIDDEN_ROW_DATA_ATTRIBUTE] !== "true" &&
-        row.dataset[FILTERED_ROW_DATA_ATTRIBUTE] !== "true" &&
-        firstVisibleCell(row),
-    )
+    .filter((row) => !isHeaderRow(table, row) && isVisibleRow(row) && firstVisibleCell(row))
     .map(getOriginalRowIndex);
 }
 

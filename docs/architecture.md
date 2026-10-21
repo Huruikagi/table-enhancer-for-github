@@ -98,17 +98,27 @@ mounting, reconciliation, lifecycle, discovery, and storage. Individual table be
 `src/table/features/`:
 
 - `copy.ts`
+- `column-measurement.ts` reads applied widths and measures Fit widths, restoring temporary styles
+- `column-widths.ts` applies and resets persistent column widths
 - `focus-mode.ts`
 - `freeze.ts`
 - `hide-controls.ts`
 - `hover.ts`
 - `row-selection.ts`
-- `resize.ts`
+- `resize.ts` owns resize handles and pointer listeners
 - `sort.ts`
 - `visibility.ts`
 
 Feature modules may use shared state types, constants, and read-only helpers from another feature.
 Cross-feature DOM mutation order remains the responsibility of `reconcile.ts`.
+
+`row-dom.ts` owns shared row identity and read-only header/visibility queries. Mounting initializes
+row identities before installing controls; standalone sort and visibility projections also ensure
+identities exist before mutating the DOM. Filter summaries only read the DOM, including before
+mounting, and never initialize identity attributes during UI rendering.
+
+Freeze reads applied column widths once per layout calculation and shares that snapshot across
+fixed cells. Widths without an applied value still use each cell's measured geometry.
 
 Preact toolbar presentation lives under `src/table/ui/`:
 

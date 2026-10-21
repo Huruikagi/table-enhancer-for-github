@@ -1,26 +1,9 @@
 import { translate } from "../../i18n";
-import {
-  ORIGINAL_ROW_INDEX_DATA_ATTRIBUTE,
-  SORT_COLUMN_INDEX_DATA_ATTRIBUTE,
-  TABLE_SORT_BUTTON_CLASS,
-} from "../constants";
+import { SORT_COLUMN_INDEX_DATA_ATTRIBUTE, TABLE_SORT_BUTTON_CLASS } from "../constants";
+import { getOriginalRowIndex, initializeOriginalRowIndexes, isHeaderRow } from "../row-dom";
 import type { TableSort } from "../state";
 
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
-
-function isHeaderRow(table: HTMLTableElement, row: HTMLTableRowElement): boolean {
-  return table.tHead?.contains(row) ?? row === table.rows[0];
-}
-
-export function initializeOriginalRowIndexes(table: HTMLTableElement): void {
-  for (const [rowIndex, row] of Array.from(table.rows).entries()) {
-    row.dataset[ORIGINAL_ROW_INDEX_DATA_ATTRIBUTE] ??= String(rowIndex);
-  }
-}
-
-export function getOriginalRowIndex(row: HTMLTableRowElement): number {
-  return Number(row.dataset[ORIGINAL_ROW_INDEX_DATA_ATTRIBUTE]);
-}
 
 function getSortableRows(table: HTMLTableElement): HTMLTableRowElement[] {
   return Array.from(table.rows).filter((row) => !isHeaderRow(table, row));
