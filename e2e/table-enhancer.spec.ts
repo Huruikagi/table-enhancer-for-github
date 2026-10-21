@@ -396,9 +396,8 @@ test("keeps row selection usable with a hidden first column, freezing, sorting, 
   await wrapper.getByLabel("Frozen rows").fill("1");
   await wrapper.getByLabel("Frozen columns").fill("1");
   await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
-  // Narrow headers can overlap the existing sort and hide buttons; use the keyboard action.
-  await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).focus();
-  await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).press("Space");
+  await wrapper.locator("th").first().hover();
+  await wrapper.getByRole("button", { name: "Hide column 1", exact: true }).click();
   await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
   const originalRow = wrapper
     .locator("tbody tr")
@@ -421,6 +420,90 @@ test("keeps row selection usable with a hidden first column, freezing, sorting, 
   await wrapper.getByRole("button", { name: "Select rows", exact: true }).press("Escape");
   await expect(wrapper).not.toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
 });
+
+for (const focusMode of [false, true]) {
+  test(`keeps narrow header actions separate in ${focusMode ? "Focus" : "normal"} mode`, async ({
+    page,
+  }, testInfo) => {
+    await page.goto(fixtureUrl);
+    const wrapper = page.locator(".github-table-enhancer-scroll").nth(1);
+    if (focusMode) await wrapper.getByRole("button", { name: "Expand", exact: true }).click();
+    await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+    await wrapper.getByLabel("Frozen rows").fill("1");
+    await wrapper.getByLabel("Frozen columns").fill("1");
+    await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+    const header = wrapper.locator("th").first();
+    const sort = wrapper.getByRole("button", { name: "Sort by column 1", exact: true });
+    const hide = wrapper.getByRole("button", { name: "Hide column 1", exact: true });
+    const resize = header.locator(".github-table-enhancer-column-resize-handle");
+
+    for (const stage of ["natural", "fit", "minimum"]) {
+      if (stage === "fit") await wrapper.getByRole("button", { name: "Fit", exact: true }).click();
+      if (stage === "minimum") {
+        const handleBox = await resize.boundingBox();
+        const headerBox = await header.boundingBox();
+        if (!handleBox || !headerBox) throw new Error("Expected a visible resize handle");
+        const x = handleBox.x + 1;
+        const y = handleBox.y + handleBox.height / 2;
+        await page.mouse.move(x, y);
+        await page.mouse.down();
+        await page.mouse.move(x - headerBox.width, y, { steps: 5 });
+        await page.mouse.up();
+        await expect(wrapper.locator("col").first()).toHaveCSS("width", "48px");
+      }
+
+      await header.hover();
+      const boxes = await Promise.all([
+        header.boundingBox(),
+        sort.boundingBox(),
+        hide.boundingBox(),
+        resize.boundingBox(),
+      ]);
+      const [cellBox, sortBox, hideBox, resizeBox] = boxes;
+      if (!cellBox || !sortBox || !hideBox || !resizeBox)
+        throw new Error("Expected visible header controls");
+      expect(sortBox.x).toBeGreaterThanOrEqual(cellBox.x);
+      expect(sortBox.x + sortBox.width).toBeLessThanOrEqual(hideBox.x);
+      expect(hideBox.x + hideBox.width).toBeLessThanOrEqual(resizeBox.x);
+      expect(hideBox.y + hideBox.height).toBeLessThanOrEqual(cellBox.y + cellBox.height);
+      for (const direction of ["ascending", "descending", "none"]) {
+        await sort.click();
+        await expect(header).toHaveAttribute("aria-sort", direction);
+      }
+      if (stage === "minimum") {
+        expect(cellBox.width).toBeLessThanOrEqual(49);
+        await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+        const all = wrapper.getByRole("checkbox", { name: "Select all visible rows" });
+        await all.uncheck();
+        await all.check();
+        await header.hover();
+        await wrapper.screenshot({ path: testInfo.outputPath("narrow-header.png") });
+        await wrapper.getByRole("button", { name: "Cancel", exact: true }).click();
+      }
+      await header.hover();
+      await hide.click();
+      await expect(header).toBeHidden();
+      await wrapper.getByRole("button", { name: "Show hidden", exact: true }).click();
+      await expect(header).toBeVisible();
+    }
+    await wrapper.getByRole("button", { name: "Reset table view", exact: true }).click();
+    // Empty headings must still reserve enough width for both actions in intrinsic layout.
+    await header.evaluate((cell) => {
+      for (const node of Array.from(cell.childNodes))
+        if (node.nodeType === Node.TEXT_NODE) node.textContent = "";
+    });
+    await header.hover();
+    const emptyBox = await header.boundingBox();
+    const sortBox = await sort.boundingBox();
+    if (!emptyBox || !sortBox) throw new Error("Expected an empty heading with controls");
+    expect(emptyBox.width).toBeGreaterThanOrEqual(48);
+    expect(sortBox.x).toBeGreaterThanOrEqual(emptyBox.x);
+    await sort.click();
+    await expect(header).toHaveAttribute("aria-sort", "ascending");
+    await hide.click();
+    await expect(header).toBeHidden();
+  });
+}
 
 test("explains why a filter leaves no visible rows", async ({ page }) => {
   await page.goto(fixtureUrl);

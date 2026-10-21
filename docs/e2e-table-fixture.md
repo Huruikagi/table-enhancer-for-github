@@ -32,6 +32,7 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - Clicking Save default should persist the current rows and columns for the nearest preceding heading text.
 - Reloading the page should apply the saved default to tables with the same preceding heading text.
 - Hovering a table header cell should show its column hide button and unsorted sort button.
+- Header sort and hide buttons should sit side by side above the heading text. Resize a column to its minimum width and confirm both buttons and the resize edge remain individually clickable, including with Wrap, frozen rows/columns, and Focus mode.
 - Select rows should show checked boxes in the first visible column for visible body rows and a select-all checkbox in the header. No row hide buttons should appear.
 - Dragging a column edge should resize that displayed column without changing the surrounding GitHub layout.
 - Clicking Fit should set readable column widths and enable wrapped cell rendering in one step.

@@ -67,6 +67,8 @@ Filtering is temporary and is not saved as a default.
 
 Hover a column header to reveal its unsorted sort button, then select it to sort the table body by that column. Once selected, the ascending or descending direction remains visible. Repeated selections cycle through ascending, descending, and original Markdown order. Numeric and date-like values are compared by value; other text uses case-insensitive natural ordering.
 
+Sort and column-hide buttons sit side by side above the header text, leaving the column edge available for resizing even when a column is narrow.
+
 Sorting is temporary. It preserves the identity of manually hidden and filtered rows as their positions change.
 
 ## Hide and restore rows or columns
