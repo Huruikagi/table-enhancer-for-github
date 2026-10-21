@@ -5,3 +5,4 @@ release/
 test-results/
 playwright-report/
 docs/store-assets/videos/*.webm
+docs/store-assets/videos/*.mp4

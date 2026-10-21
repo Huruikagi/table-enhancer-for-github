@@ -6,11 +6,11 @@ Run the following command from the repository root to rebuild the extension and 
 pnpm demo:video
 ```
 
-The command writes `github-table-enhancer-demo.webm` to this directory. The generated WebM file is ignored by Git because it is a large, reproducible artifact.
+The command writes `github-table-enhancer-demo.webm` to this directory. When `ffmpeg` is on `PATH`, it also writes `github-table-enhancer-demo.mp4` (H.264), which is ready to upload to YouTube. Both generated files are ignored by Git because they are large, reproducible artifacts.
 
-The recording uses a deterministic local GitHub-style fixture, loads the unpacked extension from `dist`, and demonstrates Freeze, Filter, Fit, Wrap, Focus mode, and Reset at 1280 x 720. Edit `e2e/demo-video.spec.ts` to change the copy, pacing, fixture data, or scenario.
+The recording uses a deterministic local GitHub-style fixture, loads the unpacked extension from `dist`, and runs for about 80 seconds at 1280 x 720. It opens and closes with title cards, draws a visible pointer with click ripples, and labels each step with a numbered caption while demonstrating frontmatter properties, hover highlighting, Freeze, Sort, Filter, row selection, hiding columns, column resizing, Fit and Wrap, Copy, Focus mode, and Reset. Edit `e2e/demo-video.spec.ts` to change the copy, pacing, fixture data, or scenario.
 
-Chrome Web Store does not accept this WebM file directly. Upload the reviewed recording to YouTube, then enter that YouTube URL in the store listing's promotional video field. Keep the local WebM as the reproducible source artifact.
+Chrome Web Store does not accept these files directly. Upload the reviewed recording to YouTube, then enter that YouTube URL in the store listing's promotional video field. Keep the local recording as the reproducible source artifact.
 
 ## User guide screenshots
 

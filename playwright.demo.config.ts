@@ -6,6 +6,6 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: true,
   reporter: "list",
-  timeout: 90_000,
+  timeout: 180_000,
   workers: 1,
 });
