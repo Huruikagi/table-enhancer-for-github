@@ -19,12 +19,13 @@ O Aprimorador de tabelas para GitHub adiciona controles compactos diretamente ac
 Mantenha-se orientado
 
 - Fixe as linhas de cabeçalho e as primeiras colunas enquanto rola a tabela.
+- Realce a linha e a coluna sob o ponteiro para acompanhar as células em tabelas largas.
 - Salve padrões de fixação por repositório e título para as tabelas que você consulta com frequência.
 
 Encontre o que importa
 
 - Filtre linhas por texto ou expressão regular.
-- Ordene por qualquer coluna ou oculte linhas e colunas desnecessárias.
+- Ordene por qualquer coluna, escolha as linhas a manter com caixas de seleção ou oculte colunas desnecessárias.
 
 Adapte a visualização à sua tarefa
 

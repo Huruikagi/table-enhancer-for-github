@@ -21,12 +21,13 @@ file.
 Stay oriented
 
 - Freeze header rows and leading columns while you scroll.
+- Highlight the row and column under the pointer to follow cells across wide tables.
 - Save Freeze defaults by repository and heading for the tables you revisit.
 
 Find what matters
 
 - Filter rows by text or regular expression.
-- Sort by any column, or hide rows and columns you do not need.
+- Sort by any column, select the rows to keep with checkboxes, or hide unwanted columns.
 
 Shape the view around your task
 

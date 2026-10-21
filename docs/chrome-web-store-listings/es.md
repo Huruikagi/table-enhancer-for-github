@@ -19,12 +19,13 @@ Mejorador de tablas para GitHub añade controles compactos justo encima de las t
 Mantén la orientación
 
 - Fija las filas de encabezado y las primeras columnas mientras te desplazas.
+- Resalta la fila y la columna bajo el puntero para seguir las celdas en tablas anchas.
 - Guarda valores predeterminados de fijación por repositorio y encabezado para las tablas que consultas con frecuencia.
 
 Encuentra lo importante
 
 - Filtra filas por texto o expresión regular.
-- Ordena por cualquier columna u oculta las filas y columnas que no necesitas.
+- Ordena por cualquier columna, elige las filas que quieres conservar con casillas de verificación u oculta las columnas que no necesitas.
 
 Adapta la vista a tu tarea
 
