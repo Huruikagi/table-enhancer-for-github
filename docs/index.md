@@ -1,5 +1,6 @@
 ---
 title: Table Enhancer for GitHub
+layout: page
 permalink: /
 ---
 

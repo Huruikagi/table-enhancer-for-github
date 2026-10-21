@@ -1,0 +1,10 @@
+{% for group in page.navigation %}
+<div class="toc-group">
+  <p>{{ group.title }}</p>
+  <ul>
+    {% for item in group.items %}
+    <li><a href="#{{ item.id }}">{{ item.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %}

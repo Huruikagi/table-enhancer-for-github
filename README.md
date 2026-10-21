@@ -72,6 +72,23 @@ Chromium profile with the generated `dist` extension loaded. The tests visit a G
 blob URL and serve a local GitHub-like fixture for that request, so the content script's
 production URL match is exercised without depending on live GitHub pages.
 
+### Public guide and website
+
+The GitHub Pages site is built from `docs/` with Jekyll. The public pages use shared layouts in
+`docs/_layouts/` and styles in `docs/assets/site.css`; the user guide's navigation is defined in
+the frontmatter of `docs/user-guide.md`. Keep those navigation IDs aligned with the section
+headings, and retain explicit IDs when renaming headings so existing links continue to work.
+Liquid layouts and includes are excluded from Biome's HTML parser because they use Jekyll
+template syntax; CSS remains covered by `pnpm lint`.
+
+After changing the site, check desktop and mobile widths, keyboard navigation, section links,
+image links, and expandable notes. The `Deploy GitHub Pages` workflow builds and publishes
+changes to `docs/` on `main`; verify the rendered pages after deployment.
+
+Guide screenshots use a deterministic fixture with the built extension loaded. Refresh them
+with `pnpm guide:screenshots`; see [the screenshot maintenance notes](docs/store-assets/videos/README.md#user-guide-screenshots).
+The local demo video is ignored by Git and is not included in the Pages deployment.
+
 ## Manual Install Without Building
 
 1. Open `chrome://extensions/`.

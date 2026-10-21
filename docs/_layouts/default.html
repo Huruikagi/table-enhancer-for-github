@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ page.description | default: site.description | escape }}">
+    <title>{{ page.title | escape }}{% unless page.permalink == '/' %} · Table Enhancer for GitHub{% endunless %}</title>
+    <link rel="icon" href="{{ '/assets/icon.svg' | relative_url }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="{{ '/' | relative_url }}">
+          <img src="{{ '/assets/icon.svg' | relative_url }}" width="32" height="32" alt="">
+          <span>Table Enhancer <span class="brand-suffix">for GitHub</span></span>
+        </a>
+        <nav class="site-nav" aria-label="Main navigation">
+          <a href="{{ '/user-guide/' | relative_url }}"{% if page.permalink == '/user-guide/' %} aria-current="page"{% endif %}>User guide</a>
+          <a class="source-link" href="https://github.com/Huruikagi/table-enhancer-for-github">GitHub <span aria-hidden="true">↗</span></a>
+          <a class="install-link" href="https://chromewebstore.google.com/detail/gnnboemmkojioleagajnphgfdpdemjlg">Add to Chrome <span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    {{ content }}
+    <footer class="site-footer">
+      <div>
+        <strong>Table Enhancer for GitHub</strong>
+        <p>An unofficial extension. Not affiliated with or endorsed by GitHub.</p>
+      </div>
+      <nav aria-label="Footer navigation">
+        <a href="{{ '/privacy-policy/' | relative_url }}">Privacy</a>
+        <a href="https://github.com/Huruikagi/table-enhancer-for-github/issues">Help & feedback <span aria-hidden="true">↗</span></a>
+      </nav>
+    </footer>
+  </body>
+</html>

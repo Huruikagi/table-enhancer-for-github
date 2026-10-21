@@ -1,0 +1,5 @@
+title: Table Enhancer for GitHub
+description: A practical guide to reading, filtering, and sharing wide GitHub Markdown tables.
+url: https://huruikagi.github.io
+baseurl: /table-enhancer-for-github
+markdown: kramdown

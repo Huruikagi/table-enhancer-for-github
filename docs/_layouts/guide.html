@@ -1,0 +1,24 @@
+---
+layout: default
+---
+<div class="guide-shell">
+  <aside class="guide-sidebar" aria-label="Guide navigation">
+    <a class="guide-label" href="#main-content">USER GUIDE</a>
+    <nav class="desktop-toc" aria-label="On this page">
+      {% include guide-toc.html %}
+    </nav>
+    <details class="mobile-toc">
+      <summary>On this page</summary>
+      <nav aria-label="On this page">
+        {% include guide-toc.html %}
+      </nav>
+    </details>
+    <div class="sidebar-note">
+      <span class="status-dot" aria-hidden="true"></span> Your view, your way.
+      <p>Table controls change your view in the browser. Your Markdown stays the same.</p>
+    </div>
+  </aside>
+  <main id="main-content" class="guide-content prose">
+    {{ content }}
+  </main>
+</div>
