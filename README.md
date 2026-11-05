@@ -63,6 +63,17 @@ pnpm test:e2e
 
 This project pins Node and pnpm in `.mise.toml`, and `package.json` pins the expected pnpm release through `packageManager`.
 
+`mise.lock` records tool download URLs and checksums for Windows x64 and Linux x64.
+Use `mise install --locked node pnpm` to require those locked downloads. After changing tool versions,
+regenerate it with `mise lock --platform "windows-x64,linux-x64"`.
+
+`.github/workflows/actions.lock` pins the Actions used by the Pages and release workflows,
+including transitive action dependencies. Install the generator with
+`gh extension install github/gh-actions-lock`, regenerate with
+`gh actions-lock --no-narrow`, and validate with `gh actions-lock --verify`.
+Dependabot keeps the lockfile in sync with its Actions updates. Action container images
+are not pinned by this lockfile.
+
 The content-script runtime and per-table state boundaries are documented in [docs/architecture.md](docs/architecture.md).
 
 After rebuilding, reload the extension from `chrome://extensions/`.
