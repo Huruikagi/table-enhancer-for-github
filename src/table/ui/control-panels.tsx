@@ -49,6 +49,9 @@ type FreezePanelProps = {
   limits: FreezeOptions;
   onClose: () => void;
   onSaveDefault?: () => void;
+  onRemoveDefault?: () => void;
+  removeDefaultStatus: SaveDefaultStatus;
+  settingsUrl?: string;
   onUpdateValues: (values: FreezeOptions) => FreezeOptions;
   panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
@@ -245,6 +248,9 @@ export function FreezePanel({
   limits,
   onClose,
   onSaveDefault,
+  onRemoveDefault,
+  removeDefaultStatus,
+  settingsUrl,
   onUpdateValues,
   panelRef,
   positionAnchor,
@@ -294,8 +300,9 @@ export function FreezePanel({
       {headingText && onSaveDefault && (
         <button
           aria-live="polite"
-          disabled={saveDefaultStatus === "saving"}
+          disabled={saveDefaultStatus === "saving" || removeDefaultStatus === "saving"}
           onClick={onSaveDefault}
+          title={headingText}
           ref={saveDefaultButtonRef}
           type="button"
         >
@@ -304,6 +311,28 @@ export function FreezePanel({
           {saveDefaultStatus === "failed" && translate("failed")}
           {saveDefaultStatus === "idle" && translate("saveDefault")}
         </button>
+      )}
+      {onRemoveDefault && (
+        <button
+          type="button"
+          onClick={onRemoveDefault}
+          title={headingText ?? undefined}
+          disabled={saveDefaultStatus === "saving" || removeDefaultStatus === "saving"}
+          aria-live="polite"
+        >
+          {removeDefaultStatus === "saving"
+            ? translate("saving")
+            : removeDefaultStatus === "failed"
+              ? translate("failed")
+              : removeDefaultStatus === "saved"
+                ? translate("globalDefaultApplied")
+                : translate("useGlobalDefault")}
+        </button>
+      )}
+      {settingsUrl && (
+        <a href={settingsUrl} target="_blank" rel="noreferrer">
+          {translate("globalFreezeSettings")}
+        </a>
       )}
     </div>
   );

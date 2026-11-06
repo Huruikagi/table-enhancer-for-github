@@ -37,6 +37,8 @@ export type TableRuntimeOptions = {
   defaultValuesPromise?: Promise<FreezeOptions | null> | null;
   headingText?: string | null;
   onSaveDefault?: (values: FreezeOptions) => Promise<void>;
+  onRemoveDefault?: () => Promise<FreezeOptions>;
+  settingsUrl?: string;
 };
 
 export type TableRuntime = {
@@ -107,6 +109,18 @@ export function mountTableRuntime(
   const controls = createTableControls({
     controller,
     headingText: options.headingText,
+    settingsUrl: options.settingsUrl,
+    onRemoveDefault: options.onRemoveDefault
+      ? async () => {
+          // Removing a default is a user action; a late initial read must not restore it.
+          controller.dispatch({ type: "freezeChanged", value: controller.getState().freeze });
+          const previousFreeze = controller.getState().freeze;
+          const value = await options.onRemoveDefault?.();
+          if (!isDestroyed && value && controller.getState().freeze === previousFreeze) {
+            controller.dispatch({ type: "freezeChanged", value });
+          }
+        }
+      : undefined,
     onSelectRows: () => {
       controller.dispatch({ type: "rowSelectionStarted", rows: getSelectableRows(table) });
       table.querySelector<HTMLInputElement>(`.${ROW_SELECTION_CLASS}`)?.focus();

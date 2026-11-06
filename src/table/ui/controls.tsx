@@ -24,6 +24,8 @@ type TableControlsProps = {
   onFitColumns: () => void;
   onSelectRows: () => void;
   onSaveDefault?: () => Promise<void>;
+  onRemoveDefault?: () => Promise<void>;
+  settingsUrl?: string;
   table: HTMLTableElement;
 };
 
@@ -34,6 +36,8 @@ function TableControls({
   onFitColumns,
   onSelectRows,
   onSaveDefault,
+  onRemoveDefault,
+  settingsUrl,
   table,
 }: TableControlsProps): VNode {
   const inputIdPrefix = useId();
@@ -57,6 +61,8 @@ function TableControls({
   const [viewState, setViewState] = useState(controller.getState());
   const [copyStatus, setCopyStatus] = useTransientStatus<CopyFormat | "failed" | "idle">("idle");
   const [saveDefaultStatus, setSaveDefaultStatus] = useTransientStatus<SaveDefaultStatus>("idle");
+  const [removeDefaultStatus, setRemoveDefaultStatus] =
+    useTransientStatus<SaveDefaultStatus>("idle");
   const { filterQuery, filterUsesRegularExpression, freeze, hiddenColumns, hiddenRows, isWrapped } =
     viewState;
   const hiddenCount = hiddenRows.length + hiddenColumns.length;
@@ -126,6 +132,18 @@ function TableControls({
       setSaveDefaultStatus("saved", 1500);
     } catch {
       setSaveDefaultStatus("failed");
+    }
+  };
+
+  const removeDefault = async (): Promise<void> => {
+    if (!onRemoveDefault) return;
+    setRemoveDefaultStatus("saving");
+    try {
+      await onRemoveDefault();
+      setSaveDefaultStatus("idle");
+      setRemoveDefaultStatus("saved", 1500);
+    } catch {
+      setRemoveDefaultStatus("failed");
     }
   };
 
@@ -342,6 +360,9 @@ function TableControls({
           limits={controller.limits}
           onClose={closePanel}
           onSaveDefault={onSaveDefault ? saveDefault : undefined}
+          onRemoveDefault={onRemoveDefault ? removeDefault : undefined}
+          removeDefaultStatus={removeDefaultStatus}
+          settingsUrl={settingsUrl}
           onUpdateValues={updateValues}
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-freeze`}

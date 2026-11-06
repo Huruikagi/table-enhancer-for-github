@@ -1,4 +1,11 @@
 export const englishMessages = {
+  globalFreezeSettings: "Global freeze settings",
+  globalFreezeDescription:
+    "Default frozen rows and columns for all tables. Saved heading defaults take priority. Changes apply the next time you open or reload a page.",
+  useGlobalDefault: "Use global default",
+  globalDefaultApplied: "Global default applied",
+  saveSettings: "Save settings",
+  settingsLoadFailed: "Could not load settings. Reload this page to try again.",
   selectRows: "Select rows",
   selectAllRows: "Select all visible rows",
   selectRow: "Select row $1",

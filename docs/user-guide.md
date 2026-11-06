@@ -102,7 +102,11 @@ Select **Freeze** to keep the first displayed rows and leftmost columns in view 
   <figcaption>The Freeze panel showing one frozen row and one frozen column.<span class="figure-hint">Select the image to view it full size.</span></figcaption>
 </figure>
 
-If a table has a preceding heading, choose **Save default** to remember those freeze values for tables under the same heading in the same GitHub repository. Defaults are stored locally in your browser and can be changed at any time; they do not apply to other repositories, even when the heading text matches.
+Open **Global freeze settings** in the Freeze panel (or the extension's Options page) to set default frozen rows and columns for all supported tables, including tables without a heading. Each value can be 0–5 and is limited to the size of each table. The initial default is 0 rows and 0 columns. Global changes apply when you next open or reload the GitHub page.
+
+If a table has a preceding heading, choose **Save default** to remember those freeze values for tables under the same heading in the same GitHub repository. Defaults are stored locally in your browser and can be changed at any time; they do not apply to other repositories, even when the heading text matches. A saved heading default overrides both global values, including an explicit 0 rows and 0 columns.
+
+Choose **Use global default** to delete that heading's saved override and immediately apply the global values to the current table. Other already-open tables use the updated settings on their next page load. **Reset** only clears the current view; it does not delete saved defaults.
 
 <details markdown="1">
 <summary>Updating from a version with older freeze defaults?</summary>
@@ -224,7 +228,7 @@ Check that you have opened the rendered preview of a Markdown **file**, with `/b
 <details markdown="1">
 <summary>Will this change my file or save my filters?</summary>
 
-Your source Markdown stays unchanged. Filters, sorting, hidden items, widths, and wrapping are temporary. Only freeze values explicitly saved with **Save default** are remembered locally for matching headings in the same repository.
+Your source Markdown stays unchanged. Filters, sorting, hidden items, widths, and wrapping are temporary. Global freeze settings and freeze values explicitly saved with **Save default** are remembered locally. Saved heading defaults apply to matching headings in the same repository.
 
 </details>
 

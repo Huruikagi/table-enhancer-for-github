@@ -1,4 +1,14 @@
 {
+  "globalFreezeSettings": { "message": "全体の固定設定" },
+  "globalFreezeDescription": {
+    "message": "すべての表に適用する固定行数・列数です。保存済みの見出し設定がある場合はそちらを優先します。変更は次回のページ表示・再読み込みから適用されます。"
+  },
+  "useGlobalDefault": { "message": "見出し設定を解除して全体設定を使う" },
+  "globalDefaultApplied": { "message": "全体設定を適用しました" },
+  "saveSettings": { "message": "設定を保存" },
+  "settingsLoadFailed": {
+    "message": "設定を読み込めませんでした。ページを再読み込みしてください。"
+  },
   "selectRows": { "message": "行を選択" },
   "selectAllRows": { "message": "表示中の行をすべて選択" },
   "selectRow": { "message": "$ROW$行目を選択", "placeholders": { "row": { "content": "$1" } } },

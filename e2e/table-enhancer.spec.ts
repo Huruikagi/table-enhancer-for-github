@@ -751,6 +751,49 @@ test("expands one table into Focus mode and restores the page with Escape", asyn
   await expect(table).toHaveAttribute("data-github-table-enhancer-wrapped-columns", "true");
 });
 
+test("global defaults, explicit zero heading overrides, and removal persist across reloads", async ({
+  page,
+  context,
+}) => {
+  await page.goto(fixtureUrl);
+  const wrapper = page.locator(".github-table-enhancer-scroll").first();
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  const optionsOpened = context.waitForEvent("page");
+  await wrapper.getByRole("link", { name: "Global freeze settings" }).click();
+  const options = await optionsOpened;
+  await expect(options.getByRole("button", { name: "Save settings" })).toBeEnabled();
+  await options.getByLabel("Frozen rows").fill("1");
+  await options.getByLabel("Frozen columns").fill("1");
+  await options.getByRole("button", { name: "Save settings" }).click();
+  await expect(options.getByRole("status")).toHaveText("Saved");
+  // Saving global settings does not mutate a table already being edited.
+  await expect(wrapper.getByLabel("Frozen rows")).toHaveValue("0");
+  await page.reload();
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  await expect(wrapper.getByLabel("Frozen rows")).toHaveValue("1");
+  await expect(wrapper.getByLabel("Frozen columns")).toHaveValue("1");
+  await wrapper.getByRole("button", { name: "Reset", exact: true }).click();
+  await wrapper.getByRole("button", { name: "Save default", exact: true }).click();
+  await expect(wrapper.getByRole("button", { name: "Saved", exact: true })).toBeVisible();
+  await page.reload();
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  await expect(wrapper.getByLabel("Frozen rows")).toHaveValue("0");
+  await expect(wrapper.getByLabel("Frozen columns")).toHaveValue("0");
+  await wrapper.getByRole("button", { name: "Use global default", exact: true }).click();
+  await expect(wrapper.getByRole("button", { name: "Global default applied" })).toBeVisible();
+  await expect(wrapper.getByLabel("Frozen rows")).toHaveValue("1");
+  await expect(wrapper.locator("th").first()).toHaveAttribute(
+    "data-github-table-enhancer-sticky",
+    "true",
+  );
+  await page.reload();
+  await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  await expect(wrapper.getByLabel("Frozen rows")).toHaveValue("1");
+  await expect(wrapper.getByLabel("Frozen columns")).toHaveValue("1");
+  await options.reload();
+  await expect(options.getByLabel("Frozen rows")).toHaveValue("1");
+});
+
 test("saves freeze defaults and reapplies them after reload", async ({ page }) => {
   await page.goto(fixtureUrl);
 

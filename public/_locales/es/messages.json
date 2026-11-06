@@ -1,4 +1,14 @@
 {
+  "globalFreezeSettings": { "message": "Configuración global de inmovilización" },
+  "globalFreezeDescription": {
+    "message": "Filas y columnas inmovilizadas por defecto para todas las tablas. Los valores guardados por encabezado tienen prioridad. Los cambios se aplican al abrir o recargar la página."
+  },
+  "useGlobalDefault": { "message": "Usar valores globales" },
+  "globalDefaultApplied": { "message": "Valores globales aplicados" },
+  "saveSettings": { "message": "Guardar configuración" },
+  "settingsLoadFailed": {
+    "message": "No se pudo cargar la configuración. Recarga la página para volver a intentarlo."
+  },
   "selectRows": { "message": "Seleccionar filas" },
   "selectAllRows": { "message": "Seleccionar todas las filas visibles" },
   "selectRow": {

@@ -1,4 +1,14 @@
 {
+  "globalFreezeSettings": { "message": "전체 고정 설정" },
+  "globalFreezeDescription": {
+    "message": "모든 표에 적용할 기본 고정 행과 열 수입니다. 저장된 제목별 설정이 우선 적용됩니다. 변경 사항은 페이지를 다시 열거나 새로고침할 때 적용됩니다."
+  },
+  "useGlobalDefault": { "message": "전체 기본 설정 사용" },
+  "globalDefaultApplied": { "message": "전체 기본 설정 적용됨" },
+  "saveSettings": { "message": "설정 저장" },
+  "settingsLoadFailed": {
+    "message": "설정을 불러오지 못했습니다. 페이지를 새로고침하여 다시 시도하세요."
+  },
   "selectRows": { "message": "행 선택" },
   "selectAllRows": { "message": "표시된 모든 행 선택" },
   "selectRow": { "message": "$ROW$행 선택", "placeholders": { "row": { "content": "$1" } } },

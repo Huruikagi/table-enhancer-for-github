@@ -1,4 +1,12 @@
 {
+  "globalFreezeSettings": { "message": "全局冻结设置" },
+  "globalFreezeDescription": {
+    "message": "所有表格的默认冻结行数和列数。已保存的标题设置优先。更改将在下次打开或刷新页面时生效。"
+  },
+  "useGlobalDefault": { "message": "使用全局默认设置" },
+  "globalDefaultApplied": { "message": "已应用全局默认设置" },
+  "saveSettings": { "message": "保存设置" },
+  "settingsLoadFailed": { "message": "无法加载设置。请刷新页面重试。" },
   "selectRows": { "message": "选择行" },
   "selectAllRows": { "message": "选择所有可见行" },
   "selectRow": { "message": "选择第$ROW$行", "placeholders": { "row": { "content": "$1" } } },

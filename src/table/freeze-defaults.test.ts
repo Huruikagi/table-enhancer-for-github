@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { act } from "preact/test-utils";
+import { describe, expect, it, vi } from "vitest";
 import {
   clickButton,
   FREEZE_RULE_SETTINGS_STORAGE_KEY,
@@ -15,10 +16,155 @@ import {
   useTableFixture,
 } from "../test/table-fixture";
 import { wrapTable } from "./enhancer";
+import {
+  readEffectiveFreezeDefault,
+  readGlobalFreezeDefault,
+  removeHeadingFreezeRule,
+  saveGlobalFreezeDefault,
+} from "./freeze-rule-storage";
+import { mountManagedTable } from "./lifecycle";
+import type { FreezeOptions } from "./state";
 
 useTableFixture();
 
 describe("saved heading freeze defaults", () => {
+  it("ignores a late initial heading read once removal starts", async () => {
+    renderMarkdownTables("<table><tbody><tr><td>one</td></tr></tbody></table>");
+    let finishInitial!: (value: FreezeOptions) => void;
+    let finishRemoval!: (value: FreezeOptions) => void;
+    act(() => {
+      const runtime = mountManagedTable(getTable(), {
+        headingText: "Matrix",
+        defaultValuesPromise: new Promise((resolve) => {
+          finishInitial = resolve;
+        }),
+        onRemoveDefault: () =>
+          new Promise((resolve) => {
+            finishRemoval = resolve;
+          }),
+      });
+      getTable().before(runtime.controls);
+    });
+    openFreezeControls();
+    clickButton("Use global default");
+    finishInitial({ rows: 1, columns: 1 });
+    await flushPromises();
+    finishRemoval({ rows: 0, columns: 0 });
+    await flushPromises();
+    expect(getTable().rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+  });
+  it("keeps the override and current view when removal cannot be saved", async () => {
+    installFakeChromeStorage({
+      githubTableEnhancerGlobalFreeze: { rows: 1, columns: 0 },
+      [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
+        version: 2,
+        repositoryRules: {
+          "owner/repo": { Matrix: { rows: 0, columns: 0 } },
+        },
+      },
+    });
+    renderMarkdownTables("<h2>Matrix</h2><table><tbody><tr><td>one</td></tr></tbody></table>");
+    wrapTable(getTable());
+    await flushPromises();
+    vi.spyOn(chrome.storage.local, "set").mockRejectedValueOnce(new Error("Write failed"));
+    openFreezeControls();
+    clickButton("Use global default");
+    await flushPromises();
+    expect(getButton("Failed")).toBeDefined();
+    expect(getTable().rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+    expect(await readEffectiveFreezeDefault("owner/repo", "Matrix")).toEqual({
+      rows: 0,
+      columns: 0,
+    });
+  });
+
+  it("does not overwrite edits made while heading removal is pending", async () => {
+    installFakeChromeStorage(
+      { githubTableEnhancerGlobalFreeze: { rows: 1, columns: 0 } },
+      { setDelayMs: 1 },
+    );
+    renderMarkdownTables("<h2>Matrix</h2><table><tbody><tr><td>one</td></tr></tbody></table>");
+    wrapTable(getTable());
+    await flushPromises();
+    openFreezeControls();
+    clickButton("Use global default");
+    setFreezeInput("Frozen rows", "0");
+    await flushPromises();
+    expect(getTable().rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBeUndefined();
+  });
+  it("inherits global defaults without a heading and clamps them to table size", async () => {
+    installFakeChromeStorage({ githubTableEnhancerGlobalFreeze: { rows: 5, columns: 5 } });
+    renderMarkdownTables("<table><tbody><tr><td>one</td></tr></tbody></table>");
+    wrapTable(getTable());
+    await flushPromises();
+    openFreezeControls();
+    expect(document.querySelector<HTMLInputElement>('[aria-label="Frozen rows"]')?.value).toBe("1");
+    expect(document.querySelector<HTMLInputElement>('[aria-label="Frozen columns"]')?.value).toBe(
+      "1",
+    );
+  });
+
+  it("keeps explicit zero overrides and removes only the selected heading", async () => {
+    const storage = installFakeChromeStorage({
+      githubTableEnhancerGlobalFreeze: { rows: 1, columns: 1 },
+      [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
+        version: 2,
+        repositoryRules: {
+          "owner/repo": { Matrix: { rows: 0, columns: 0 }, Other: { rows: 2, columns: 0 } },
+          "other/repo": { Matrix: { rows: 2, columns: 2 } },
+        },
+      },
+    });
+    expect(await readEffectiveFreezeDefault("owner/repo", "Matrix")).toEqual({
+      rows: 0,
+      columns: 0,
+    });
+    expect(await removeHeadingFreezeRule("owner/repo", "Matrix")).toEqual({ rows: 1, columns: 1 });
+    expect(await readEffectiveFreezeDefault("owner/repo", "Matrix")).toEqual({
+      rows: 1,
+      columns: 1,
+    });
+    expect(await readEffectiveFreezeDefault("owner/repo", "Other")).toEqual({
+      rows: 2,
+      columns: 0,
+    });
+    expect(await readEffectiveFreezeDefault("other/repo", "Matrix")).toEqual({
+      rows: 2,
+      columns: 2,
+    });
+    await saveGlobalFreezeDefault({ rows: 0, columns: 2 });
+    expect(storage.githubTableEnhancerGlobalFreeze).toEqual({ rows: 0, columns: 2 });
+    expect(await readEffectiveFreezeDefault("owner/repo", "Other")).toEqual({
+      rows: 2,
+      columns: 0,
+    });
+  });
+
+  it("uses zero for malformed global settings and rejects invalid writes", async () => {
+    installFakeChromeStorage({ githubTableEnhancerGlobalFreeze: { rows: -1, columns: 6 } });
+    expect(await readGlobalFreezeDefault()).toEqual({ rows: 0, columns: 0 });
+    await expect(saveGlobalFreezeDefault({ rows: 1.5, columns: 0 })).rejects.toThrow();
+  });
+
+  it("applies the global default immediately after removing a heading override", async () => {
+    installFakeChromeStorage({
+      githubTableEnhancerGlobalFreeze: { rows: 1, columns: 0 },
+      [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
+        version: 2,
+        repositoryRules: {
+          "owner/repo": { Matrix: { rows: 0, columns: 0 } },
+        },
+      },
+    });
+    renderMarkdownTables("<h2>Matrix</h2><table><tbody><tr><td>one</td></tr></tbody></table>");
+    wrapTable(getTable());
+    await flushPromises();
+    openFreezeControls();
+    clickButton("Use global default");
+    await flushPromises();
+    expect(getTable().rows[0]?.cells[0]?.dataset[STICKY_CELL_DATA_ATTRIBUTE]).toBe("true");
+    expect(getButton("Global default applied")).toBeDefined();
+  });
   it("applies a saved heading freeze rule as the initial value", async () => {
     installFakeChromeStorage({
       [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {

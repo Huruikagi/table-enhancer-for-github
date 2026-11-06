@@ -22,7 +22,7 @@ const mode = getBuildMode(process.argv.slice(2), process.env);
 const isDevelopment = mode === "development";
 
 await build({
-  entryPoints: ["src/content.ts", "src/page-data.ts"],
+  entryPoints: ["src/content.ts", "src/page-data.ts", "src/options.tsx"],
   outdir: "dist",
   bundle: true,
   format: "iife",

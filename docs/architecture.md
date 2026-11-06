@@ -181,6 +181,14 @@ Clipboard writes and saved Freeze defaults are injected at the mount boundary. T
 adapters use `navigator.clipboard` and `chrome.storage.local`; tests can supply replacements without
 changing controls or state transitions.
 
+Freeze defaults resolve at discovery: a repository/heading rule takes priority over the global
+default, with an explicit zero pair remaining an override. Global values use a separate local
+storage key so saving them cannot replace existing version-2 heading rules. The extension Options
+page edits global values; changes are read on the next table mount. Removing a heading rule is an
+injected operation that returns the global values. The mount runtime applies them immediately
+unless the user edited the table while the operation was pending. Reset remains a temporary view
+operation and never deletes saved defaults.
+
 ## Testing boundaries
 
 - `state.test.ts` covers pure state transitions.

@@ -1,7 +1,11 @@
 import { isMetadataTable } from "../frontmatter/runtime";
 import { isMarkdownBlobPage } from "../page-navigation";
 import { TABLE_WRAPPER_CLASS } from "./constants";
-import { readHeadingFreezeRule, saveHeadingFreezeRule } from "./freeze-rule-storage";
+import {
+  readEffectiveFreezeDefault,
+  removeHeadingFreezeRule,
+  saveHeadingFreezeRule,
+} from "./freeze-rule-storage";
 import { mountManagedTable } from "./lifecycle";
 
 export { isMarkdownBlobPage } from "../page-navigation";
@@ -78,8 +82,12 @@ export function wrapTable(table: HTMLTableElement): void {
   }
 
   const runtime = mountManagedTable(table, {
-    defaultValuesPromise:
-      headingText && repository ? readHeadingFreezeRule(repository, headingText) : null,
+    defaultValuesPromise: readEffectiveFreezeDefault(repository, headingText),
+    settingsUrl: typeof chrome !== "undefined" ? chrome.runtime?.getURL("options.html") : undefined,
+    onRemoveDefault:
+      headingText && repository
+        ? () => removeHeadingFreezeRule(repository, headingText)
+        : undefined,
     headingText,
     onSaveDefault:
       headingText && repository

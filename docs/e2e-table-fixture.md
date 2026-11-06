@@ -61,7 +61,11 @@ The separate `pnpm demo:video` command records the store presentation scenario. 
 - When frozen rows are enabled, long tables may scroll vertically inside the table wrapper.
 - Setting frozen columns should keep the first N left columns fully visible while scrolling horizontally, including after dragging the table scrollbar away from the left edge.
 - The last frozen column should show a clear right separator while the table scrolls horizontally.
-- Reset should return both freeze values to `0` and remove sticky row and column behavior.
+- Open **Global freeze settings**, save Rows `1` and Columns `1`, and reload this page. Tables without heading overrides should inherit both values, limited to their size. Existing open tables should remain unchanged until reload.
+- Save a heading override of Rows `0` and Columns `0`; reload and confirm it remains unfrozen despite the global default. Other headings should still inherit the global default.
+- Choose **Use global default** for that heading. Confirm both global values apply immediately and survive reload; other saved heading rules remain unchanged.
+- Verify global defaults also apply to a table without a preceding heading, and that it has no heading save/removal controls. Restore global values to `0` after this check.
+- Reset should return both freeze values to `0` and remove sticky row and column behavior without deleting global or heading defaults.
 - Reset table view should restore the current table to its initial display by clearing freeze, hidden rows and columns, filters, wrap, fitted widths, and resized column widths.
 - Clicking Expand should show only that table in a full-window Focus mode while preserving its current filter, visibility, sizing, wrapping, and freeze state.
 - Clicking Close or pressing Escape should leave Focus mode and restore the GitHub file view without resetting the table state.

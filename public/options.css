@@ -1,0 +1,38 @@
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, sans-serif;
+}
+body {
+  margin: 0;
+  padding: 32px 20px;
+}
+main {
+  max-width: 600px;
+  margin: auto;
+}
+h1 {
+  font-size: 24px;
+}
+p {
+  line-height: 1.6;
+}
+form {
+  display: grid;
+  gap: 20px;
+}
+label {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+input {
+  width: 64px;
+  padding: 8px;
+  font: inherit;
+}
+button {
+  width: fit-content;
+  padding: 8px 16px;
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,4 +1,12 @@
 {
+  "globalFreezeSettings": { "message": "Global freeze settings" },
+  "globalFreezeDescription": {
+    "message": "Default frozen rows and columns for all tables. Saved heading defaults take priority. Changes apply the next time you open or reload a page."
+  },
+  "useGlobalDefault": { "message": "Use global default" },
+  "globalDefaultApplied": { "message": "Global default applied" },
+  "saveSettings": { "message": "Save settings" },
+  "settingsLoadFailed": { "message": "Could not load settings. Reload this page to try again." },
   "selectRows": { "message": "Select rows" },
   "selectAllRows": { "message": "Select all visible rows" },
   "selectRow": { "message": "Select row $ROW$", "placeholders": { "row": { "content": "$1" } } },

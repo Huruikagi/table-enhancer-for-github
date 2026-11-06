@@ -1,6 +1,7 @@
 import type { FreezeOptions } from "./state";
 
 const FREEZE_RULE_SETTINGS_STORAGE_KEY = "githubTableEnhancerFreezeRuleSettings";
+const GLOBAL_FREEZE_STORAGE_KEY = "githubTableEnhancerGlobalFreeze";
 
 export type FreezeRuleSettings = {
   version: 2;
@@ -102,4 +103,57 @@ export async function saveHeadingFreezeRule(
       },
     },
   });
+}
+
+export async function readGlobalFreezeDefault(): Promise<FreezeOptions> {
+  const items = await getStorageArea()?.get(GLOBAL_FREEZE_STORAGE_KEY);
+  const value: unknown = items?.[GLOBAL_FREEZE_STORAGE_KEY];
+  return isFreezeOptions(value) &&
+    value.rows >= 0 &&
+    value.rows <= 5 &&
+    value.columns >= 0 &&
+    value.columns <= 5
+    ? value
+    : { rows: 0, columns: 0 };
+}
+
+export async function saveGlobalFreezeDefault(value: FreezeOptions): Promise<void> {
+  if (
+    !isFreezeOptions(value) ||
+    value.rows < 0 ||
+    value.rows > 5 ||
+    value.columns < 0 ||
+    value.columns > 5
+  ) {
+    throw new Error("Invalid global freeze values");
+  }
+  const storage = getStorageArea();
+  if (!storage) throw new Error("Storage unavailable");
+  await storage.set({ [GLOBAL_FREEZE_STORAGE_KEY]: value });
+}
+
+export async function readEffectiveFreezeDefault(
+  repository: string | null,
+  heading: string | null,
+): Promise<FreezeOptions> {
+  const rule = repository && heading ? await readHeadingFreezeRule(repository, heading) : null;
+  return rule ?? readGlobalFreezeDefault();
+}
+
+export async function removeHeadingFreezeRule(
+  repository: string,
+  heading: string,
+): Promise<FreezeOptions> {
+  const storage = getStorageArea();
+  if (!storage) throw new Error("Storage unavailable");
+  const [settings, globalDefault] = await Promise.all([
+    readFreezeRuleSettings(),
+    readGlobalFreezeDefault(),
+  ]);
+  delete settings.repositoryRules[repository]?.[heading];
+  if (Object.keys(settings.repositoryRules[repository] ?? {}).length === 0) {
+    delete settings.repositoryRules[repository];
+  }
+  await storage.set({ [FREEZE_RULE_SETTINGS_STORAGE_KEY]: settings });
+  return globalDefault;
 }

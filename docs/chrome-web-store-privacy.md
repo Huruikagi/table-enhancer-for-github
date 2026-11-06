@@ -14,7 +14,7 @@ Table Enhancer for GitHub improves readability and navigation for wide tables on
 
 ### storage
 
-Used only to save the user's repository-specific, heading-based freeze defaults locally in Chrome storage. The extension uses these settings to restore table freeze defaults on matching GitHub Markdown blob pages.
+Used only to save the user's global and repository-specific, heading-based freeze defaults locally in Chrome storage. The extension uses these settings to restore table freeze defaults on matching GitHub Markdown blob pages.
 
 The extension does not sync, transmit, sell, or share this data.
 
@@ -24,7 +24,7 @@ Content scripts load on `https://github.com/*` to detect same-document navigatio
 
 This extension does not collect, transmit, sell, or share user data.
 
-It stores table display preferences locally in the user's browser using `chrome.storage.local`. These preferences are used only by the extension to restore the user's repository-specific table freeze defaults on matching GitHub Markdown blob pages.
+It stores table display preferences locally in the user's browser using `chrome.storage.local`. These preferences are used only by the extension to restore the user's global and heading-specific table freeze defaults on matching GitHub Markdown blob pages.
 
 ## Remote Code And Network
 
@@ -32,4 +32,4 @@ The extension does not load remote code and does not send network requests.
 
 ## Privacy Policy Summary
 
-Table Enhancer for GitHub does not collect, transmit, sell, or share user data. It stores table display preferences locally in the user's browser using Chrome local storage so the extension can restore repository-specific, heading-based freeze defaults on matching GitHub Markdown blob pages.
+Table Enhancer for GitHub does not collect, transmit, sell, or share user data. It stores table display preferences locally in the user's browser using Chrome local storage so the extension can restore global and repository-specific, heading-based freeze defaults on matching GitHub Markdown blob pages.

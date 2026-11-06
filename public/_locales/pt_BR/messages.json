@@ -1,4 +1,14 @@
 {
+  "globalFreezeSettings": { "message": "Configurações globais de congelamento" },
+  "globalFreezeDescription": {
+    "message": "Linhas e colunas congeladas por padrão para todas as tabelas. Os valores salvos por título têm prioridade. As alterações são aplicadas ao abrir ou recarregar a página."
+  },
+  "useGlobalDefault": { "message": "Usar padrão global" },
+  "globalDefaultApplied": { "message": "Padrão global aplicado" },
+  "saveSettings": { "message": "Salvar configurações" },
+  "settingsLoadFailed": {
+    "message": "Não foi possível carregar as configurações. Recarregue a página para tentar novamente."
+  },
   "selectRows": { "message": "Selecionar linhas" },
   "selectAllRows": { "message": "Selecionar todas as linhas visíveis" },
   "selectRow": {
