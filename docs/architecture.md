@@ -44,7 +44,8 @@ and follows the same mutation routing as legacy embedded JSON.
 
 `view.ts` renders values using text nodes, definition lists and native details
 elements. Top-level properties are open, nested collections are collapsed, and
-short scalar lists use tags. This view has no table controller, storage, or
+short scalar lists use tags. When nested collections exist, a header button expands or collapses them
+all at once; it keeps no state beyond the native `open` attributes. This view has no table controller, storage, or
 network operations. The table discovery boundary excludes metadata and nested
 tables. A conservative leading key/value shape check can exclude a table from
 controls, but can never authorize replacing it with a property view.

@@ -92,7 +92,17 @@ for (const shape of ["flat", "nested"] as const) {
       await expect(view.locator(".gte-metadata-tags li")).toHaveText(["release", "docs"]);
       const branch = view.locator("dd details");
       await expect(branch).not.toHaveAttribute("open");
+      const toggleAll = view.locator(".gte-metadata-toggle-all");
+      await expect(toggleAll).toHaveText("Expand all");
+      await toggleAll.click();
+      await expect(branch).toHaveAttribute("open");
+      await expect(toggleAll).toHaveText("Collapse all");
+      await toggleAll.click();
+      await expect(branch).not.toHaveAttribute("open");
+      await expect(toggleAll).toHaveText("Expand all");
       await branch.locator(":scope > summary").click();
+      await expect(toggleAll).toHaveText("Collapse all");
+      await expect(view).toHaveAttribute("open");
       await expect(branch.locator("dt")).toHaveText(["fpt", "ghec"]);
       await expect(view.locator("img")).toHaveCount(0);
       await page.screenshot({ path: testInfo.outputPath("properties-light.png"), fullPage: true });

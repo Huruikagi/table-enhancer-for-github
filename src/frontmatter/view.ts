@@ -17,6 +17,7 @@ function renderValue(value: MetadataValue): HTMLElement {
     const size = value instanceof Map ? value.size : value.length;
     if (!size) {
       const empty = document.createElement("code");
+      empty.className = "gte-metadata-code";
       empty.textContent = value instanceof Map ? "{}" : "[]";
       return empty;
     }
@@ -41,8 +42,10 @@ function renderValue(value: MetadataValue): HTMLElement {
       return list;
     }
     const details = document.createElement("details");
+    details.className = "gte-metadata-branch";
     const summary = document.createElement("summary");
     summary.textContent = countLabel(size);
+    summary.dataset.kind = value instanceof Map ? "map" : "list";
     details.append(summary);
     if (value instanceof Map) details.append(renderProperties(value));
     else {
@@ -57,7 +60,9 @@ function renderValue(value: MetadataValue): HTMLElement {
     return details;
   }
   const text = document.createElement(typeof value === "string" ? "span" : "code");
-  text.className = "gte-metadata-value";
+  text.className =
+    typeof value === "string" ? "gte-metadata-value" : "gte-metadata-value gte-metadata-code";
+  text.dataset.type = value === null ? "null" : typeof value;
   text.textContent = scalar(value);
   return text;
 }
@@ -77,6 +82,31 @@ function renderProperties(values: Map<string, MetadataValue>): HTMLDListElement 
   return list;
 }
 
+function branches(root: HTMLElement): HTMLDetailsElement[] {
+  return [...root.querySelectorAll<HTMLDetailsElement>("details.gte-metadata-branch")];
+}
+
+function createExpandToggle(root: HTMLDetailsElement): HTMLButtonElement | null {
+  if (!branches(root).length) return null;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "gte-metadata-toggle-all";
+  const update = () => {
+    const expanded = branches(root).every((branch) => branch.open);
+    button.textContent = translate(expanded ? "metadataCollapseAll" : "metadataExpandAll");
+    button.setAttribute("aria-pressed", String(expanded));
+  };
+  button.addEventListener("click", () => {
+    const open = !branches(root).every((branch) => branch.open);
+    for (const branch of branches(root)) branch.open = open;
+    update();
+  });
+  // Nested toggles do not bubble, so listen during capture to keep the label in sync.
+  root.addEventListener("toggle", update, true);
+  update();
+  return button;
+}
+
 export function createMetadataView(values: Map<string, MetadataValue>): HTMLDetailsElement {
   const details = document.createElement("details");
   details.className = METADATA_CLASS;
@@ -88,5 +118,7 @@ export function createMetadataView(values: Map<string, MetadataValue>): HTMLDeta
   count.textContent = countLabel(values.size);
   summary.append(count);
   details.append(summary, renderProperties(values));
+  const expandToggle = createExpandToggle(details);
+  if (expandToggle) details.insertBefore(expandToggle, summary.nextSibling);
   return details;
 }
