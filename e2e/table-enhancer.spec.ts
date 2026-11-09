@@ -814,3 +814,91 @@ test("saves freeze defaults and reapplies them after reload", async ({ page }) =
     "true",
   );
 });
+
+test("keeps keyboard focus inside Focus mode and restores background state", async ({ page }) => {
+  await page.goto(fixtureUrl);
+  await page.evaluate(() => {
+    const background = document.createElement("button");
+    background.id = "background-control";
+    background.textContent = "Background";
+    document.body.prepend(background);
+    const alreadyInert = document.createElement("div");
+    alreadyInert.id = "already-inert";
+    alreadyInert.inert = true;
+    document.body.append(alreadyInert);
+  });
+  const wrapper = page.locator(".github-table-enhancer-scroll").first();
+  await wrapper.getByRole("button", { name: "Expand" }).click();
+  await expect(wrapper).toHaveRole("dialog");
+  await expect(page.locator("#background-control")).toHaveAttribute("inert", "");
+  await page.evaluate(() => document.getElementById("background-control")?.focus());
+  await expect(wrapper.getByRole("button", { name: "Close", exact: true })).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  expect(await wrapper.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  await page.evaluate(() => {
+    const late = document.createElement("button");
+    late.id = "late-background";
+    document.body.append(late);
+  });
+  await expect(page.locator("#late-background")).toHaveAttribute("inert", "");
+  await page.keyboard.press("Escape");
+  await expect(wrapper.getByRole("button", { name: "Expand" })).toBeFocused();
+  await expect(page.locator("#background-control")).not.toHaveAttribute("inert");
+  await expect(page.locator("#late-background")).not.toHaveAttribute("inert");
+  await expect(page.locator("#already-inert")).toHaveAttribute("inert", "");
+  // Removal while open must also release the background.
+  await wrapper.getByRole("button", { name: "Expand" }).click();
+  await wrapper.evaluate((el) => el.remove());
+  await expect(page.locator("#background-control")).not.toHaveAttribute("inert");
+});
+
+test("resizes columns using only the keyboard", async ({ page }) => {
+  await page.goto(fixtureUrl);
+  const wrapper = page.locator(".github-table-enhancer-scroll").first();
+  const handle = wrapper.getByRole("separator").first();
+  await handle.focus();
+  const initial = Number(await handle.getAttribute("aria-valuenow"));
+  await page.keyboard.press("ArrowRight");
+  await expect(handle).toHaveAttribute("aria-valuenow", String(initial + 10));
+  const width = await wrapper
+    .locator("col")
+    .first()
+    .evaluate((el) => parseFloat((el as HTMLElement).style.width));
+  expect(width).toBeCloseTo(initial + 10, 0);
+  await page.keyboard.press("ArrowLeft");
+  await expect(handle).toHaveAttribute("aria-valuenow", String(initial));
+  await expect(handle).toBeFocused();
+  await wrapper.getByRole("button", { name: "Reset table view" }).click();
+  await expect(wrapper.locator("table")).not.toHaveAttribute(
+    "data-github-table-enhancer-resized-columns",
+  );
+});
+
+test("preserves different heading defaults saved from two tabs", async ({ page, context }) => {
+  const other = await context.newPage();
+  await other.route(fixtureUrl, (route) =>
+    route.fulfill({ contentType: "text/html", body: githubBlobFixture }),
+  );
+  await Promise.all([page.goto(fixtureUrl), other.goto(fixtureUrl)]);
+  const first = page.locator(".github-table-enhancer-scroll").first();
+  const second = other.locator(".github-table-enhancer-scroll").nth(1);
+  for (const wrapper of [first, second]) {
+    await wrapper.getByRole("button", { name: "Freeze", exact: true }).click();
+  }
+  await first.getByLabel("Frozen rows").fill("1");
+  await second.getByLabel("Frozen columns").fill("1");
+  await Promise.all(
+    [first, second].map((wrapper) =>
+      wrapper.getByRole("button", { name: "Save default", exact: true }).click(),
+    ),
+  );
+  for (const wrapper of [first, second]) {
+    await expect(wrapper.getByRole("button", { name: "Saved", exact: true })).toBeVisible();
+  }
+  await Promise.all([page.reload(), other.reload()]);
+  await first.getByRole("button", { name: "Freeze", exact: true }).click();
+  await second.getByRole("button", { name: "Freeze", exact: true }).click();
+  await expect(first.getByLabel("Frozen rows")).toHaveValue("1");
+  await expect(second.getByLabel("Frozen columns")).toHaveValue("1");
+  await other.close();
+});

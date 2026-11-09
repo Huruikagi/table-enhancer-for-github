@@ -5,6 +5,7 @@
 import { WRAPPED_COLUMNS_DATA_ATTRIBUTE } from "./constants";
 import { applyTableColumnWidths } from "./features/column-widths";
 import { applyTableFreeze } from "./features/freeze";
+import { updateColumnResizeValues } from "./features/resize";
 import { applyRowSelection } from "./features/row-selection";
 import { applyTableSort } from "./features/sort";
 import { applyTableVisibility } from "./features/visibility";
@@ -70,5 +71,6 @@ export function reconcileTable(
     selectionChanged
   ) {
     applyTableFreeze(table, state.freeze);
+    updateColumnResizeValues(table, state.columnWidths);
   }
 }

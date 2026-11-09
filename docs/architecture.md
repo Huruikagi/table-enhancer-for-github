@@ -207,3 +207,12 @@ operation and never deletes saved defaults.
 
 New behavior should normally begin with a state transition test, add DOM integration coverage when
 it changes a projection, and add E2E coverage when it changes a browser-visible workflow.
+
+Heading Freeze writes use an independent storage key per repository/heading pair.
+Reads prefer these overrides, falling back to existing version-2 rules. Removal
+writes a null tombstone so an old rule cannot reappear. No whole-map migration or
+read-modify-write is performed, so tabs editing distinct rules cannot overwrite
+one another. Concurrent writes to the same rule retain last-write-wins semantics.
+Focus mode preserves the table DOM and makes siblings along its ancestor path
+inert, including newly inserted background nodes; closing or destruction restores
+their original inert attributes and the wrapper's original accessibility attributes.

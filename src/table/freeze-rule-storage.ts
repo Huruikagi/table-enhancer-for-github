@@ -1,6 +1,12 @@
 import type { FreezeOptions } from "./state";
 
 const FREEZE_RULE_SETTINGS_STORAGE_KEY = "githubTableEnhancerFreezeRuleSettings";
+const HEADING_RULE_PREFIX = "githubTableEnhancerHeadingFreeze:";
+
+function headingRuleKey(repository: string, heading: string): string {
+  return HEADING_RULE_PREFIX + JSON.stringify([repository, heading]);
+}
+
 const GLOBAL_FREEZE_STORAGE_KEY = "githubTableEnhancerGlobalFreeze";
 
 export type FreezeRuleSettings = {
@@ -57,7 +63,7 @@ function normalizeSettings(value: unknown): FreezeRuleSettings {
   return { version: 2, repositoryRules };
 }
 
-export async function readFreezeRuleSettings(): Promise<FreezeRuleSettings> {
+async function readLegacyFreezeRuleSettings(): Promise<FreezeRuleSettings> {
   const storage = getStorageArea();
 
   if (!storage) {
@@ -73,8 +79,13 @@ export async function readHeadingFreezeRule(
   repository: string,
   headingText: string,
 ): Promise<FreezeOptions | null> {
-  const settings = await readFreezeRuleSettings();
-
+  const key = headingRuleKey(repository, headingText);
+  const items = await getStorageArea()?.get(key);
+  // A null override is a tombstone: never resurrect a removed legacy rule.
+  if (items && items[key] !== undefined) {
+    return isFreezeOptions(items[key]) ? items[key] : null;
+  }
+  const settings = await readLegacyFreezeRuleSettings();
   return settings.repositoryRules[repository]?.[headingText] ?? null;
 }
 
@@ -89,20 +100,8 @@ export async function saveHeadingFreezeRule(
     return;
   }
 
-  const settings = await readFreezeRuleSettings();
-
-  await storage.set({
-    [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
-      version: 2,
-      repositoryRules: {
-        ...settings.repositoryRules,
-        [repository]: {
-          ...settings.repositoryRules[repository],
-          [headingText]: options,
-        },
-      },
-    },
-  });
+  // Independent keys prevent concurrent writes in other tabs from losing rules.
+  await storage.set({ [headingRuleKey(repository, headingText)]: options });
 }
 
 export async function readGlobalFreezeDefault(): Promise<FreezeOptions> {
@@ -146,14 +145,7 @@ export async function removeHeadingFreezeRule(
 ): Promise<FreezeOptions> {
   const storage = getStorageArea();
   if (!storage) throw new Error("Storage unavailable");
-  const [settings, globalDefault] = await Promise.all([
-    readFreezeRuleSettings(),
-    readGlobalFreezeDefault(),
-  ]);
-  delete settings.repositoryRules[repository]?.[heading];
-  if (Object.keys(settings.repositoryRules[repository] ?? {}).length === 0) {
-    delete settings.repositoryRules[repository];
-  }
-  await storage.set({ [FREEZE_RULE_SETTINGS_STORAGE_KEY]: settings });
+  const globalDefault = await readGlobalFreezeDefault();
+  await storage.set({ [headingRuleKey(repository, heading)]: null });
   return globalDefault;
 }

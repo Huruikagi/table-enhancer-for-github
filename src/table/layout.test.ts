@@ -332,3 +332,26 @@ describe("table layout and visibility interactions", () => {
     expect(table.rows[0]?.cells[0]?.getAttribute("aria-sort")).toBe("none");
   });
 });
+
+it("clamps keyboard resizing and keeps the accessible width in sync with Fit and Reset", () => {
+  renderMarkdownTables("<table><tbody><tr><td>one</td><td>two</td></tr></tbody></table>");
+  const table = getTable();
+  wrapTable(table);
+  clickButton("Fit");
+  const handle = table.querySelector<HTMLElement>(`.${TABLE_COLUMN_RESIZE_HANDLE_CLASS}`);
+  if (!handle) throw new Error("Expected a resize handle");
+  expect(handle.getAttribute("aria-valuenow")).toBe("96");
+  act(() => {
+    for (let index = 0; index < 30; index++) {
+      handle.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+    }
+  });
+  expect(Number(handle.getAttribute("aria-valuenow"))).toBeGreaterThan(0);
+  const minimum = handle.getAttribute("aria-valuemin");
+  expect(handle.getAttribute("aria-valuenow")).toBe(minimum);
+  expect(table.querySelector("col")?.style.width).toBe(`${minimum}px`);
+  clickButton("Fit");
+  expect(handle.getAttribute("aria-valuenow")).toBe("96");
+  clickButton("Reset table view");
+  expect(table.querySelector("col")?.style.width).toBe("");
+});

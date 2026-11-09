@@ -37,7 +37,13 @@ export function resetTableColumnResizeControls(table: HTMLTableElement): void {
 function createColumnResizeHandle(index: number): HTMLSpanElement {
   const handle = document.createElement("span");
 
-  handle.ariaHidden = "true";
+  handle.tabIndex = 0;
+  handle.setAttribute("role", "separator");
+  handle.setAttribute("aria-orientation", "vertical");
+  handle.setAttribute("aria-valuemin", String(MIN_COLUMN_WIDTH));
+  handle.setAttribute("aria-valuenow", String(MIN_COLUMN_WIDTH));
+  handle.setAttribute("aria-keyshortcuts", "ArrowLeft ArrowRight");
+  handle.ariaLabel = translate("resizeColumn", [index + 1]);
   handle.className = TABLE_COLUMN_RESIZE_HANDLE_CLASS;
   handle.dataset[COLUMN_RESIZE_INDEX_DATA_ATTRIBUTE] = String(index);
   handle.title = translate("resizeColumn", [index + 1]);
@@ -56,6 +62,20 @@ export function installTableColumnResizeControls(table: HTMLTableElement): void 
 
   for (const [columnIndex, cell] of Array.from(columnControlRow.cells).entries()) {
     cell.appendChild(createColumnResizeHandle(columnIndex));
+  }
+}
+
+/** Keep the accessible value current after Fit, Reset, and pointer resizing too. */
+export function updateColumnResizeValues(
+  table: HTMLTableElement,
+  widths: readonly number[] | null,
+): void {
+  const values = widths ?? getColumnWidths(table);
+  for (const handle of table.querySelectorAll<HTMLElement>(
+    `.${TABLE_COLUMN_RESIZE_HANDLE_CLASS}`,
+  )) {
+    const index = Number(handle.dataset[COLUMN_RESIZE_INDEX_DATA_ATTRIBUTE]);
+    handle.setAttribute("aria-valuenow", String(Math.round(values[index] ?? MIN_COLUMN_WIDTH)));
   }
 }
 
@@ -131,12 +151,38 @@ export function installColumnResizeBehavior(
     document.documentElement.style.userSelect = "none";
   };
 
+  const handleFocus = (event: FocusEvent): void => {
+    const handle = getColumnResizeHandle(event.target);
+    if (!handle) return;
+    const index = Number(handle.dataset[COLUMN_RESIZE_INDEX_DATA_ATTRIBUTE]);
+    handle.setAttribute(
+      "aria-valuenow",
+      String(Math.round(getColumnWidths(table)[index] ?? MIN_COLUMN_WIDTH)),
+    );
+  };
+  const handleKeyDown = (event: KeyboardEvent): void => {
+    const handle = getColumnResizeHandle(event.target);
+    if (!handle || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const index = Number(handle.dataset[COLUMN_RESIZE_INDEX_DATA_ATTRIBUTE]);
+    const widths = getColumnWidths(table);
+    const width = widths[index];
+    if (width === undefined) return;
+    widths[index] = Math.max(MIN_COLUMN_WIDTH, width + (event.key === "ArrowRight" ? 10 : -10));
+    onResize(widths);
+    handle.setAttribute("aria-valuenow", String(Math.round(widths[index])));
+  };
+  table.addEventListener("focusin", handleFocus);
+  table.addEventListener("keydown", handleKeyDown);
   table.addEventListener("pointerdown", handlePointerDown);
   window.addEventListener("pointermove", handlePointerMove);
   window.addEventListener("pointerup", handlePointerUp);
   window.addEventListener("pointercancel", handlePointerUp);
 
   return () => {
+    table.removeEventListener("focusin", handleFocus);
+    table.removeEventListener("keydown", handleKeyDown);
     table.removeEventListener("pointerdown", handlePointerDown);
     window.removeEventListener("pointermove", handlePointerMove);
     window.removeEventListener("pointerup", handlePointerUp);

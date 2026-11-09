@@ -19,8 +19,10 @@ import { wrapTable } from "./enhancer";
 import {
   readEffectiveFreezeDefault,
   readGlobalFreezeDefault,
+  readHeadingFreezeRule,
   removeHeadingFreezeRule,
   saveGlobalFreezeDefault,
+  saveHeadingFreezeRule,
 } from "./freeze-rule-storage";
 import { mountManagedTable } from "./lifecycle";
 import type { FreezeOptions } from "./state";
@@ -196,7 +198,7 @@ describe("saved heading freeze defaults", () => {
   });
 
   it("saves explicit freeze values for the preceding heading", async () => {
-    const storage = installFakeChromeStorage({}, { setDelayMs: 1 });
+    installFakeChromeStorage({}, { setDelayMs: 1 });
     renderMarkdownTables(`
       <h2>Release Matrix</h2>
       <table>
@@ -217,13 +219,9 @@ describe("saved heading freeze defaults", () => {
     await flushPromises();
 
     expect(getButton("Saved").disabled).toBe(false);
-    expect(storage[FREEZE_RULE_SETTINGS_STORAGE_KEY]).toEqual({
-      version: 2,
-      repositoryRules: {
-        "owner/repo": {
-          "Release Matrix": { rows: 1, columns: 1 },
-        },
-      },
+    expect(await readHeadingFreezeRule("owner/repo", "Release Matrix")).toEqual({
+      rows: 1,
+      columns: 1,
     });
 
     setFreezeInput("Frozen columns", "2");
@@ -292,4 +290,27 @@ describe("saved heading freeze defaults", () => {
       ),
     ).toBe(false);
   });
+});
+
+it("preserves concurrent saves and removals without resurrecting legacy rules", async () => {
+  installFakeChromeStorage(
+    {
+      [FREEZE_RULE_SETTINGS_STORAGE_KEY]: {
+        version: 2,
+        repositoryRules: {
+          "owner/repo": { A: { rows: 1, columns: 1 }, C: { rows: 1, columns: 0 } },
+        },
+      },
+    },
+    { setDelayMs: 1 },
+  );
+  await Promise.all([
+    saveHeadingFreezeRule("owner/repo", "B", { rows: 0, columns: 1 }),
+    saveHeadingFreezeRule("other/repo", "B", { rows: 1, columns: 0 }),
+    removeHeadingFreezeRule("owner/repo", "A"),
+  ]);
+  expect(await readHeadingFreezeRule("owner/repo", "A")).toBeNull();
+  expect(await readHeadingFreezeRule("owner/repo", "B")).toEqual({ rows: 0, columns: 1 });
+  expect(await readHeadingFreezeRule("other/repo", "B")).toEqual({ rows: 1, columns: 0 });
+  expect(await readHeadingFreezeRule("owner/repo", "C")).toEqual({ rows: 1, columns: 0 });
 });

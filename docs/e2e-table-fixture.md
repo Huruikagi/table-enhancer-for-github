@@ -169,3 +169,15 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 | Second | Table | Here |
 | --- | --- | --- |
 | 1 | 2 | 3 |
+
+## Accessibility and concurrent settings regression checks
+
+- Tab to a column resize separator. ArrowRight increases the width by 10px;
+  ArrowLeft reduces it by 10px down to the minimum. Confirm visible focus, retained
+  focus after resizing, and that Reset restores the original layout.
+- Open Focus mode and use Tab/Shift+Tab. Background links must not receive focus.
+  Escape restores the Expand button and background interaction. Repeat after
+  GitHub navigation removes the focused table; previously inert content stays inert.
+- In two tabs, save Freeze defaults for different headings concurrently, then reload
+  both. Both settings must survive. Removing one override must preserve the other,
+  including when an older version originally saved the removed override.

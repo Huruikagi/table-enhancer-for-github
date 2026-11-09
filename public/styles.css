@@ -566,6 +566,7 @@ body.github-table-enhancer-focus-mode-open {
   width: 2px;
 }
 
+.github-table-enhancer-column-resize-handle:focus-visible::after,
 .github-table-enhancer-column-resize-handle:hover::after {
   opacity: 1;
 }
@@ -619,4 +620,9 @@ body.github-table-enhancer-focus-mode-open {
 .github-table-enhancer-scroll > table[data-github-table-enhancer-wrapped-columns="true"] th code {
   overflow-wrap: anywhere;
   white-space: normal;
+}
+
+.github-table-enhancer-column-resize-handle:focus-visible {
+  outline: 2px solid var(--focus-outlineColor, #0969da);
+  outline-offset: 2px;
 }
