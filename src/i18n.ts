@@ -42,6 +42,8 @@ export const englishMessages = {
   metadata: "Metadata",
   metadataItem: "$1 item",
   metadataItems: "$1 items",
+  metadataExpandAll: "Expand all",
+  metadataCollapseAll: "Collapse all",
   noRowsMatchFilter: "No rows match this filter.",
   reset: "Reset",
   resetTableView: "Reset table view",

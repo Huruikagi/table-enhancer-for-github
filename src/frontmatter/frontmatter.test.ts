@@ -253,6 +253,35 @@ describe("metadata discovery and lifecycle", () => {
     expect(view?.querySelector<HTMLDetailsElement>("dd details")?.open).toBe(false);
   });
 
+  it("expands and collapses every nested value from the header toggle", () => {
+    const markup =
+      "<table><tbody><tr><th>nested</th><td>value</td></tr><tr><th>people</th><td>Alice</td></tr></tbody></table>";
+    install(
+      embedded(["---", "nested: {inner: {value: 1}}", "people: [{name: Alice}]", "---"], markup),
+      markup,
+    );
+    enhanceTables();
+    const view = document.querySelector<HTMLDetailsElement>(metadataSelector);
+    const toggle = view?.querySelector<HTMLButtonElement>(".gte-metadata-toggle-all");
+    const branches = () => [...(view?.querySelectorAll<HTMLDetailsElement>("dd details") ?? [])];
+    expect(branches()).toHaveLength(4);
+    expect(toggle?.textContent).toBe("Expand all");
+    toggle?.click();
+    expect(branches().every((branch) => branch.open)).toBe(true);
+    expect(toggle?.textContent).toBe("Collapse all");
+    expect(toggle?.getAttribute("aria-pressed")).toBe("true");
+    toggle?.click();
+    expect(branches().some((branch) => branch.open)).toBe(false);
+    expect(view?.open).toBe(true);
+    expect(toggle?.textContent).toBe("Expand all");
+  });
+
+  it("omits the header toggle when nothing is folded", () => {
+    install();
+    enhanceTables();
+    expect(document.querySelector(`${metadataSelector} .gte-metadata-toggle-all`)).toBeNull();
+  });
+
   it("matches encoded file paths and slash-containing branch names", () => {
     const data = embedded();
     data.payload.codeViewLayoutRoute.path = "docs/日本語.md";

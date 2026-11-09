@@ -24,6 +24,8 @@
   "metadata": { "message": "Metadados" },
   "metadataItem": { "message": "$1 item" },
   "metadataItems": { "message": "$1 itens" },
+  "metadataExpandAll": { "message": "Expandir tudo" },
+  "metadataCollapseAll": { "message": "Recolher tudo" },
   "extensionName": { "message": "Aprimorador de tabelas para GitHub" },
   "extensionDescription": {
     "message": "Uma extensão não oficial que facilita a leitura de tabelas largas nas visualizações de arquivos Markdown do GitHub."

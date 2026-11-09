@@ -3,49 +3,141 @@
 }
 
 .markdown-body .github-table-enhancer-metadata {
-  background: var(--bgColor-muted, var(--color-canvas-subtle, #f6f8fa));
-  border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
+  --gte-metadata-border: var(--borderColor-default, var(--color-border-default, #d0d7de));
+  --gte-metadata-divider: var(--borderColor-muted, var(--color-border-muted, #d8dee4b3));
+  --gte-metadata-muted: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+  --gte-metadata-subtle-bg: var(--bgColor-muted, var(--color-canvas-subtle, #f6f8fa));
+  background: var(--bgColor-default, var(--color-canvas-default, #ffffff));
+  border: 1px solid var(--gte-metadata-border);
   border-radius: 6px;
   color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+  font-size: 14px;
+  line-height: 1.5;
   margin-block: 16px;
   max-width: 100%;
-  padding: 10px 14px;
+  position: relative;
 }
 
 .github-table-enhancer-metadata summary {
   cursor: pointer;
+  list-style: none;
   overflow-wrap: anywhere;
 }
 
+.github-table-enhancer-metadata summary::-webkit-details-marker {
+  display: none;
+}
+
+.github-table-enhancer-metadata summary::before {
+  border-block-end: 1.5px solid currentColor;
+  border-inline-end: 1.5px solid currentColor;
+  content: "";
+  display: inline-block;
+  flex: none;
+  height: 6px;
+  margin-inline: 2px 10px;
+  transform: translateY(-2px) rotate(-45deg);
+  transition: transform 120ms ease;
+  vertical-align: middle;
+  width: 6px;
+}
+
+.github-table-enhancer-metadata[open] > summary::before,
+.github-table-enhancer-metadata details[open] > summary::before {
+  transform: translateY(-3px) rotate(45deg);
+}
+
+.github-table-enhancer-metadata summary:focus-visible,
+.github-table-enhancer-metadata .gte-metadata-toggle-all:focus-visible {
+  outline: 2px solid var(--focus-outlineColor, var(--color-accent-fg, #0969da));
+  outline-offset: -2px;
+}
+
 .github-table-enhancer-metadata > summary {
+  align-items: center;
+  background: var(--gte-metadata-subtle-bg);
+  box-sizing: border-box;
+  display: flex;
   font-weight: 600;
+  border-radius: 5px;
+  min-height: 40px;
+  padding: 8px 16px;
+}
+
+.github-table-enhancer-metadata[open] > summary {
+  border-end-end-radius: 0;
+  border-end-start-radius: 0;
+  border-block-end: 1px solid var(--gte-metadata-border);
+}
+
+.github-table-enhancer-metadata[open]:has(> .gte-metadata-toggle-all) > summary {
+  padding-inline-end: 128px;
 }
 
 .github-table-enhancer-metadata .gte-metadata-count {
-  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
+  background: var(--bgColor-neutral-muted, var(--color-neutral-muted, #818b981f));
+  border-radius: 2em;
+  color: var(--gte-metadata-muted);
   font-size: 12px;
-  font-weight: 400;
-  margin-inline-start: 10px;
+  font-weight: 500;
+  line-height: 18px;
+  margin-inline-start: 8px;
+  padding: 0 7px;
+  white-space: nowrap;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-toggle-all {
+  background: var(
+    --button-default-bgColor-rest,
+    var(--bgColor-default, var(--color-canvas-default, #ffffff))
+  );
+  border: 1px solid var(--button-default-borderColor-rest, var(--gte-metadata-border));
+  border-radius: 6px;
+  color: var(--fgColor-default, var(--color-fg-default, #1f2328));
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  inset-block-start: 8px;
+  inset-inline-end: 12px;
+  line-height: 20px;
+  max-width: 112px;
+  overflow: hidden;
+  padding: 1px 10px;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-toggle-all:hover {
+  background: var(--button-default-bgColor-hover, var(--gte-metadata-subtle-bg));
 }
 
 .markdown-body .github-table-enhancer-metadata dl {
-  margin: 8px 0 0;
-  padding: 0;
+  container-type: inline-size;
+  margin: 0;
+  min-width: 0;
+  padding: 0 16px;
 }
 
 .github-table-enhancer-metadata .gte-metadata-row {
   display: grid;
-  gap: 8px 16px;
-  grid-template-columns: minmax(64px, 24%) minmax(0, 1fr);
-  padding-block: 7px;
+  gap: 4px 16px;
+  grid-template-columns: minmax(80px, min(28%, 200px)) minmax(0, 1fr);
+  padding-block: 8px;
+}
+
+.github-table-enhancer-metadata .gte-metadata-row + .gte-metadata-row {
+  border-block-start: 1px solid var(--gte-metadata-divider);
 }
 
 .markdown-body .github-table-enhancer-metadata dt {
-  color: var(--fgColor-muted, var(--color-fg-muted, #59636e));
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 13px;
+  color: var(--gte-metadata-muted);
+  font-family: var(--fontStack-monospace, ui-monospace, SFMono-Regular, Consolas, monospace);
+  font-size: 12px;
   font-style: normal;
   font-weight: 400;
+  line-height: 21px;
   margin: 0;
   overflow-wrap: anywhere;
   padding: 0;
@@ -62,40 +154,105 @@
   white-space: pre-wrap;
 }
 
-.markdown-body .github-table-enhancer-metadata dd details > dl {
-  border-inline-start: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
-  padding-inline-start: 12px;
+.markdown-body .github-table-enhancer-metadata .gte-metadata-code {
+  background: var(--bgColor-neutral-muted, var(--color-neutral-muted, #818b981f));
+  border-radius: 6px;
+  font-size: 12px;
+  margin: 0;
+  padding: 0.2em 0.4em;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-value[data-type="number"],
+.markdown-body .github-table-enhancer-metadata .gte-metadata-value[data-type="boolean"] {
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-value[data-type="null"] {
+  color: var(--gte-metadata-muted);
+  font-style: italic;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-branch > summary {
+  align-items: center;
+  border-radius: 6px;
+  color: var(--gte-metadata-muted);
+  display: inline-flex;
+  font-size: 12px;
+  line-height: 21px;
+  padding-inline-end: 4px;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-branch > summary:hover {
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
 }
 
 .markdown-body .github-table-enhancer-metadata ol {
-  margin: 8px 0;
-  padding-inline-start: 24px;
+  padding: 4px 12px 4px 36px;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-branch > dl,
+.markdown-body .github-table-enhancer-metadata .gte-metadata-branch > ol {
+  background: var(--gte-metadata-subtle-bg);
+  border: 1px solid var(--gte-metadata-divider);
+  border-radius: 6px;
+  margin: 6px 0 2px;
+}
+
+.markdown-body .github-table-enhancer-metadata .gte-metadata-branch > dl {
+  padding: 0 12px;
+}
+
+.github-table-enhancer-metadata .gte-metadata-branch .gte-metadata-row {
+  padding-block: 6px;
+}
+
+.markdown-body .github-table-enhancer-metadata ol > li {
+  margin: 0;
+  padding-block: 6px;
+}
+
+.markdown-body .github-table-enhancer-metadata ol > li + li {
+  border-block-start: 1px solid var(--gte-metadata-divider);
+}
+
+.markdown-body .github-table-enhancer-metadata ol > li::marker {
+  color: var(--gte-metadata-muted);
+  font-size: 12px;
 }
 
 .markdown-body .github-table-enhancer-metadata .gte-metadata-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px 6px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .markdown-body .github-table-enhancer-metadata .gte-metadata-tags > li {
-  background: var(--bgColor-default, var(--color-canvas-default, #ffffff));
-  border: 1px solid var(--borderColor-default, var(--color-border-default, #d0d7de));
-  border-radius: 12px;
+  background: var(--bgColor-accent-muted, var(--color-accent-subtle, #54aeff26));
+  border: 1px solid transparent;
+  border-radius: 2em;
+  color: var(--fgColor-accent, var(--color-accent-fg, #0969da));
   font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
   margin: 0;
   max-width: 100%;
-  padding: 1px 8px;
+  padding: 1px 10px;
   white-space: pre-wrap;
 }
 
-@media (max-width: 480px) {
+.markdown-body .github-table-enhancer-metadata .gte-metadata-tags > li + li {
+  margin: 0;
+}
+
+/* Stack keys above values wherever a property list gets narrow, including
+   deeply nested lists inside a wide panel, so expanded values never overflow. */
+@container (max-width: 360px) {
   .github-table-enhancer-metadata .gte-metadata-row {
     grid-template-columns: minmax(0, 1fr);
-    gap: 4px;
+    gap: 2px;
   }
 }
 
@@ -218,7 +375,10 @@ body.github-table-enhancer-focus-mode-open {
 }
 
 .github-table-enhancer-focus-mode-status kbd {
-  background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
+  background: var(
+    --button-default-bgColor-rest,
+    var(--bgColor-default, var(--color-canvas-default, #ffffff))
+  );
   border: 1px solid var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
   border-bottom-width: 2px;
   border-radius: 4px;
@@ -232,7 +392,10 @@ body.github-table-enhancer-focus-mode-open {
 .github-table-enhancer-selection-actions button,
 .github-table-enhancer-controls-panel button {
   appearance: none;
-  background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
+  background: var(
+    --button-default-bgColor-rest,
+    var(--bgColor-default, var(--color-canvas-default, #ffffff))
+  );
   border: 1px solid var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
   border-radius: 6px;
   color: var(--fgColor-default, var(--color-fg-default, #24292f));
@@ -414,7 +577,10 @@ body.github-table-enhancer-focus-mode-open {
 .github-table-enhancer-hide-button {
   align-items: center;
   appearance: none;
-  background: var(--button-default-bgColor-rest, var(--color-btn-bg, #f6f8fa));
+  background: var(
+    --button-default-bgColor-rest,
+    var(--bgColor-default, var(--color-canvas-default, #ffffff))
+  );
   border: 1px solid var(--button-default-borderColor-rest, var(--color-btn-border, #d0d7de));
   border-radius: 50%;
   color: var(--fgColor-muted, var(--color-fg-muted, #57606a));

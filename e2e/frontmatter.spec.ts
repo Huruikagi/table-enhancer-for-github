@@ -92,7 +92,17 @@ for (const shape of ["flat", "nested"] as const) {
       await expect(view.locator(".gte-metadata-tags li")).toHaveText(["release", "docs"]);
       const branch = view.locator("dd details");
       await expect(branch).not.toHaveAttribute("open");
+      const toggleAll = view.locator(".gte-metadata-toggle-all");
+      await expect(toggleAll).toHaveText("Expand all");
+      await toggleAll.click();
+      await expect(branch).toHaveAttribute("open");
+      await expect(toggleAll).toHaveText("Collapse all");
+      await toggleAll.click();
+      await expect(branch).not.toHaveAttribute("open");
+      await expect(toggleAll).toHaveText("Expand all");
       await branch.locator(":scope > summary").click();
+      await expect(toggleAll).toHaveText("Collapse all");
+      await expect(view).toHaveAttribute("open");
       await expect(branch.locator("dt")).toHaveText(["fpt", "ghec"]);
       await expect(view.locator("img")).toHaveCount(0);
       await page.screenshot({ path: testInfo.outputPath("properties-light.png"), fullPage: true });
@@ -119,6 +129,29 @@ for (const shape of ["flat", "nested"] as const) {
     expect(requests).toEqual([fixtureUrl]);
   });
 }
+
+test("keeps deeply nested values visible after expanding all", async ({ page }, testInfo) => {
+  const table = "<table><tbody><tr><th>level4</th><td>visible content</td></tr></tbody></table>";
+  const lines = ["---", 'level4: {level3: {level2: {level1: {level0: "visible content"}}}}', "---"];
+  await page.setViewportSize({ width: 648, height: 900 });
+  await page.route(fixtureUrl, (route) =>
+    route.fulfill({ body: fixture(table, payload(lines, table)), contentType: "text/html" }),
+  );
+  await page.goto(fixtureUrl);
+  const view = page.locator(metadataSelector);
+  await view.locator(".gte-metadata-toggle-all").click();
+  const deepest = view.locator(".gte-metadata-value", { hasText: "visible content" });
+  await expect(deepest).toBeVisible();
+  const panel = await view.boundingBox();
+  const value = await deepest.boundingBox();
+  expect(panel && value).toBeTruthy();
+  if (panel && value) {
+    expect(value.x).toBeGreaterThanOrEqual(panel.x);
+    expect(value.x + value.width).toBeLessThanOrEqual(panel.x + panel.width);
+  }
+  expect(await view.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("deep-expanded.png") });
+});
 
 test("waits for matching embedded data and restores native markup across navigation", async ({
   page,
