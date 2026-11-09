@@ -15,7 +15,6 @@ type FreezeNumberInputProps = {
   label: string;
   limits: FreezeOptions;
   onChange: (values: FreezeOptions) => FreezeOptions;
-  onEscape: () => void;
   onValidValueChange?: () => void;
   values: FreezeOptions;
 };
@@ -29,7 +28,6 @@ type FilterPanelProps = {
   inputIdPrefix: string;
   onFilterQueryChange: (filterQuery: string) => void;
   onFilterUsesRegularExpressionChange: (value: boolean) => void;
-  onEscape: () => void;
   panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
 };
@@ -37,7 +35,6 @@ type FilterPanelProps = {
 type CopyPanelProps = {
   firstButtonRef: Ref<HTMLButtonElement>;
   onCopy: (format: CopyFormat) => void;
-  onEscape: () => void;
   panelRef: Ref<HTMLDivElement>;
   positionAnchor: string;
   status: CopyFormat | "failed" | "idle";
@@ -47,7 +44,6 @@ type FreezePanelProps = {
   headingText?: string | null;
   inputIdPrefix: string;
   limits: FreezeOptions;
-  onClose: () => void;
   onSaveDefault?: () => void;
   onRemoveDefault?: () => void;
   removeDefaultStatus: SaveDefaultStatus;
@@ -75,7 +71,6 @@ function FreezeNumberInput({
   label,
   limits,
   onChange,
-  onEscape,
   onValidValueChange,
   values,
 }: FreezeNumberInputProps): VNode {
@@ -109,15 +104,6 @@ function FreezeNumberInput({
 
         onValidValueChange?.();
       }}
-      onKeyDown={(event) => {
-        if (event.key !== "Escape") {
-          return;
-        }
-
-        event.preventDefault();
-        event.stopPropagation();
-        onEscape();
-      }}
       ref={inputRef}
       pattern="[0-9]"
       type="text"
@@ -135,7 +121,6 @@ export function FilterPanel({
   inputIdPrefix,
   onFilterQueryChange,
   onFilterUsesRegularExpressionChange,
-  onEscape,
   panelRef,
   positionAnchor,
 }: FilterPanelProps): VNode {
@@ -156,15 +141,6 @@ export function FilterPanel({
             aria-label={translate("filterRows")}
             id={`${inputIdPrefix}-filter`}
             onInput={(event) => onFilterQueryChange(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key !== "Escape") {
-                return;
-              }
-
-              event.preventDefault();
-              event.stopPropagation();
-              onEscape();
-            }}
             placeholder={translate("filterRowsPlaceholder")}
             ref={filterInputRef}
             type="search"
@@ -206,7 +182,6 @@ export function FilterPanel({
 export function CopyPanel({
   firstButtonRef,
   onCopy,
-  onEscape,
   panelRef,
   positionAnchor,
   status,
@@ -222,13 +197,6 @@ export function CopyPanel({
         <button
           key={format}
           onClick={() => onCopy(format)}
-          onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              event.preventDefault();
-              event.stopPropagation();
-              onEscape();
-            }
-          }}
           ref={format === "markdown" ? firstButtonRef : undefined}
           type="button"
         >
@@ -246,7 +214,6 @@ export function FreezePanel({
   headingText,
   inputIdPrefix,
   limits,
-  onClose,
   onSaveDefault,
   onRemoveDefault,
   removeDefaultStatus,
@@ -275,7 +242,6 @@ export function FreezePanel({
           label={translate("frozenRows")}
           limits={limits}
           onChange={onUpdateValues}
-          onEscape={onClose}
           onValidValueChange={() => columnsInputRef.current?.focus()}
           values={values}
         />
@@ -289,7 +255,6 @@ export function FreezePanel({
           label={translate("frozenColumns")}
           limits={limits}
           onChange={onUpdateValues}
-          onEscape={onClose}
           onValidValueChange={() => saveDefaultButtonRef.current?.focus()}
           values={values}
         />

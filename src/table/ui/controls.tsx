@@ -325,7 +325,6 @@ function TableControls({
         <CopyPanel
           firstButtonRef={copyFirstButtonRef}
           onCopy={copyTable}
-          onEscape={closePanel}
           panelRef={panelRef}
           positionAnchor={`${anchorPrefix}-copy`}
           status={copyStatus}
@@ -341,7 +340,6 @@ function TableControls({
           filterUsesRegularExpression={filterUsesRegularExpression}
           resultSummary={filterResultSummary}
           inputIdPrefix={inputIdPrefix}
-          onEscape={closePanel}
           onFilterQueryChange={(value) =>
             controller.dispatch({ type: "filterQueryChanged", value })
           }
@@ -358,7 +356,6 @@ function TableControls({
           headingText={headingText}
           inputIdPrefix={inputIdPrefix}
           limits={controller.limits}
-          onClose={closePanel}
           onSaveDefault={onSaveDefault ? saveDefault : undefined}
           onRemoveDefault={onRemoveDefault ? removeDefault : undefined}
           removeDefaultStatus={removeDefaultStatus}

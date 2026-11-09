@@ -902,3 +902,43 @@ test("preserves different heading defaults saved from two tabs", async ({ page, 
   await expect(second.getByLabel("Frozen columns")).toHaveValue("1");
   await other.close();
 });
+
+for (const focusMode of [false, true]) {
+  test(`dismisses every panel control with Escape in ${focusMode ? "Focus" : "normal"} mode`, async ({
+    page,
+  }) => {
+    await page.goto(fixtureUrl);
+    const wrapper = page.locator(".github-table-enhancer-scroll").first();
+    if (focusMode) await wrapper.getByRole("button", { name: "Expand", exact: true }).click();
+    await wrapper.getByRole("button", { name: "Filter", exact: true }).click();
+    await wrapper.getByRole("searchbox").fill("owner");
+    await page.keyboard.press("Escape");
+    await wrapper.getByRole("button", { name: "Select rows", exact: true }).click();
+    for (const name of ["Freeze", "Filter", "Copy as"]) {
+      const toggle = wrapper.getByRole("button", { name, exact: true });
+      await toggle.click();
+      const panel = wrapper.locator(".github-table-enhancer-controls-panel");
+      const controls = panel.locator("input, button, a");
+      const count = await controls.count();
+      for (let index = 0; index < count; index++) {
+        if (index > 0) await toggle.click();
+        await controls.nth(index).focus();
+        await expect(controls.nth(index)).toBeFocused();
+        await page.keyboard.press("Escape");
+        await expect(panel).toHaveCount(0);
+        await expect(toggle).toHaveAttribute("aria-expanded", "false");
+        await expect(toggle).toBeFocused();
+        await expect(
+          wrapper.getByRole("button", { name: "Select rows", exact: true }),
+        ).toHaveAttribute("aria-pressed", "true");
+        if (focusMode)
+          await expect(wrapper).toHaveAttribute("data-github-table-enhancer-focus-mode", "true");
+      }
+      if (name === "Filter") {
+        await toggle.click();
+        await expect(wrapper.getByRole("searchbox")).toHaveValue("owner");
+        await page.keyboard.press("Escape");
+      }
+    }
+  });
+}

@@ -43,6 +43,15 @@ export function useControlPanels() {
     document.addEventListener("pointerdown", handlePointerDown);
 
     const panel = panelRef.current;
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      // Consume Escape before it reaches row selection or Focus mode listeners.
+      event.stopPropagation();
+      setOpenPanel(null);
+      activeToggle?.focus();
+    };
+    panel?.addEventListener("keydown", handleKeyDown);
     const containingBlock = panel?.offsetParent;
     let resizeObserver: ResizeObserver | undefined;
     const positionPanel = (): void => {
@@ -61,6 +70,7 @@ export function useControlPanels() {
 
     return () => {
       document.removeEventListener("pointerdown", handlePointerDown);
+      panel?.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("resize", positionPanel);
       resizeObserver?.disconnect();
     };

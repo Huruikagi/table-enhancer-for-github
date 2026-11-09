@@ -181,3 +181,7 @@ Set Frozen rows to `1` or `2`. The table wrapper should scroll vertically while 
 - In two tabs, save Freeze defaults for different headings concurrently, then reload
   both. Both settings must survive. Removing one override must preserve the other,
   including when an older version originally saved the removed override.
+
+- In normal and Focus mode, open Freeze, Filter, and Copy as. From each input,
+  button, and settings link, press Escape: only the panel closes and focus returns
+  to its toolbar toggle. Filter text, Focus mode, and active row selection remain.
