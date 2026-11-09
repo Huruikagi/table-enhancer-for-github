@@ -130,6 +130,29 @@ for (const shape of ["flat", "nested"] as const) {
   });
 }
 
+test("keeps deeply nested values visible after expanding all", async ({ page }, testInfo) => {
+  const table = "<table><tbody><tr><th>level4</th><td>visible content</td></tr></tbody></table>";
+  const lines = ["---", 'level4: {level3: {level2: {level1: {level0: "visible content"}}}}', "---"];
+  await page.setViewportSize({ width: 648, height: 900 });
+  await page.route(fixtureUrl, (route) =>
+    route.fulfill({ body: fixture(table, payload(lines, table)), contentType: "text/html" }),
+  );
+  await page.goto(fixtureUrl);
+  const view = page.locator(metadataSelector);
+  await view.locator(".gte-metadata-toggle-all").click();
+  const deepest = view.locator(".gte-metadata-value", { hasText: "visible content" });
+  await expect(deepest).toBeVisible();
+  const panel = await view.boundingBox();
+  const value = await deepest.boundingBox();
+  expect(panel && value).toBeTruthy();
+  if (panel && value) {
+    expect(value.x).toBeGreaterThanOrEqual(panel.x);
+    expect(value.x + value.width).toBeLessThanOrEqual(panel.x + panel.width);
+  }
+  expect(await view.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("deep-expanded.png") });
+});
+
 test("waits for matching embedded data and restores native markup across navigation", async ({
   page,
 }) => {
